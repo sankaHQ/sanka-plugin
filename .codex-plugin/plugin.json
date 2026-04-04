@@ -1,0 +1,42 @@
+{
+  "name": "sanka-plugin",
+  "version": "0.1.0",
+  "description": "Sanka CRM plugin with MCP-powered contact and company discovery skill.",
+  "author": {
+    "name": "Sanka",
+    "url": "https://sanka.com"
+  },
+  "homepage": "https://sanka.com",
+  "repository": "https://github.com/sankaHQ/sanka-plugin",
+  "license": "MIT",
+  "keywords": [
+    "sanka",
+    "crm",
+    "mcp",
+    "contacts",
+    "companies"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "Sanka Plugin",
+    "shortDescription": "Search Sanka contacts and companies from Codex",
+    "longDescription": "Use Sanka's hosted MCP endpoint and a read-only CRM skill to find contacts and companies from Codex without exposing write actions.",
+    "developerName": "Sanka",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Read"
+    ],
+    "websiteURL": "https://sanka.com",
+    "defaultPrompt": [
+      "Find a company in Sanka by name",
+      "List recent contacts that match a search term",
+      "Search Sanka CRM for contacts and companies"
+    ],
+    "brandColor": "#3B82F6",
+    "composerIcon": "./assets/logo.svg",
+    "logo": "./assets/logo.svg",
+    "screenshots": []
+  }
+}
