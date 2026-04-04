@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "sanka-crm": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://mcp.sanka.com/mcp?profile=chatgpt",
+        "--header",
+        "x-sanka-api-key:${SANKA_API_KEY}",
+        "--header",
+        "x-sanka-mcp-profile:chatgpt"
+      ],
+      "env": {
+        "SANKA_API_KEY": "${SANKA_API_KEY}"
+      }
+    }
+  }
+}
