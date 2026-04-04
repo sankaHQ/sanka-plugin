@@ -18,9 +18,12 @@ Use this skill when the user wants to find contacts or companies in Sanka CRM.
 - `crm.list_contacts`
 - `crm.list_companies`
 
+If either required tool is unavailable in the MCP registry, stop immediately and tell the user the Sanka connector is mis-profiled or not authenticated yet. Do not fall back to `search_docs`, `execute`, SDK method calls, or any create/update/delete path.
+
 ## Workflow
 
 1. Decide whether the user intent is about contacts, companies, or both.
+2. Confirm `crm.list_contacts` / `crm.list_companies` are actually available before trying to answer.
 2. Call `crm.list_contacts` or `crm.list_companies` with narrow filters first:
    - `search` for free-text terms
    - `limit` for concise results (default 10, max 100)
@@ -40,3 +43,4 @@ Use this skill when the user wants to find contacts or companies in Sanka CRM.
 
 - Do not perform create/update/delete actions.
 - Do not fabricate fields that are not present in tool output.
+- Do not substitute documentation search or raw SDK execution when the CRM tools are missing.
