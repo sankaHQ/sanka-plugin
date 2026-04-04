@@ -85,6 +85,19 @@ This repo keeps the shared `.plugin/` manifest for generic hosts and adds `.code
 
 Use the existing `.cursor-plugin/`, `.claude-plugin/`, and MCP config files for those hosts. They now follow the same OAuth-based `mcp-remote` flow.
 
+## Troubleshooting
+
+If Claude or Cursor shows `search_docs` / `execute` instead of `crm.list_contacts` / `crm.list_companies`, the connector is not running in the intended CRM-only profile yet. In that state, the model may fall back to SDK-style execution and show confusing API-key/auth errors.
+
+Try this reset flow:
+
+1. Remove the installed connector/plugin from the client.
+2. Clear cached OAuth tokens with `rm -rf ~/.mcp-auth`.
+3. Reinstall the plugin after GitHub raw cache has refreshed.
+4. Start a fresh chat and confirm the available Sanka tools are `crm.list_contacts` and `crm.list_companies`.
+
+If the client still exposes `search_docs` and `execute`, that is a profile-selection bug in the MCP/plugin integration rather than a missing workspace API key.
+
 ## Legacy local server / raw API use
 
 If you are running Sanka locally or using the SDK directly, API keys still exist for those lower-level developer flows. The packaged plugin is intended to remove that manual setup step for the hosted MCP path.
