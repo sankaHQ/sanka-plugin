@@ -17,6 +17,7 @@
     "companies"
   ],
   "skills": "./skills/",
+  "apps": "./.app.json",
   "mcpServers": "./.mcp.json",
   "interface": {
     "displayName": "Sanka Plugin",

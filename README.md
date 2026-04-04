@@ -8,6 +8,7 @@ Open Plugins-compatible Sanka plugin with a read-only CRM skill for listing cont
 - `.mcp.json` (vendor-neutral MCP config)
 - `mcp.json` (Cursor-compatible MCP config)
 - `.plugin/plugin.json` (vendor-neutral manifest)
+- `.app.json` (Codex ChatGPT app binding for OAuth install)
 - `.codex-plugin/plugin.json` (Codex manifest)
 - `.cursor-plugin/plugin.json` and `.claude-plugin/plugin.json` for tool-specific compatibility
 
@@ -29,6 +30,8 @@ Set your API key before use:
 ```bash
 export SANKA_API_KEY="your-api-key"
 ```
+
+For Codex, OAuth via the Sanka app is the preferred path. The API key is kept as an MCP fallback.
 
 ## Codex install
 
@@ -67,6 +70,10 @@ ln -s /absolute/path/to/sanka-plugin ~/plugins/sanka-plugin
 ```
 
 3. Restart Codex, open the Plugins menu, and install `Sanka Plugin`.
+
+4. In Codex, connect the bundled Sanka app when prompted.
+
+The Codex manifest includes `.app.json` with Sanka's OpenAI app id, so Codex can use the same OAuth-backed app you created in ChatGPT. The bundled `.mcp.json` remains available as an API-key fallback for MCP-only hosts or local debugging.
 
 This repo keeps the shared `.plugin/` manifest for generic hosts and adds `.codex-plugin/` as the Codex-specific adapter.
 
