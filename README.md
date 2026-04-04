@@ -18,17 +18,21 @@ This plugin uses Sanka's hosted MCP endpoint:
 
 - `https://mcp.sanka.com/mcp`
 
-The config uses `mcp-remote` and forces `chatgpt` tool profile so the CRM list tools are available:
+The config uses `mcp-remote`, forces the `chatgpt` tool profile, and now relies on browser-based OAuth instead of a pasted API key:
 
 - `crm.list_contacts`
 - `crm.list_companies`
 
 ## Setup
 
-Set your API key before use:
+No API key is required for the packaged plugin flow.
+
+On first use, `mcp-remote` will open a browser window so you can sign in to Sanka and approve the requested access. The resulting tokens are stored locally by `mcp-remote` under `~/.mcp-auth`.
+
+If you need to reset the OAuth session:
 
 ```bash
-export SANKA_API_KEY="your-api-key"
+rm -rf ~/.mcp-auth
 ```
 
 For Codex, OAuth via the Sanka app is the preferred path. The API key is kept as an MCP fallback.
@@ -79,7 +83,11 @@ This repo keeps the shared `.plugin/` manifest for generic hosts and adds `.code
 
 ## Cursor and Claude
 
-Use the existing `.cursor-plugin/`, `.claude-plugin/`, and MCP config files for those hosts.
+Use the existing `.cursor-plugin/`, `.claude-plugin/`, and MCP config files for those hosts. They now follow the same OAuth-based `mcp-remote` flow.
+
+## Legacy local server / raw API use
+
+If you are running Sanka locally or using the SDK directly, API keys still exist for those lower-level developer flows. The packaged plugin is intended to remove that manual setup step for the hosted MCP path.
 
 ## License
 
