@@ -5,11 +5,9 @@
       "args": [
         "-y",
         "mcp-remote",
-        "https://mcp.sanka.com/mcp?profile=chatgpt",
+        "https://mcp.sanka.com/mcp/crm",
         "--resource",
-        "https://mcp.sanka.com/mcp",
-        "--header",
-        "x-sanka-mcp-profile:chatgpt"
+        "https://mcp.sanka.com/mcp/crm"
       ]
     }
   }

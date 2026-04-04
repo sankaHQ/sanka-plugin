@@ -16,10 +16,11 @@ Open Plugins-compatible Sanka plugin with a read-only CRM skill for listing cont
 
 This plugin uses Sanka's hosted MCP endpoint:
 
-- `https://mcp.sanka.com/mcp`
+- `https://mcp.sanka.com/mcp/crm`
 
-The config uses `mcp-remote`, forces the `chatgpt` tool profile, and now relies on browser-based OAuth instead of a pasted API key:
+The config uses `mcp-remote`, targets the dedicated CRM endpoint, and relies on browser-based OAuth instead of a pasted API key:
 
+- `crm.auth_status`
 - `crm.list_contacts`
 - `crm.list_companies`
 
@@ -77,7 +78,7 @@ ln -s /absolute/path/to/sanka-plugin ~/plugins/sanka-plugin
 
 4. In Codex, connect the bundled Sanka app when prompted.
 
-The Codex manifest includes `.app.json` with Sanka's OpenAI app id, so Codex can use the same OAuth-backed app you created in ChatGPT. The bundled `.mcp.json` remains available as an API-key fallback for MCP-only hosts or local debugging.
+The Codex manifest includes `.app.json` with Sanka's OpenAI app id, so Codex can use the same OAuth-backed app you created in ChatGPT. The bundled `.mcp.json` now points at the same dedicated CRM OAuth endpoint for MCP-capable hosts.
 
 This repo keeps the shared `.plugin/` manifest for generic hosts and adds `.codex-plugin/` as the Codex-specific adapter.
 
@@ -87,14 +88,14 @@ Use the existing `.cursor-plugin/`, `.claude-plugin/`, and MCP config files for 
 
 ## Troubleshooting
 
-If Claude or Cursor shows `search_docs` / `execute` instead of `crm.list_contacts` / `crm.list_companies`, the connector is not running in the intended CRM-only profile yet. In that state, the model may fall back to SDK-style execution and show confusing API-key/auth errors.
+If Claude or Cursor shows `search_docs` / `execute` instead of `crm.auth_status` / `crm.list_contacts` / `crm.list_companies`, the connector is not running in the intended CRM-only profile yet. In that state, the model may fall back to SDK-style execution and show confusing API-key/auth errors.
 
 Try this reset flow:
 
 1. Remove the installed connector/plugin from the client.
 2. Clear cached OAuth tokens with `rm -rf ~/.mcp-auth`.
 3. Reinstall the plugin after GitHub raw cache has refreshed.
-4. Start a fresh chat and confirm the available Sanka tools are `crm.list_contacts` and `crm.list_companies`.
+4. Start a fresh chat and confirm the available Sanka tools are `crm.auth_status`, `crm.list_contacts`, and `crm.list_companies`.
 
 If the client still exposes `search_docs` and `execute`, that is a profile-selection bug in the MCP/plugin integration rather than a missing workspace API key.
 
