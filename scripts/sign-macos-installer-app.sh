@@ -12,7 +12,11 @@ setup_sanka_macos_signing_env
 IDENTITY="${APPLE_CODESIGN_IDENTITY:-${2:-}}"
 
 if [ ! -d "$APP_PATH" ]; then
-  "$ROOT_DIR/scripts/build-macos-installer-app.sh"
+  if [ "$(basename "$APP_PATH")" = "Uninstall Sanka Plugin.app" ]; then
+    "$ROOT_DIR/scripts/build-macos-uninstaller-app.sh"
+  else
+    "$ROOT_DIR/scripts/build-macos-installer-app.sh"
+  fi
 fi
 
 /usr/bin/codesign \
