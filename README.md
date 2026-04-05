@@ -70,6 +70,11 @@ For non-technical users, distribute a Release ZIP and use the bundled installer:
 6. Open the Plugins screen, choose `Personal Plugins`, and install `Sanka Plugin`.
 7. When prompted, sign in to Sanka in the browser window.
 
+To remove the Codex plugin later, use the bundled uninstaller:
+
+- macOS: `Uninstall Sanka Plugin.app`
+- Windows: `Uninstall Sanka Plugin.bat`
+
 The installer copies the plugin into `~/.codex/plugins/sanka-plugin` and merges a single `sanka-plugin` entry into `~/.agents/plugins/marketplace.json`. Existing marketplace entries are preserved so this flow does not remove other local plugins.
 
 The Codex manifest includes `.app.json` with Sanka's OpenAI app id, so Codex can use the same OAuth-backed app you created in ChatGPT. The bundled `.mcp.json` points at the same dedicated CRM OAuth endpoint for MCP-capable hosts.
@@ -154,7 +159,9 @@ To build the end-user Codex package:
 The script writes `dist/Sanka-Plugin-Codex.zip` and includes:
 
 - `Install Sanka Plugin.app` for macOS
+- `Uninstall Sanka Plugin.app` for macOS
 - `Install Sanka Plugin.bat` and `Install-Sanka-Plugin.ps1` for Windows
+- `Uninstall Sanka Plugin.bat` and `Uninstall-Sanka-Plugin.ps1` for Windows
 - `Support/payload/` containing the plugin files consumed by the installers
 
 ## Signing and notarization
