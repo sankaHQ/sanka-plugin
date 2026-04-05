@@ -22,7 +22,6 @@ Important:
 - `.mcp.json` (vendor-neutral MCP config)
 - `mcp.json` (Cursor-compatible MCP config)
 - `.plugin/plugin.json` (vendor-neutral manifest)
-- `.app.json` (Codex ChatGPT app binding for OAuth install)
 - `.codex-plugin/plugin.json` (Codex manifest)
 - `.cursor-plugin/plugin.json` and `.claude-plugin/plugin.json` for tool-specific compatibility
 - `macos/installer-app/` (macOS app bundle template)
@@ -52,7 +51,7 @@ If you need to reset the OAuth session:
 rm -rf ~/.mcp-auth
 ```
 
-For Codex, OAuth via the Sanka app is the preferred path. The API key is kept as an MCP fallback.
+Codex also uses the same hosted MCP OAuth flow. No separate ChatGPT app install is required.
 
 ## Codex install
 
@@ -68,7 +67,7 @@ For non-technical users, distribute a Release ZIP and use the bundled installer:
    - Windows: `Install Sanka Plugin.bat`
 5. Restart Codex.
 6. Open the Plugins screen, choose `Personal Plugins`, and install `Sanka Plugin`.
-7. When prompted, sign in to Sanka in the browser window.
+7. On first use, sign in to Sanka in the browser window when `mcp-remote` prompts for OAuth.
 
 To remove the Codex plugin later, use the bundled uninstaller:
 
@@ -77,7 +76,7 @@ To remove the Codex plugin later, use the bundled uninstaller:
 
 The installer copies the plugin into `~/.codex/plugins/sanka-plugin` and merges a single `sanka-plugin` entry into `~/.agents/plugins/marketplace.json`. Existing marketplace entries are preserved so this flow does not remove other local plugins.
 
-The Codex manifest includes `.app.json` with Sanka's OpenAI app id, so Codex can use the same OAuth-backed app you created in ChatGPT. The bundled `.mcp.json` points at the same dedicated CRM OAuth endpoint for MCP-capable hosts.
+The Codex bundle uses the same `.mcp.json` hosted CRM endpoint as the other clients, so Codex, Cursor, and Claude all follow the same browser-based OAuth flow.
 
 ### Manual setup for developers
 
@@ -117,7 +116,7 @@ cp -R /absolute/path/to/sanka-plugin ~/.codex/plugins/sanka-plugin
 
 3. Restart Codex, open the Plugins menu, and install `Sanka Plugin`.
 
-4. In Codex, connect the bundled Sanka app when prompted.
+4. On first use, complete the browser-based Sanka OAuth flow when prompted by `mcp-remote`.
 
 This repo keeps the shared `.plugin/` manifest for generic hosts and adds `.codex-plugin/` as the Codex-specific adapter.
 
