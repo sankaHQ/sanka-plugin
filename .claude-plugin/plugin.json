@@ -4,5 +4,6 @@
   "description": "Sanka CRM plugin with MCP-powered contact and company discovery skill using OAuth sign-in.",
   "author": {
     "name": "Sanka"
-  }
+  },
+  "mcpServers": "./.mcp.json"
 }

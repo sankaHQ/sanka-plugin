@@ -8,7 +8,10 @@
         "https://mcp.sanka.com/mcp/crm",
         "--resource",
         "https://mcp.sanka.com/mcp/crm"
-      ]
+      ],
+      "env": {
+        "PATH": "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+      }
     }
   }
 }
