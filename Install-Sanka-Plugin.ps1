@@ -1,7 +1,9 @@
 $ErrorActionPreference = "Stop"
 
 $pluginName = "sanka-plugin"
-$pluginSourceDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$packagedPayloadDir = Join-Path $scriptDir "Support\payload"
+$pluginSourceDir = if (Test-Path $packagedPayloadDir) { $packagedPayloadDir } else { $scriptDir }
 $pluginDestDir = Join-Path $HOME ".codex\plugins\$pluginName"
 $marketplaceDir = Join-Path $HOME ".agents\plugins"
 $marketplaceFile = Join-Path $marketplaceDir "marketplace.json"

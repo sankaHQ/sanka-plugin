@@ -4,12 +4,21 @@ set -euo pipefail
 export COPYFILE_DISABLE=1
 
 PLUGIN_NAME="sanka-plugin"
-PLUGIN_SOURCE_DIR="$(cd "$(dirname "$0")" && pwd)"
+PLUGIN_SOURCE_DIR="${1:-}"
 PLUGIN_DEST_DIR="$HOME/.codex/plugins/$PLUGIN_NAME"
 MARKETPLACE_DIR="$HOME/.agents/plugins"
 MARKETPLACE_FILE="$MARKETPLACE_DIR/marketplace.json"
 BACKUP_SUFFIX="$(date +%Y%m%d%H%M%S)"
 TMP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/sanka-plugin.XXXXXX")"
+
+if [ -z "$PLUGIN_SOURCE_DIR" ]; then
+  PLUGIN_SOURCE_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+fi
+
+if [ ! -d "$PLUGIN_SOURCE_DIR/.codex-plugin" ]; then
+  echo "Installer payload is missing .codex-plugin metadata." >&2
+  exit 1
+fi
 
 cleanup() {
   rm -rf "$TMP_DIR"
@@ -27,7 +36,7 @@ mkdir -p "$STAGING_DIR"
 
 (
   cd "$PLUGIN_SOURCE_DIR"
-  tar --exclude='.git' --exclude='dist' --exclude='.DS_Store' -cf - .
+  tar --exclude='.DS_Store' -cf - .
 ) | (
   cd "$STAGING_DIR"
   tar -xf -
@@ -128,5 +137,3 @@ echo "1. Restart Codex."
 echo "2. Open Plugins and choose 'Personal Plugins'."
 echo "3. Install 'Sanka Plugin'."
 echo "4. Sign in to Sanka when prompted."
-echo
-read -r -p "Press Enter to close."

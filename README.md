@@ -11,6 +11,8 @@ Open Plugins-compatible Sanka plugin with a read-only CRM skill for listing cont
 - `.app.json` (Codex ChatGPT app binding for OAuth install)
 - `.codex-plugin/plugin.json` (Codex manifest)
 - `.cursor-plugin/plugin.json` and `.claude-plugin/plugin.json` for tool-specific compatibility
+- `macos/installer-app/` (macOS app bundle template)
+- `scripts/` (payload, build, signing, notarization, and release helpers)
 
 ## MCP endpoint
 
@@ -47,7 +49,7 @@ For non-technical users, distribute a Release ZIP and use the bundled installer:
 1. Download the latest Codex package from [GitHub Releases](https://github.com/sankaHQ/sanka-plugin/releases).
 2. Extract the ZIP.
 3. Run the installer for the user's OS:
-   - macOS: `Install Sanka Plugin.command`
+   - macOS: `Install Sanka Plugin.app`
    - Windows: `Install Sanka Plugin.bat`
 4. Restart Codex.
 5. Open the Plugins screen, choose `Personal Plugins`, and install `Sanka Plugin`.
@@ -116,15 +118,48 @@ Try this reset flow:
 
 If the client still exposes `search_docs` and `execute`, that is a profile-selection bug in the MCP/plugin integration rather than a missing workspace API key.
 
+## macOS installer build
+
+To build the macOS `.app` bundle from the repository, run:
+
+```bash
+./scripts/build-macos-installer-app.sh
+```
+
+The script writes `dist/macos/Install Sanka Plugin.app` and generates the app icon from `assets/logo.svg`.
+
 ## Release packaging
 
-To build a Codex-friendly release ZIP that keeps the macOS installer executable:
+To build the end-user Codex package:
 
 ```bash
 ./scripts/build-codex-package.sh
 ```
 
-The script writes `dist/Sanka-Plugin-Codex.zip`. Attach that ZIP to a GitHub Release and point end users to it instead of the source archive.
+The script writes `dist/Sanka-Plugin-Codex.zip` and includes:
+
+- `Install Sanka Plugin.app` for macOS
+- `Install Sanka Plugin.bat` and `Install-Sanka-Plugin.ps1` for Windows
+- `Support/payload/` containing the plugin files consumed by the installers
+
+## Signing and notarization
+
+To sign the macOS app bundle with a Developer ID Application certificate:
+
+```bash
+APPLE_CODESIGN_IDENTITY="Developer ID Application: Example, Inc. (TEAMID1234)" \
+./scripts/sign-macos-installer-app.sh
+```
+
+To produce a notarized release package:
+
+```bash
+APPLE_CODESIGN_IDENTITY="Developer ID Application: Example, Inc. (TEAMID1234)" \
+APPLE_NOTARY_PROFILE="sanka-notary" \
+./scripts/release-codex-package.sh
+```
+
+`APPLE_NOTARY_PROFILE` should point to a keychain profile created with `xcrun notarytool store-credentials`.
 
 ## Legacy local server / raw API use
 
