@@ -1,4 +1,25 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Sanka Plugin logo">
-  <rect width="128" height="128" rx="24" fill="#111827" />
-  <path d="M34 74c0 12 10 20 25 20 12 0 21-5 21-14 0-8-6-11-18-14l-8-2c-7-2-10-4-10-8 0-5 5-8 12-8 8 0 14 3 17 9l14-7c-5-10-16-16-31-16-16 0-28 8-28 22 0 11 8 18 22 21l8 2c8 2 12 4 12 9 0 5-5 8-13 8-10 0-17-4-21-11l-14 7z" fill="#ffffff"/>
+<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="1200" height="1200" fill="#FFF4EF"/>
+<g clip-path="url(#clip0_10270_54134)">
+<path d="M210 225L296.667 600.5H600L210 225Z" fill="url(#paint0_linear_10270_54134)"/>
+<path d="M990 976L600 600.5H903.333L990 976Z" fill="url(#paint1_linear_10270_54134)"/>
+<path d="M758.889 340.538H441.111C296.667 340.538 210 225 210 225H990C990 225 903.333 340.538 758.889 340.538Z" fill="#1B0F0B"/>
+<path d="M758.889 860.462H441.111C296.667 860.462 210 976 210 976H990C990 976 903.333 860.462 758.889 860.462Z" fill="#1B0F0B"/>
+<path d="M758.888 658.269H441.11C409.212 658.269 296.666 600.5 296.666 600.5C296.666 600.5 409.212 542.731 441.11 542.731H758.888C790.786 542.731 903.333 600.5 903.333 600.5C903.333 600.5 790.786 658.269 758.888 658.269Z" fill="#1B0F0B"/>
+</g>
+<defs>
+<linearGradient id="paint0_linear_10270_54134" x1="405" y1="225" x2="405" y2="600.5" gradientUnits="userSpaceOnUse">
+<stop offset="0.25" stop-color="#1B0F0B" stop-opacity="0"/>
+<stop offset="0.78" stop-color="#1B0F0B" stop-opacity="0.2"/>
+<stop offset="1" stop-color="#1B0F0B" stop-opacity="0.36"/>
+</linearGradient>
+<linearGradient id="paint1_linear_10270_54134" x1="795" y1="976" x2="795" y2="225" gradientUnits="userSpaceOnUse">
+<stop offset="0.25" stop-color="#1B0F0B" stop-opacity="0"/>
+<stop offset="0.78" stop-color="#1B0F0B" stop-opacity="0.2"/>
+<stop offset="1" stop-color="#1B0F0B" stop-opacity="0.36"/>
+</linearGradient>
+<clipPath id="clip0_10270_54134">
+<rect width="780" height="751" fill="white" transform="translate(210 225)"/>
+</clipPath>
+</defs>
 </svg>
