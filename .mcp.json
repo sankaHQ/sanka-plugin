@@ -1,19 +1,8 @@
 {
   "mcpServers": {
     "sanka-crm": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-remote",
-        "https://mcp.sanka.com/mcp/crm",
-        "--resource",
-        "https://mcp.sanka.com/mcp/crm",
-        "--static-oauth-client-metadata",
-        "{\"scope\":\"contacts:read companies:read\"}"
-      ],
-      "env": {
-        "PATH": "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
-      }
+      "type": "http",
+      "url": "https://mcp.sanka.com/mcp/crm"
     }
   }
 }
