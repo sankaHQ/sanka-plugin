@@ -4,20 +4,18 @@ Open Plugins-compatible Sanka plugin with a read-only CRM skill for listing cont
 
 ## Download
 
-This repo now ships two release assets from the same source:
+This repo ships one shared release asset:
 
 - [Sanka-Plugin.zip](https://github.com/sankaHQ/sanka-plugin/releases/latest/download/Sanka-Plugin.zip)
-  - Use this for Claude, Cursor, and any client that uploads or imports a plugin ZIP directly.
-- [Sanka-Plugin-Codex-Installer.zip](https://github.com/sankaHQ/sanka-plugin/releases/latest/download/Sanka-Plugin-Codex-Installer.zip)
-  - Use this for Codex on macOS or Windows when you want the double-click installer flow.
+  - Use this for Claude, Cursor, and Codex.
 - Release page: [sankaHQ/sanka-plugin Releases](https://github.com/sankaHQ/sanka-plugin/releases)
 
 Important:
 
 - Do not use GitHub's green `Code` button and `Download ZIP`.
 - Do not use the auto-generated `Source code (zip)` file on the Releases page.
-- `Sanka-Plugin.zip` is the shared plugin archive. It contains `.claude-plugin/`, `.cursor-plugin/`, `.codex-plugin/`, and the shared MCP files at the ZIP root.
-- `Sanka-Plugin-Codex-Installer.zip` is the Codex-only installer bundle. It extracts to `Sanka Plugin for Codex` and includes `Install Sanka Plugin.app`.
+- `Sanka-Plugin.zip` contains `.claude-plugin/`, `.cursor-plugin/`, `.codex-plugin/`, and the shared MCP files at the ZIP root.
+- The same ZIP also includes a visible `Codex/` folder with the macOS and Windows Codex installers.
 
 ## Included components
 
@@ -62,9 +60,9 @@ Codex also uses the same hosted MCP OAuth flow. No separate ChatGPT app install 
 
 For non-technical users, distribute a Release ZIP and use the bundled installer:
 
-1. Download [Sanka-Plugin-Codex-Installer.zip](https://github.com/sankaHQ/sanka-plugin/releases/latest/download/Sanka-Plugin-Codex-Installer.zip).
+1. Download [Sanka-Plugin.zip](https://github.com/sankaHQ/sanka-plugin/releases/latest/download/Sanka-Plugin.zip).
 2. Extract the ZIP.
-3. Open the extracted `Sanka Plugin for Codex` folder.
+3. Open the extracted `Codex` folder.
 4. Run the installer for the user's OS:
    - macOS: `Install Sanka Plugin.app`
    - Windows: `Install Sanka Plugin.bat`
@@ -125,7 +123,7 @@ This repo keeps the shared `.plugin/` manifest for generic hosts and adds `.code
 
 ## Cursor and Claude
 
-Use [Sanka-Plugin.zip](https://github.com/sankaHQ/sanka-plugin/releases/latest/download/Sanka-Plugin.zip) for Claude and Cursor. That archive has the client manifests at the ZIP root, including `.claude-plugin/plugin.json`, so it can be uploaded directly. The Codex installer ZIP is intentionally different and should not be uploaded to Claude.
+Use [Sanka-Plugin.zip](https://github.com/sankaHQ/sanka-plugin/releases/latest/download/Sanka-Plugin.zip) for Claude and Cursor. That archive has the client manifests at the ZIP root, including `.claude-plugin/plugin.json`, so it can be uploaded directly. The same archive also contains the `Codex/` installer folder for Codex users.
 
 ## Troubleshooting
 
@@ -152,27 +150,19 @@ The script writes `dist/macos/Install Sanka Plugin.app` and generates the app ic
 
 ## Release packaging
 
-To build the end-user Codex package:
-
-```bash
-./scripts/build-codex-package.sh
-```
-
-The script writes `dist/Sanka-Plugin-Codex-Installer.zip` and includes:
-
-- `Install Sanka Plugin.app` for macOS
-- `Uninstall Sanka Plugin.app` for macOS
-- `Install Sanka Plugin.bat` and `Install-Sanka-Plugin.ps1` for Windows
-- `Uninstall Sanka Plugin.bat` and `Uninstall-Sanka-Plugin.ps1` for Windows
-- `Support/payload/` containing the plugin files consumed by the installers
-
-To build the shared upload package for Claude, Cursor, and other compatible clients:
+To build the shared package for Claude, Cursor, Codex, and other compatible clients:
 
 ```bash
 ./scripts/build-plugin-package.sh
 ```
 
-The script writes `dist/Sanka-Plugin.zip` with the plugin manifests at the ZIP root.
+The script writes `dist/Sanka-Plugin.zip` with:
+
+- plugin manifests at the ZIP root for Claude, Cursor, Codex, and generic hosts
+- `Codex/Install Sanka Plugin.app` for macOS
+- `Codex/Uninstall Sanka Plugin.app` for macOS
+- `Codex/Install Sanka Plugin.bat` and `Codex/Install-Sanka-Plugin.ps1` for Windows
+- `Codex/Uninstall Sanka Plugin.bat` and `Codex/Uninstall-Sanka-Plugin.ps1` for Windows
 
 ## Signing and notarization
 
