@@ -7,7 +7,9 @@
         "mcp-remote",
         "https://mcp.sanka.com/mcp/crm",
         "--resource",
-        "https://mcp.sanka.com/mcp/crm"
+        "https://mcp.sanka.com/mcp/crm",
+        "--static-oauth-client-metadata",
+        "{\"scope\":\"contacts:read companies:read\"}"
       ],
       "env": {
         "PATH": "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
