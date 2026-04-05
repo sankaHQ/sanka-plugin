@@ -46,14 +46,22 @@ For Codex, OAuth via the Sanka app is the preferred path. The API key is kept as
 
 For non-technical users, distribute a Release ZIP and use the bundled installer:
 
-1. Download the latest Codex package from [GitHub Releases](https://github.com/sankaHQ/sanka-plugin/releases).
+1. Download [Sanka-Plugin-Codex.zip](https://github.com/sankaHQ/sanka-plugin/releases/latest/download/Sanka-Plugin-Codex.zip).
 2. Extract the ZIP.
-3. Run the installer for the user's OS:
+3. Open the extracted `Sanka Plugin for Codex` folder.
+4. Run the installer for the user's OS:
    - macOS: `Install Sanka Plugin.app`
    - Windows: `Install Sanka Plugin.bat`
-4. Restart Codex.
-5. Open the Plugins screen, choose `Personal Plugins`, and install `Sanka Plugin`.
-6. When prompted, sign in to Sanka in the browser window.
+5. Restart Codex.
+6. Open the Plugins screen, choose `Personal Plugins`, and install `Sanka Plugin`.
+7. When prompted, sign in to Sanka in the browser window.
+
+Important:
+
+- Do not use GitHub's `Code` -> `Download ZIP`.
+- Do not use the auto-generated `Source code (zip)` file on the Releases page.
+- If the extracted folder is named `sanka-plugin-main`, you downloaded the source code instead of the installer package.
+- The correct installer package extracts to a folder named `Sanka Plugin for Codex` and includes `Install Sanka Plugin.app`.
 
 The installer copies the plugin into `~/.codex/plugins/sanka-plugin` and merges a single `sanka-plugin` entry into `~/.agents/plugins/marketplace.json`. Existing marketplace entries are preserved so this flow does not remove other local plugins.
 
