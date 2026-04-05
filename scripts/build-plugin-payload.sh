@@ -11,7 +11,6 @@ if [ -z "$DEST_DIR" ]; then
 fi
 
 PAYLOAD_ITEMS=(
-  ".app.json"
   ".claude-plugin"
   ".codex-plugin"
   ".cursor-plugin"
