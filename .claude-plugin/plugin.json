@@ -5,5 +5,5 @@
   "author": {
     "name": "Sanka"
   },
-  "mcpServers": "./mcp.json"
+  "mcpServers": "./.mcp.json"
 }

@@ -40,6 +40,7 @@ mkdir -p "$VERIFY_DIR"
 "$ROOT_DIR/scripts/check-macos-installer-app.sh" \
   "$VERIFY_DIR/Codex/Install Sanka Plugin.app" \
   "$VERIFY_DIR/Codex/Uninstall Sanka Plugin.app"
+"$ROOT_DIR/scripts/test-plugin-package.sh" --skip-build
 
 echo "Release package ready at:"
 echo "  $PLUGIN_ZIP"

@@ -1,9 +1,8 @@
 {
   "mcpServers": {
-    "sanka_plugin": {
+    "sanka": {
       "type": "http",
-      "url": "https://mcp.sanka.com/mcp",
-      "note": "Hosted Sanka MCP server with native OAuth. Codex should attach this as a direct HTTP MCP server and prompt for OAuth on install/use."
+      "url": "https://mcp.sanka.com/mcp"
     }
   }
 }
