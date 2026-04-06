@@ -1,0 +1,24 @@
+{
+  "mcpServers": {
+    "sanka": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://mcp.sanka.com/mcp",
+        "--host",
+        "127.0.0.1",
+        "--auth-timeout",
+        "180",
+        "--debug",
+        "--resource",
+        "https://mcp.sanka.com/mcp",
+        "--static-oauth-client-metadata",
+        "{\"scope\":\"contacts:read companies:read prospect:read\"}"
+      ],
+      "env": {
+        "PATH": "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+      }
+    }
+  }
+}

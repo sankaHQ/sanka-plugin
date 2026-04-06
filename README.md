@@ -71,7 +71,7 @@ To remove the Codex plugin later, use the bundled uninstaller:
 
 The installer copies the plugin into `~/.codex/plugins/sanka-plugin` and merges a single `sanka-plugin` entry into `~/.agents/plugins/marketplace.json`. Existing marketplace entries are preserved so this flow does not remove other local plugins.
 
-The Codex bundle uses the same `.mcp.json` hosted endpoint as the other clients, so Codex, Cursor, and Claude all follow the same hosted OAuth flow.
+The Codex bundle uses a dedicated `codex.mcp.json` wrapper that runs `mcp-remote` against the hosted `/mcp` endpoint. Cursor and Claude continue to use the shared `.mcp.json` hosted endpoint.
 
 ### Manual setup for developers
 
@@ -113,7 +113,7 @@ cp -R /absolute/path/to/sanka-plugin ~/.codex/plugins/sanka-plugin
 
 4. On first use, complete the browser-based Sanka OAuth flow when prompted by the client.
 
-This repo keeps the shared `.plugin/` manifest for generic hosts and adds `.codex-plugin/` as the Codex-specific adapter.
+This repo keeps the shared `.plugin/` manifest for generic hosts and adds `.codex-plugin/` plus `codex.mcp.json` as the Codex-specific adapter.
 
 ## Cursor and Claude
 

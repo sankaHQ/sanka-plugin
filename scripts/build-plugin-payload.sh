@@ -19,6 +19,7 @@ PAYLOAD_ITEMS=(
   "LICENSE"
   "README.md"
   "assets"
+  "codex.mcp.json"
   "mcp.json"
   "skills"
 )
