@@ -20,8 +20,9 @@ Important:
 ## Included components
 
 - `skills/list-contacts-companies/SKILL.md`
-- `.mcp.json` (vendor-neutral MCP config)
-- `mcp.json` (Cursor-compatible MCP config)
+- `.mcp.json` (shared MCP config for Claude, Cursor, and generic hosts)
+- `codex.mcp.json` (Codex MCP config)
+- `mcp.json` (legacy alias for the shared hosted HTTP MCP config)
 - `.plugin/plugin.json` (vendor-neutral manifest)
 - `.codex-plugin/plugin.json` (Codex manifest)
 - `.cursor-plugin/plugin.json` and `.claude-plugin/plugin.json` for tool-specific compatibility
@@ -55,7 +56,7 @@ fail with `invalid_scope` before any authorization code is issued.
 
 No API key is required for the packaged plugin flow.
 
-On first protected tool use, the MCP client should prompt you to sign in to Sanka and approve the requested access.
+On install or first protected tool use, the MCP client should prompt you to sign in to Sanka and approve the requested access.
 
 Codex also uses the same hosted MCP OAuth flow. No separate ChatGPT app install is required.
 
@@ -82,21 +83,26 @@ To remove the Codex plugin later, use the bundled uninstaller:
 
 The installer copies the plugin into `~/.codex/plugins/sanka-plugin` and merges a single `sanka-plugin` entry into `~/.agents/plugins/marketplace.json`. Existing marketplace entries are preserved so this flow does not remove other local plugins.
 
-The Codex bundle uses a dedicated `codex.mcp.json` wrapper plus a vendored
-`vendor/mcp-remote/proxy.mjs` patch. That wrapper exists because upstream
-`mcp-remote` can launch OAuth from a later protected `tools/call` request
-without first starting the localhost callback listener, which leaves the
-`127.0.0.1` redirect with no server to receive it. Cursor and Claude continue
-to use the shared `.mcp.json` hosted endpoint.
+Claude, Cursor, and the generic plugin manifest should keep using the canonical
+shared `./.mcp.json` path. Codex uses its own `./codex.mcp.json` file so the
+Codex-specific server alias can stay isolated from the generic clients.
+
+The Codex bundle uses a dedicated `codex.mcp.json` file with the same direct
+hosted HTTP MCP shape as the official plugins. The native
+OAuth path depends on `mcp.sanka.com` exposing same-origin OAuth discovery and
+auth endpoints, so Codex can show its standard install/use auth screen instead
+of relying on a vendored wrapper.
 
 In Codex, the plugin MCP server is intentionally named `sanka_plugin`, not
 `sanka`. That avoids collisions with any stale global
 `[mcp_servers.sanka]` entry in `~/.codex/config.toml`.
 
 When testing in Codex, start from the installed plugin itself, for example
-`[@sanka-plugin](plugin://sanka-plugin@personal) Find a company in Sanka`, not
-from a raw skill-file link. A direct skill invocation can load the instructions
-without attaching the plugin MCP server to that thread.
+`[@sanka-plugin](plugin://sanka-plugin@personal) Find a company in Sanka`.
+
+A direct skill-file invocation can still load the skill instructions without
+attaching the plugin MCP server to that thread, so the installed plugin chip is
+the safer entrypoint for end users.
 
 If you need to refresh the vendored runtime after an upstream `mcp-remote`
 update, use:
@@ -133,7 +139,7 @@ cp -R /absolute/path/to/sanka-plugin ~/.codex/plugins/sanka-plugin
       },
       "policy": {
         "installation": "AVAILABLE",
-        "authentication": "ON_USE"
+        "authentication": "ON_INSTALL"
       },
       "category": "Productivity"
     }
@@ -143,10 +149,13 @@ cp -R /absolute/path/to/sanka-plugin ~/.codex/plugins/sanka-plugin
 
 3. Restart Codex, open the Plugins menu, and install `Sanka Plugin`.
 
-4. On first use, complete the browser-based Sanka OAuth flow when prompted by the client.
-   The Codex adapter starts the localhost callback listener eagerly so the browser redirect can complete.
+4. Complete the browser-based Sanka OAuth flow when Codex prompts during install or first use.
 
-This repo keeps the shared `.plugin/` manifest for generic hosts and adds `.codex-plugin/` plus `codex.mcp.json` as the Codex-specific adapter.
+This repo keeps the shared `.plugin/` manifest plus `./.mcp.json` for Claude,
+Cursor, and generic hosts, and uses `.codex-plugin/` plus `./codex.mcp.json`
+for Codex. Keep those client-specific MCP paths separate. A Codex-only manifest
+change can break the Claude/Cursor upload flow if it drifts the shared clients
+off the canonical `./.mcp.json` path.
 
 If you previously configured Sanka manually in Codex, disable or remove any
 global entry like this from `~/.codex/config.toml` before testing the plugin:
@@ -165,6 +174,11 @@ instead of the plugin wrapper.
 
 Use [Sanka-Plugin.zip](https://github.com/sankaHQ/sanka-plugin/releases/latest/download/Sanka-Plugin.zip) for Claude and Cursor. That archive has the client manifests at the ZIP root, including `.claude-plugin/plugin.json`, so it can be uploaded directly. The same archive also contains the `Codex/` installer folder for Codex users.
 
+If Claude opens an "Add custom connector" sheet instead of attaching the
+packaged connector normally, first confirm the uploaded ZIP still has
+`.claude-plugin/plugin.json` pointing at `./.mcp.json`. The working Claude
+releases use that canonical shared MCP path.
+
 ## Troubleshooting
 
 If Claude or Cursor shows `search_docs` / `execute` instead of `auth_status` / `list_contacts` / `list_companies`, the connector is not running in the intended CRM-only profile yet. In that state, the model may fall back to SDK-style execution and show confusing API-key/auth errors.
@@ -181,13 +195,25 @@ If the client still exposes `search_docs` and `execute`, that is a profile-selec
 If Codex returns a native `streamable_http_client ... Auth required` error and
 no browser OAuth window opens, inspect `~/.codex/config.toml`. A stale global
 `[mcp_servers.sanka]` block will hijack `mcp__sanka__*` calls and bypass the
-plugin's `sanka_plugin` wrapper.
+plugin's `sanka_plugin` server attachment.
 
 If the session says the `sanka-plugin:list-contacts-companies` skill is present
 but `mcp__sanka_plugin__list_companies` is unavailable, the thread likely loaded
 only the skill instructions. Start a new thread from the installed plugin chip
 `[@sanka-plugin](plugin://sanka-plugin@personal)` instead of invoking the skill
 file directly.
+
+If Codex answers a Sanka Plugin CRM query by referencing local Django models,
+`manage.py shell`, `.env`, `DB_HOST`, `psql`, or repo-local records, that answer
+is invalid. The Sanka Plugin is remote-only. Those queries must come from
+`mcp__sanka_plugin__*`, and if those tools are missing the assistant should stop
+and report a plugin attachment failure instead of falling back to the local
+workspace.
+
+If this keeps happening after reinstalling, clear the installed personal plugin
+cache or reinstall with the bundled installer. The installer now removes
+`~/.codex/plugins/cache/personal/sanka-plugin` so Codex does not keep resolving
+an older cached bundle while the installed plugin has newer manifests.
 
 If the browser returns to `127.0.0.1:19550/oauth/callback` with
 `error=invalid_scope`, the plugin is requesting a scope that Sanka's OAuth
