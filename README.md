@@ -55,7 +55,7 @@ fail with `invalid_scope` before any authorization code is issued.
 
 No API key is required for the packaged plugin flow.
 
-On first protected tool use, the MCP client should prompt you to sign in to Sanka and approve the requested access.
+On install or first protected tool use, the MCP client should prompt you to sign in to Sanka and approve the requested access.
 
 Codex also uses the same hosted MCP OAuth flow. No separate ChatGPT app install is required.
 
@@ -82,13 +82,12 @@ To remove the Codex plugin later, use the bundled uninstaller:
 
 The installer copies the plugin into `~/.codex/plugins/sanka-plugin` and merges a single `sanka-plugin` entry into `~/.agents/plugins/marketplace.json`. Existing marketplace entries are preserved so this flow does not remove other local plugins.
 
-The Codex bundle now follows the canonical `plugin-creator` pattern and points
-its `.codex-plugin/plugin.json` manifest at `./.mcp.json`. That Codex MCP file
-uses the vendored `vendor/mcp-remote/proxy.mjs` patch. The wrapper exists because upstream
-`mcp-remote` can launch OAuth from a later protected `tools/call` request
-without first starting the localhost callback listener, which leaves the
-`127.0.0.1` redirect with no server to receive it. Claude, Cursor, and the
-generic manifest continue to use the shared `mcp.json` hosted endpoint.
+The Codex bundle follows the canonical `plugin-creator` pattern and points its
+`.codex-plugin/plugin.json` manifest at `./.mcp.json`. That Codex MCP file now
+uses the same direct hosted HTTP MCP shape as the official plugins. The native
+OAuth path depends on `mcp.sanka.com` exposing same-origin OAuth discovery and
+auth endpoints, so Codex can show its standard install/use auth screen instead
+of relying on a vendored wrapper.
 
 In Codex, the plugin MCP server is intentionally named `sanka_plugin`, not
 `sanka`. That avoids collisions with any stale global
@@ -136,7 +135,7 @@ cp -R /absolute/path/to/sanka-plugin ~/.codex/plugins/sanka-plugin
       },
       "policy": {
         "installation": "AVAILABLE",
-        "authentication": "ON_USE"
+        "authentication": "ON_INSTALL"
       },
       "category": "Productivity"
     }
@@ -146,8 +145,7 @@ cp -R /absolute/path/to/sanka-plugin ~/.codex/plugins/sanka-plugin
 
 3. Restart Codex, open the Plugins menu, and install `Sanka Plugin`.
 
-4. On first use, complete the browser-based Sanka OAuth flow when prompted by the client.
-   The Codex adapter starts the localhost callback listener eagerly so the browser redirect can complete.
+4. Complete the browser-based Sanka OAuth flow when Codex prompts during install or first use.
 
 This repo keeps the shared `.plugin/` manifest for generic hosts and uses the
 canonical `.codex-plugin/` plus `.mcp.json` shape for Codex. The legacy
@@ -187,7 +185,7 @@ If the client still exposes `search_docs` and `execute`, that is a profile-selec
 If Codex returns a native `streamable_http_client ... Auth required` error and
 no browser OAuth window opens, inspect `~/.codex/config.toml`. A stale global
 `[mcp_servers.sanka]` block will hijack `mcp__sanka__*` calls and bypass the
-plugin's `sanka_plugin` wrapper.
+plugin's `sanka_plugin` server attachment.
 
 If the session says the `sanka-plugin:list-contacts-companies` skill is present
 but `mcp__sanka_plugin__list_companies` is unavailable, the thread likely loaded
