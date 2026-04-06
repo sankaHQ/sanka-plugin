@@ -193,6 +193,13 @@ only the skill instructions. Start a new thread from the installed plugin chip
 `[@sanka-plugin](plugin://sanka-plugin@personal)` instead of invoking the skill
 file directly.
 
+If Codex answers a Sanka Plugin CRM query by referencing local Django models,
+`manage.py shell`, `.env`, `DB_HOST`, `psql`, or repo-local records, that answer
+is invalid. The Sanka Plugin is remote-only. Those queries must come from
+`mcp__sanka_plugin__*`, and if those tools are missing the assistant should stop
+and report a plugin attachment failure instead of falling back to the local
+workspace.
+
 If this keeps happening after reinstalling, clear the installed personal plugin
 cache or reinstall with the bundled installer. The installer now removes
 `~/.codex/plugins/cache/personal/sanka-plugin` so Codex does not keep resolving
