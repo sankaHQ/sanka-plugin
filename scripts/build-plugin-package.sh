@@ -26,6 +26,7 @@ PAYLOAD_ITEMS=(
   "assets"
   "mcp.json"
   "skills"
+  "vendor"
 )
 
 PACKAGE_ITEMS=(
@@ -41,6 +42,7 @@ PACKAGE_ITEMS=(
   "codex.mcp.json"
   "mcp.json"
   "skills"
+  "vendor"
 )
 
 for arg in "$@"; do
