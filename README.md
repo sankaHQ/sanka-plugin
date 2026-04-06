@@ -150,6 +150,16 @@ To build the shared package for Claude, Cursor, Codex, and other compatible clie
 ./scripts/build-plugin-package.sh
 ```
 
+The packaging scripts now refuse to emit a macOS installer ZIP unless the staged
+`.app` bundles pass both `codesign` verification and Gatekeeper assessment via
+`spctl`. That is intentional. Production releases must come from the notarized flow.
+
+For local-only unsigned test builds, use:
+
+```bash
+SANKA_ALLOW_UNSIGNED_MACOS_APPS=1 ./scripts/build-plugin-package.sh
+```
+
 The script writes `dist/Sanka-Plugin.zip` with:
 
 - plugin manifests at the ZIP root for Claude, Cursor, Codex, and generic hosts
@@ -176,6 +186,8 @@ APPLE_NOTARY_PROFILE="sanka-notary" \
 ```
 
 `APPLE_NOTARY_PROFILE` should point to a keychain profile created with `xcrun notarytool store-credentials`.
+
+See [RELEASING.md](RELEASING.md) for the concrete `v0.4.11` recovery-release checklist.
 
 ## Legacy local server / raw API use
 

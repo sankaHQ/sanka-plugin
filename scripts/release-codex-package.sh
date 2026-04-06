@@ -9,6 +9,7 @@ UNINSTALL_APP_PATH="$DIST_DIR/macos/Uninstall Sanka Plugin.app"
 PLUGIN_ZIP="$DIST_DIR/Sanka-Plugin.zip"
 NOTARY_DIR="$DIST_DIR/notary"
 NOTARY_ZIP="$NOTARY_DIR/Sanka-Plugin.zip"
+VERIFY_DIR="$DIST_DIR/verify-release"
 
 source "$ROOT_DIR/scripts/macos-signing-env.sh"
 trap cleanup_sanka_macos_signing_env EXIT
@@ -32,6 +33,13 @@ mkdir -p "$NOTARY_DIR"
 /usr/sbin/spctl --assess --type execute --verbose=2 "$UNINSTALL_APP_PATH"
 
 "$ROOT_DIR/scripts/build-plugin-package.sh" --reuse-macos-apps
+
+rm -rf "$VERIFY_DIR"
+mkdir -p "$VERIFY_DIR"
+/usr/bin/unzip -q "$PLUGIN_ZIP" -d "$VERIFY_DIR"
+"$ROOT_DIR/scripts/check-macos-installer-app.sh" \
+  "$VERIFY_DIR/Codex/Install Sanka Plugin.app" \
+  "$VERIFY_DIR/Codex/Uninstall Sanka Plugin.app"
 
 echo "Release package ready at:"
 echo "  $PLUGIN_ZIP"

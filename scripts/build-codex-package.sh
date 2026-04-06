@@ -13,9 +13,25 @@ INSTALL_APP_PATH="$DIST_DIR/macos/$INSTALL_APP_NAME"
 UNINSTALL_APP_NAME="Uninstall Sanka Plugin.app"
 UNINSTALL_APP_PATH="$DIST_DIR/macos/$UNINSTALL_APP_NAME"
 REUSE_MACOS_APPS=0
+ALLOW_UNSIGNED_MACOS_APPS=0
 
-if [ "${1:-}" = "--reuse-app" ] || [ "${1:-}" = "--reuse-macos-apps" ]; then
-  REUSE_MACOS_APPS=1
+for arg in "$@"; do
+  case "$arg" in
+    --reuse-app|--reuse-macos-apps)
+      REUSE_MACOS_APPS=1
+      ;;
+    --allow-unsigned-macos-apps)
+      ALLOW_UNSIGNED_MACOS_APPS=1
+      ;;
+    *)
+      echo "Unknown argument: $arg" >&2
+      exit 1
+      ;;
+  esac
+done
+
+if [ "$ALLOW_UNSIGNED_MACOS_APPS" = "1" ]; then
+  export SANKA_ALLOW_UNSIGNED_MACOS_APPS=1
 fi
 
 if [ "$REUSE_MACOS_APPS" != "1" ] || [ ! -d "$INSTALL_APP_PATH" ]; then
@@ -41,6 +57,10 @@ cp "$ROOT_DIR/LICENSE" "$PACKAGE_DIR/"
 
 xattr -cr "$PACKAGE_DIR" 2>/dev/null || true
 find "$PACKAGE_DIR" -name '._*' -delete
+
+"$ROOT_DIR/scripts/check-macos-installer-app.sh" \
+  "$PACKAGE_DIR/$INSTALL_APP_NAME" \
+  "$PACKAGE_DIR/$UNINSTALL_APP_NAME"
 
 rm -f "$ZIP_PATH"
 (
