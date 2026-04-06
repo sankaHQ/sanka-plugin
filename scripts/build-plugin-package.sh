@@ -25,6 +25,7 @@ PAYLOAD_ITEMS=(
   "README.md"
   "assets"
   "mcp.json"
+  "skills"
   "vendor"
 )
 
@@ -40,6 +41,7 @@ PACKAGE_ITEMS=(
   "assets"
   "codex.mcp.json"
   "mcp.json"
+  "skills"
   "vendor"
 )
 
