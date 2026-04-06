@@ -12,6 +12,20 @@ MARKETPLACE_FILE="$MARKETPLACE_DIR/marketplace.json"
 CODEX_CONFIG_FILE="$HOME/.codex/config.toml"
 BACKUP_SUFFIX="$(date +%Y%m%d%H%M%S)"
 TMP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/sanka-plugin.XXXXXX")"
+PAYLOAD_ITEMS=(
+  ".claude-plugin"
+  ".codex-plugin"
+  ".cursor-plugin"
+  ".mcp.json"
+  ".plugin"
+  "LICENSE"
+  "README.md"
+  "assets"
+  "codex.mcp.json"
+  "mcp.json"
+  "skills"
+  "vendor"
+)
 
 if [ -z "$PLUGIN_SOURCE_DIR" ]; then
   PLUGIN_SOURCE_DIR="$(cd "$(dirname "$0")/.." && pwd)"
@@ -36,13 +50,14 @@ mkdir -p "$HOME/.codex/plugins" "$MARKETPLACE_DIR"
 STAGING_DIR="$TMP_DIR/$PLUGIN_NAME"
 mkdir -p "$STAGING_DIR"
 
-(
-  cd "$PLUGIN_SOURCE_DIR"
-  tar --exclude='.DS_Store' -cf - .
-) | (
-  cd "$STAGING_DIR"
-  tar -xf -
-)
+for item in "${PAYLOAD_ITEMS[@]}"; do
+  if [ ! -e "$PLUGIN_SOURCE_DIR/$item" ]; then
+    echo "Installer payload is missing $item." >&2
+    exit 1
+  fi
+
+  rsync -a --exclude='.DS_Store' "$PLUGIN_SOURCE_DIR/$item" "$STAGING_DIR/"
+done
 
 rm -rf "$PLUGIN_DEST_DIR"
 mv "$STAGING_DIR" "$PLUGIN_DEST_DIR"
