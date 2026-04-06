@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+SANKA_MACOS_SIGNING_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SANKA_MACOS_SIGNING_ROOT_DIR="$(cd "$SANKA_MACOS_SIGNING_SCRIPT_DIR/.." && pwd)"
 SANKA_MACOS_SIGNING_READY=0
 SANKA_MACOS_SIGNING_WORKDIR=""
 SANKA_MACOS_TEMP_KEYCHAIN=""
@@ -15,7 +17,74 @@ trim_sanka_line() {
   value="${value%"${value##*[![:space:]]}"}"
   value="${value#\"}"
   value="${value%\"}"
+  value="${value#\'}"
+  value="${value%\'}"
   printf '%s' "$value"
+}
+
+load_sanka_macos_signing_env_file() {
+  local env_path="$1"
+  local line=""
+  local key=""
+  local value=""
+  local loaded=0
+
+  if [ ! -f "$env_path" ]; then
+    return 0
+  fi
+
+  while IFS= read -r line || [ -n "$line" ]; do
+    line="${line%$'\r'}"
+    line="$(trim_sanka_line "$line")"
+
+    if [ -z "$line" ]; then
+      continue
+    fi
+
+    case "$line" in
+      \#*)
+        continue
+        ;;
+    esac
+
+    if [[ "$line" != *=* ]]; then
+      continue
+    fi
+
+    key="$(trim_sanka_line "${line%%=*}")"
+    value="$(trim_sanka_line "${line#*=}")"
+
+    case "$key" in
+      APPLE_NOTARY_PROFILE|MACOS_APPLE_CERTIFICATE|MACOS_APPLE_CERTIFICATE_PASSWORD|MACOS_APPLE_SIGNING_IDENTITY|MACOS_APPLE_TEAM_ID|MACOS_APPLE_ID|MACOS_APPLE_APP_SPECIFIC_PASSWORD)
+        ;;
+      *)
+        continue
+        ;;
+    esac
+
+    if [ -n "${!key:-}" ]; then
+      continue
+    fi
+
+    export "$key=$value"
+    loaded=1
+  done < "$env_path"
+
+  if [ "$loaded" = "1" ]; then
+    echo "Loaded macOS signing credentials from $env_path" >&2
+  fi
+}
+
+load_sanka_macos_signing_env_candidates() {
+  local env_path=""
+
+  for env_path in \
+    "$SANKA_MACOS_SIGNING_ROOT_DIR/.env" \
+    "$SANKA_MACOS_SIGNING_ROOT_DIR/../sanka/.env" \
+    "$HOME/Sites/sanka/sanka/.env"
+  do
+    load_sanka_macos_signing_env_file "$env_path"
+  done
 }
 
 import_sanka_apple_intermediates() {
@@ -37,6 +106,8 @@ setup_sanka_macos_signing_env() {
   if [ "$SANKA_MACOS_SIGNING_READY" = "1" ]; then
     return 0
   fi
+
+  load_sanka_macos_signing_env_candidates
 
   if [ -z "${APPLE_CODESIGN_IDENTITY:-}" ] && [ -n "${MACOS_APPLE_SIGNING_IDENTITY:-}" ]; then
     export APPLE_CODESIGN_IDENTITY="$MACOS_APPLE_SIGNING_IDENTITY"
