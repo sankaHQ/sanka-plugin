@@ -170,6 +170,18 @@ The script writes `dist/Sanka-Plugin.zip` with:
 
 ## Signing and notarization
 
+On Sanka developer machines, the release helpers can auto-load the Apple signing
+and notarization variables from the sibling `../sanka/.env` file when they are not
+already exported in the shell. That includes:
+
+- `MACOS_APPLE_CERTIFICATE`
+- `MACOS_APPLE_CERTIFICATE_PASSWORD`
+- `MACOS_APPLE_SIGNING_IDENTITY`
+- `MACOS_APPLE_TEAM_ID`
+- `MACOS_APPLE_ID`
+- `MACOS_APPLE_APP_SPECIFIC_PASSWORD`
+- `APPLE_NOTARY_PROFILE` (optional, if you prefer notarytool keychain profiles)
+
 To sign the macOS app bundle with a Developer ID Application certificate:
 
 ```bash
@@ -180,12 +192,15 @@ APPLE_CODESIGN_IDENTITY="Developer ID Application: Example, Inc. (TEAMID1234)" \
 To produce a notarized release package:
 
 ```bash
-APPLE_CODESIGN_IDENTITY="Developer ID Application: Example, Inc. (TEAMID1234)" \
-APPLE_NOTARY_PROFILE="sanka-notary" \
 ./scripts/release-codex-package.sh
 ```
 
-`APPLE_NOTARY_PROFILE` should point to a keychain profile created with `xcrun notarytool store-credentials`.
+If you are not relying on auto-loaded `.env` values, set either:
+
+- `APPLE_NOTARY_PROFILE`, or
+- `MACOS_APPLE_ID`, `MACOS_APPLE_TEAM_ID`, and `MACOS_APPLE_APP_SPECIFIC_PASSWORD`
+
+before running the release script.
 
 See [RELEASING.md](RELEASING.md) for the concrete `v0.4.11` recovery-release checklist.
 
