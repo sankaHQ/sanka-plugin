@@ -38,7 +38,7 @@ mkdir -p "$STAGING_DIR"
 
 (
   cd "$PLUGIN_SOURCE_DIR"
-  tar --exclude='.DS_Store' --exclude='./skills' -cf - .
+  tar --exclude='.DS_Store' -cf - .
 ) | (
   cd "$STAGING_DIR"
   tar -xf -

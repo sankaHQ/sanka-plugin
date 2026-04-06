@@ -1,6 +1,6 @@
 # sanka-plugin
 
-Open Plugins-compatible Sanka plugin with a read-only hosted MCP for listing contacts and companies.
+Open Plugins-compatible Sanka plugin with a read-only CRM skill for listing contacts and companies.
 
 ## Download
 
@@ -19,6 +19,7 @@ Important:
 
 ## Included components
 
+- `skills/list-contacts-companies/SKILL.md`
 - `.mcp.json` (Codex MCP config)
 - `mcp.json` (hosted HTTP MCP config for non-Codex clients)
 - `.plugin/plugin.json` (vendor-neutral manifest)
@@ -41,7 +42,7 @@ The config targets the unified Sanka MCP endpoint and relies on the MCP client's
 - `list_companies`
 
 For Codex, the packaged plugin currently requests only the read scopes it needs
-for read-only contact and company access:
+for that skill:
 
 - `contacts:read`
 - `companies:read`
@@ -95,6 +96,10 @@ In Codex, the plugin MCP server is intentionally named `sanka_plugin`, not
 
 When testing in Codex, start from the installed plugin itself, for example
 `[@sanka-plugin](plugin://sanka-plugin@personal) Find a company in Sanka`.
+
+A direct skill-file invocation can still load the skill instructions without
+attaching the plugin MCP server to that thread, so the installed plugin chip is
+the safer entrypoint for end users.
 
 If you need to refresh the vendored runtime after an upstream `mcp-remote`
 update, use:
@@ -183,6 +188,12 @@ If Codex returns a native `streamable_http_client ... Auth required` error and
 no browser OAuth window opens, inspect `~/.codex/config.toml`. A stale global
 `[mcp_servers.sanka]` block will hijack `mcp__sanka__*` calls and bypass the
 plugin's `sanka_plugin` wrapper.
+
+If the session says the `sanka-plugin:list-contacts-companies` skill is present
+but `mcp__sanka_plugin__list_companies` is unavailable, the thread likely loaded
+only the skill instructions. Start a new thread from the installed plugin chip
+`[@sanka-plugin](plugin://sanka-plugin@personal)` instead of invoking the skill
+file directly.
 
 If Codex answers a Sanka Plugin CRM query by referencing local Django models,
 `manage.py shell`, `.env`, `DB_HOST`, `psql`, or repo-local records, that answer

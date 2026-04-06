@@ -1,7 +1,7 @@
 {
   "name": "sanka-plugin",
-  "version": "0.4.14",
-  "description": "Sanka CRM plugin with MCP-powered contact and company discovery using OAuth sign-in.",
+  "version": "0.4.15",
+  "description": "Sanka CRM plugin with MCP-powered contact and company discovery skill using OAuth sign-in.",
   "author": {
     "name": "Sanka",
     "url": "https://sanka.com"
@@ -16,11 +16,12 @@
     "contacts",
     "companies"
   ],
+  "skills": "./skills/",
   "mcpServers": "./.mcp.json",
   "interface": {
     "displayName": "Sanka Plugin",
     "shortDescription": "Search Sanka contacts and companies from Codex with OAuth",
-    "longDescription": "Use Sanka's hosted MCP endpoint to find contacts and companies from Codex through a browser-based OAuth sign-in flow without exposing write actions. In Codex, start from the installed Sanka Plugin chip so the MCP server is attached to the thread. These queries must come from the hosted MCP tools, not from any local Sanka repo, Django shell, or Postgres fallback.",
+    "longDescription": "Use Sanka's hosted MCP endpoint and a read-only CRM skill to find contacts and companies from Codex through a browser-based OAuth sign-in flow without exposing write actions. In Codex, start from the installed Sanka Plugin chip so the MCP server is attached to the thread. These queries must come from the hosted MCP tools, not from any local Sanka repo, Django shell, or Postgres fallback.",
     "developerName": "Sanka",
     "category": "Productivity",
     "capabilities": [
