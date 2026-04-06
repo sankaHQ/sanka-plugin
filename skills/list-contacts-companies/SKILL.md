@@ -19,8 +19,9 @@ Use this skill when the user wants to find contacts or companies in Sanka CRM.
 - `mcp__sanka_plugin__list_contacts`
 - `mcp__sanka_plugin__list_companies`
 
-In Codex, invoking this skill file directly does not always attach the plugin's
-MCP server to the thread. Prefer starting from the installed plugin chip such as
+This skill is guidance, not the plugin attachment itself. In Codex, invoking
+the skill file directly does not always attach the plugin's MCP server to the
+thread. Prefer starting from the installed plugin chip such as
 `[@sanka-plugin](plugin://sanka-plugin@personal)` or by selecting `Sanka Plugin`
 from `Personal Plugins`.
 

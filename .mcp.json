@@ -1,8 +1,14 @@
 {
   "mcpServers": {
-    "sanka": {
-      "type": "http",
-      "url": "https://mcp.sanka.com/mcp"
+    "sanka_plugin": {
+      "command": "node",
+      "args": [
+        "-e",
+        "const os=require('node:os'); const path=require('node:path'); const script=path.join(os.homedir(), '.codex', 'plugins', 'sanka-plugin', 'vendor', 'mcp-remote', 'bundled-proxy.cjs'); process.argv=[process.argv[0], script, 'https://mcp.sanka.com/mcp', '--host', '127.0.0.1', '--auth-timeout', '180', '--debug', '--resource', 'https://mcp.sanka.com/mcp', '--static-oauth-client-metadata', '{\"scope\":\"contacts:read companies:read\"}']; require(script);"
+      ],
+      "env": {
+        "PATH": "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+      }
     }
   }
 }

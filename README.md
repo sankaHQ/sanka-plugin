@@ -20,8 +20,8 @@ Important:
 ## Included components
 
 - `skills/list-contacts-companies/SKILL.md`
-- `.mcp.json` (vendor-neutral MCP config)
-- `mcp.json` (Cursor-compatible MCP config)
+- `.mcp.json` (Codex MCP config)
+- `mcp.json` (hosted HTTP MCP config for non-Codex clients)
 - `.plugin/plugin.json` (vendor-neutral manifest)
 - `.codex-plugin/plugin.json` (Codex manifest)
 - `.cursor-plugin/plugin.json` and `.claude-plugin/plugin.json` for tool-specific compatibility
@@ -82,12 +82,13 @@ To remove the Codex plugin later, use the bundled uninstaller:
 
 The installer copies the plugin into `~/.codex/plugins/sanka-plugin` and merges a single `sanka-plugin` entry into `~/.agents/plugins/marketplace.json`. Existing marketplace entries are preserved so this flow does not remove other local plugins.
 
-The Codex bundle uses a dedicated `codex.mcp.json` wrapper plus a vendored
-`vendor/mcp-remote/proxy.mjs` patch. That wrapper exists because upstream
+The Codex bundle now follows the canonical `plugin-creator` pattern and points
+its `.codex-plugin/plugin.json` manifest at `./.mcp.json`. That Codex MCP file
+uses the vendored `vendor/mcp-remote/proxy.mjs` patch. The wrapper exists because upstream
 `mcp-remote` can launch OAuth from a later protected `tools/call` request
 without first starting the localhost callback listener, which leaves the
-`127.0.0.1` redirect with no server to receive it. Cursor and Claude continue
-to use the shared `.mcp.json` hosted endpoint.
+`127.0.0.1` redirect with no server to receive it. Claude, Cursor, and the
+generic manifest continue to use the shared `mcp.json` hosted endpoint.
 
 In Codex, the plugin MCP server is intentionally named `sanka_plugin`, not
 `sanka`. That avoids collisions with any stale global
@@ -146,7 +147,10 @@ cp -R /absolute/path/to/sanka-plugin ~/.codex/plugins/sanka-plugin
 4. On first use, complete the browser-based Sanka OAuth flow when prompted by the client.
    The Codex adapter starts the localhost callback listener eagerly so the browser redirect can complete.
 
-This repo keeps the shared `.plugin/` manifest for generic hosts and adds `.codex-plugin/` plus `codex.mcp.json` as the Codex-specific adapter.
+This repo keeps the shared `.plugin/` manifest for generic hosts and uses the
+canonical `.codex-plugin/` plus `.mcp.json` shape for Codex. The legacy
+`codex.mcp.json` file is kept in the bundle as a compatibility alias, but the
+Codex manifest should point at `./.mcp.json`.
 
 If you previously configured Sanka manually in Codex, disable or remove any
 global entry like this from `~/.codex/config.toml` before testing the plugin:
@@ -188,6 +192,11 @@ but `mcp__sanka_plugin__list_companies` is unavailable, the thread likely loaded
 only the skill instructions. Start a new thread from the installed plugin chip
 `[@sanka-plugin](plugin://sanka-plugin@personal)` instead of invoking the skill
 file directly.
+
+If this keeps happening after reinstalling, clear the installed personal plugin
+cache or reinstall with the bundled installer. The installer now removes
+`~/.codex/plugins/cache/personal/sanka-plugin` so Codex does not keep resolving
+an older cached bundle while the installed plugin has newer manifests.
 
 If the browser returns to `127.0.0.1:19550/oauth/callback` with
 `error=invalid_scope`, the plugin is requesting a scope that Sanka's OAuth
