@@ -25,6 +25,7 @@ Important:
 - `.plugin/plugin.json` (vendor-neutral manifest)
 - `.codex-plugin/plugin.json` (Codex manifest)
 - `.cursor-plugin/plugin.json` and `.claude-plugin/plugin.json` for tool-specific compatibility
+- `vendor/mcp-remote/` (vendored Codex-only MCP proxy patch)
 - `macos/installer-app/` (macOS app bundle template)
 - `scripts/` (payload, build, signing, notarization, and release helpers)
 
@@ -39,6 +40,16 @@ The config targets the unified Sanka MCP endpoint and relies on the MCP client's
 - `auth_status`
 - `list_contacts`
 - `list_companies`
+
+For Codex, the packaged plugin currently requests only the read scopes it needs
+for that skill:
+
+- `contacts:read`
+- `companies:read`
+
+It does not request `prospect:read`. The Sanka OAuth scope registry does not
+currently publish that scope, so requesting it would cause the authorize step to
+fail with `invalid_scope` before any authorization code is issued.
 
 ## Setup
 
@@ -71,7 +82,28 @@ To remove the Codex plugin later, use the bundled uninstaller:
 
 The installer copies the plugin into `~/.codex/plugins/sanka-plugin` and merges a single `sanka-plugin` entry into `~/.agents/plugins/marketplace.json`. Existing marketplace entries are preserved so this flow does not remove other local plugins.
 
-The Codex bundle uses a dedicated `codex.mcp.json` wrapper that runs `mcp-remote` against the hosted `/mcp` endpoint. Cursor and Claude continue to use the shared `.mcp.json` hosted endpoint.
+The Codex bundle uses a dedicated `codex.mcp.json` wrapper plus a vendored
+`vendor/mcp-remote/proxy.mjs` patch. That wrapper exists because upstream
+`mcp-remote` can launch OAuth from a later protected `tools/call` request
+without first starting the localhost callback listener, which leaves the
+`127.0.0.1` redirect with no server to receive it. Cursor and Claude continue
+to use the shared `.mcp.json` hosted endpoint.
+
+In Codex, the plugin MCP server is intentionally named `sanka_plugin`, not
+`sanka`. That avoids collisions with any stale global
+`[mcp_servers.sanka]` entry in `~/.codex/config.toml`.
+
+When testing in Codex, start from the installed plugin itself, for example
+`[@sanka-plugin](plugin://sanka-plugin@personal) Find a company in Sanka`, not
+from a raw skill-file link. A direct skill invocation can load the instructions
+without attaching the plugin MCP server to that thread.
+
+If you need to refresh the vendored runtime after an upstream `mcp-remote`
+update, use:
+
+```bash
+./scripts/rebuild-codex-mcp-remote-vendor.sh
+```
 
 ### Manual setup for developers
 
@@ -112,8 +144,22 @@ cp -R /absolute/path/to/sanka-plugin ~/.codex/plugins/sanka-plugin
 3. Restart Codex, open the Plugins menu, and install `Sanka Plugin`.
 
 4. On first use, complete the browser-based Sanka OAuth flow when prompted by the client.
+   The Codex adapter starts the localhost callback listener eagerly so the browser redirect can complete.
 
 This repo keeps the shared `.plugin/` manifest for generic hosts and adds `.codex-plugin/` plus `codex.mcp.json` as the Codex-specific adapter.
+
+If you previously configured Sanka manually in Codex, disable or remove any
+global entry like this from `~/.codex/config.toml` before testing the plugin:
+
+```toml
+[mcp_servers.sanka]
+enabled = true
+url = "https://mcp.sanka.com/mcp"
+```
+
+The installer app now disables that stale global block automatically when it
+finds it, because otherwise Codex can route calls to the direct HTTP server
+instead of the plugin wrapper.
 
 ## Cursor and Claude
 
@@ -131,6 +177,22 @@ Try this reset flow:
 4. Start a fresh chat and confirm the available Sanka tools are `auth_status`, `list_contacts`, and `list_companies`.
 
 If the client still exposes `search_docs` and `execute`, that is a profile-selection bug in the MCP/plugin integration rather than a missing workspace API key.
+
+If Codex returns a native `streamable_http_client ... Auth required` error and
+no browser OAuth window opens, inspect `~/.codex/config.toml`. A stale global
+`[mcp_servers.sanka]` block will hijack `mcp__sanka__*` calls and bypass the
+plugin's `sanka_plugin` wrapper.
+
+If the session says the `sanka-plugin:list-contacts-companies` skill is present
+but `mcp__sanka_plugin__list_companies` is unavailable, the thread likely loaded
+only the skill instructions. Start a new thread from the installed plugin chip
+`[@sanka-plugin](plugin://sanka-plugin@personal)` instead of invoking the skill
+file directly.
+
+If the browser returns to `127.0.0.1:19550/oauth/callback` with
+`error=invalid_scope`, the plugin is requesting a scope that Sanka's OAuth
+server does not publish. The current Codex package should only request
+`contacts:read companies:read`.
 
 ## macOS installer build
 
@@ -202,7 +264,7 @@ If you are not relying on auto-loaded `.env` values, set either:
 
 before running the release script.
 
-See [RELEASING.md](RELEASING.md) for the concrete `v0.4.11` recovery-release checklist.
+See [RELEASING.md](RELEASING.md) for the current release checklist.
 
 ## Legacy local server / raw API use
 

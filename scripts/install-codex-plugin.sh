@@ -8,6 +8,7 @@ PLUGIN_SOURCE_DIR="${1:-}"
 PLUGIN_DEST_DIR="$HOME/.codex/plugins/$PLUGIN_NAME"
 MARKETPLACE_DIR="$HOME/.agents/plugins"
 MARKETPLACE_FILE="$MARKETPLACE_DIR/marketplace.json"
+CODEX_CONFIG_FILE="$HOME/.codex/config.toml"
 BACKUP_SUFFIX="$(date +%Y%m%d%H%M%S)"
 TMP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/sanka-plugin.XXXXXX")"
 
@@ -129,6 +130,51 @@ JXA
 )"
 
 printf '%s\n' "$MARKETPLACE_JSON" > "$MARKETPLACE_FILE"
+
+if [ -f "$CODEX_CONFIG_FILE" ]; then
+  export CODEX_CONFIG_FILE BACKUP_SUFFIX
+  CONFLICT_STATUS="$(
+python3 <<'PY'
+from pathlib import Path
+import os
+import re
+import shutil
+
+path = Path(os.environ["CODEX_CONFIG_FILE"])
+text = path.read_text(encoding="utf-8")
+match = re.search(r"(?ms)^\[mcp_servers\.sanka\]\n(.*?)(?=^\[|\Z)", text)
+if not match:
+    print("missing")
+    raise SystemExit
+
+block = match.group(1)
+if re.search(r"(?m)^enabled\s*=\s*false\s*$", block):
+    print("already-disabled")
+    raise SystemExit
+
+if re.search(r"(?m)^enabled\s*=.*$", block):
+    new_block = re.sub(r"(?m)^enabled\s*=.*$", "enabled = false", block, count=1)
+else:
+    new_block = "enabled = false\n" + block
+
+backup_path = f"{path}.bak-{os.environ['BACKUP_SUFFIX']}"
+shutil.copy2(path, backup_path)
+new_text = text[: match.start(1)] + new_block + text[match.end(1) :]
+path.write_text(new_text, encoding="utf-8")
+print(f"disabled::{backup_path}")
+PY
+)"
+
+  case "$CONFLICT_STATUS" in
+    disabled::*)
+      echo "Disabled conflicting global MCP server in $CODEX_CONFIG_FILE."
+      echo "Backup written to ${CONFLICT_STATUS#disabled::}."
+      ;;
+    already-disabled)
+      echo "Global MCP server conflict was already disabled in $CODEX_CONFIG_FILE."
+      ;;
+  esac
+fi
 
 echo "Installation complete."
 echo
