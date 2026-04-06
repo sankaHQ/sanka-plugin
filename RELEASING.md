@@ -1,12 +1,18 @@
 # Releasing `sanka-plugin`
 
-## `v0.4.12` release checklist
+## Release checklist
 
 Use this checklist for the release that includes:
 
 - the Codex OAuth scope fix (`contacts:read companies:read` only)
 - the vendored callback error fix for OAuth provider errors
 - the Codex guidance to start from the installed plugin chip, not a raw skill link
+- the client manifest split:
+  - Claude, Cursor, and generic hosts use `./.mcp.json`
+  - Codex uses `./codex.mcp.json`
+- the installer cache purge for `~/.codex/plugins/cache/personal/sanka-plugin`
+- the package regression test that prevents Claude/Cursor from drifting onto the
+  Codex-only MCP config
 
 1. Use the dedicated macOS release machine that has:
    - a valid `Developer ID Application` signing certificate
@@ -49,17 +55,26 @@ Expected result:
    - `accepted`
    - `source=Notarized Developer ID`
 
-7. Verify the final ZIP preserves the notarized apps after extraction:
+7. Run the package-level regression checks against the actual ZIP:
 
 ```bash
-rm -rf /tmp/sanka-plugin-v0.4.12
-mkdir -p /tmp/sanka-plugin-v0.4.12
-unzip -q dist/Sanka-Plugin.zip -d /tmp/sanka-plugin-v0.4.12
-spctl -a -vvv "/tmp/sanka-plugin-v0.4.12/Codex/Install Sanka Plugin.app"
-spctl -a -vvv "/tmp/sanka-plugin-v0.4.12/Codex/Uninstall Sanka Plugin.app"
+./scripts/test-plugin-package.sh --skip-build
 ```
 
-8. Smoke-test the installer on a clean Codex setup:
+This validates the packaged manifests for Claude and Codex separately and
+confirms the live OAuth metadata on `mcp.sanka.com`.
+
+8. Verify the final ZIP preserves the notarized apps after extraction:
+
+```bash
+rm -rf /tmp/sanka-plugin-release-local
+mkdir -p /tmp/sanka-plugin-release-local
+unzip -q dist/Sanka-Plugin.zip -d /tmp/sanka-plugin-release-local
+spctl -a -vvv "/tmp/sanka-plugin-release-local/Codex/Install Sanka Plugin.app"
+spctl -a -vvv "/tmp/sanka-plugin-release-local/Codex/Uninstall Sanka Plugin.app"
+```
+
+9. Smoke-test the installer on a clean Codex setup:
    - run `Install Sanka Plugin.app`
    - restart Codex
    - install `Sanka Plugin` from `Personal Plugins`
@@ -67,31 +82,40 @@ spctl -a -vvv "/tmp/sanka-plugin-v0.4.12/Codex/Uninstall Sanka Plugin.app"
    - confirm the OAuth prompt appears
    - confirm the localhost callback listener is started before the browser round-trip if you inspect the `~/.mcp-auth/..._debug.log`
 
-9. Publish the GitHub release from the notarized ZIP only:
+10. Smoke-test the packaged connector on Claude:
+
+- upload `dist/Sanka-Plugin.zip`
+- confirm Claude recognizes the packaged connector instead of dropping straight
+  into the generic "Add custom connector" sheet
+- install the Sanka connector
+- confirm the OAuth browser opens from the packaged connector flow
+
+11. Publish the GitHub release from the notarized ZIP only:
 
 ```bash
-gh release create v0.4.12 'dist/Sanka-Plugin.zip#Sanka-Plugin.zip' \
+gh release create vX.Y.Z 'dist/Sanka-Plugin.zip#Sanka-Plugin.zip' \
   --repo sankaHQ/sanka-plugin \
   --target main \
-  --title v0.4.12
+  --title vX.Y.Z
 ```
 
-10. Download the published asset and verify it again:
+12. Download the published asset and verify it again:
 
 ```bash
 rm -rf /tmp/sanka-plugin-release-check
 mkdir -p /tmp/sanka-plugin-release-check
-gh release download v0.4.12 -R sankaHQ/sanka-plugin -D /tmp/sanka-plugin-release-check
+gh release download vX.Y.Z -R sankaHQ/sanka-plugin -D /tmp/sanka-plugin-release-check
 unzip -q /tmp/sanka-plugin-release-check/Sanka-Plugin.zip -d /tmp/sanka-plugin-release-check/unzip
 spctl -a -vvv "/tmp/sanka-plugin-release-check/unzip/Codex/Install Sanka Plugin.app"
 ```
 
-11. Announce the release only after the downloaded asset passes Gatekeeper.
+13. Announce the release only after the downloaded asset passes Gatekeeper.
 
 ## Notes
 
 - `./scripts/build-plugin-package.sh` is now guarded and should fail on unsigned macOS apps by default.
 - `SANKA_ALLOW_UNSIGNED_MACOS_APPS=1` exists only for local development and should never be used for a published GitHub release.
 - `./scripts/macos-signing-env.sh` auto-loads the sibling `../sanka/.env` file before falling back to manually exported values.
-- `codex.mcp.json` intentionally uses the vendored `vendor/mcp-remote/proxy.mjs` wrapper for Codex. Do not swap it back to raw upstream `npx mcp-remote` unless upstream fixes the late-401 callback-server bug and you have re-smoke-tested OAuth.
-- If you update the vendored Codex proxy, rebuild the runtime artifact with `./scripts/rebuild-codex-mcp-remote-vendor.sh` before packaging a release.
+- `.mcp.json` is the shared hosted HTTP MCP config for Claude, Cursor, and generic hosts.
+- `codex.mcp.json` is the dedicated Codex MCP config and should not be repointed back to `./.mcp.json`.
+- If Claude stops recognizing the uploaded ZIP as a packaged connector, first inspect `.claude-plugin/plugin.json` inside the ZIP and confirm it still points at `./.mcp.json`.
