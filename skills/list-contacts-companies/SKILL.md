@@ -15,9 +15,19 @@ Use this skill when the user wants to find contacts or companies in Sanka CRM.
 
 ## Required tools
 
-- `auth_status`
-- `list_contacts`
-- `list_companies`
+- `mcp__sanka_plugin__auth_status`
+- `mcp__sanka_plugin__list_contacts`
+- `mcp__sanka_plugin__list_companies`
+
+In Codex, invoking this skill file directly does not always attach the plugin's
+MCP server to the thread. Prefer starting from the installed plugin chip such as
+`[@sanka-plugin](plugin://sanka-plugin@personal)` or by selecting `Sanka Plugin`
+from `Personal Plugins`.
+
+Do not use `mcp__sanka__*` in Codex. That name often comes from a stale global
+`[mcp_servers.sanka]` entry in `~/.codex/config.toml`, which bypasses the
+plugin's OAuth wrapper and can return `Auth required` without opening the
+browser flow.
 
 Do not use MCP registry search as a blocking preflight. In some clients, uploaded plugins lazily expose MCP tools and the registry can appear empty before the first connector call. Do not fall back to `search_docs`, `execute`, SDK method calls, or any create/update/delete path.
 
@@ -25,11 +35,11 @@ Do not use MCP registry search as a blocking preflight. In some clients, uploade
 
 1. Decide whether the user intent is about contacts, companies, or both.
 2. Do not stop on an empty MCP registry search result. Treat that as a client-side lazy-load issue and continue with the intended CRM tool call.
-3. If the user explicitly asks whether OAuth is required or whether the connector is connected, call `auth_status`.
-4. If the user wants contact or company data, call `list_contacts` or `list_companies` directly instead of using `auth_status` as a preflight. Protected tool calls are what trigger OAuth in clients like Codex and Claude.
-5. If `auth_status` reports missing auth, or the protected call returns an auth challenge, tell the user to approve the OAuth prompt in the client and stop there.
-6. If the protected CRM tool itself is unavailable at call time, tell the user the connector did not load correctly in the client and ask them to reinstall or restart the plugin.
-7. Call `list_contacts` or `list_companies` with narrow filters first:
+3. If the user explicitly asks whether OAuth is required or whether the connector is connected, call `mcp__sanka_plugin__auth_status`.
+4. If the user wants contact or company data, call `mcp__sanka_plugin__list_contacts` or `mcp__sanka_plugin__list_companies` directly instead of using `mcp__sanka_plugin__auth_status` as a preflight. Protected tool calls are what trigger OAuth in clients like Codex and Claude.
+5. If `mcp__sanka_plugin__auth_status` reports missing auth, or the protected call returns an auth challenge, tell the user to approve the OAuth prompt in the client and stop there.
+6. If the protected CRM tool itself is unavailable at call time, do not jump straight to reinstall advice. In Codex this often means the thread loaded only the skill instructions, not the plugin attachment. Tell the user to start a new thread from `[@sanka-plugin](plugin://sanka-plugin@personal)` or the installed `Sanka Plugin` chip first. If that still fails, then ask them to reinstall or restart the plugin.
+7. Call `mcp__sanka_plugin__list_contacts` or `mcp__sanka_plugin__list_companies` with narrow filters first:
    - `search` for free-text terms
    - `limit` for concise results (default 10, max 100)
    - `page` for pagination

@@ -22,6 +22,7 @@ PAYLOAD_ITEMS=(
   "codex.mcp.json"
   "mcp.json"
   "skills"
+  "vendor"
 )
 
 rm -rf "$DEST_DIR"
