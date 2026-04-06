@@ -106,7 +106,7 @@ const entry = {
   },
   policy: {
     installation: "AVAILABLE",
-    authentication: "ON_USE"
+    authentication: "ON_INSTALL"
   },
   category: "Productivity"
 };
