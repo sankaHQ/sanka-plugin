@@ -20,8 +20,9 @@ Important:
 ## Included components
 
 - `skills/list-contacts-companies/SKILL.md`
-- `.mcp.json` (Codex MCP config)
-- `mcp.json` (hosted HTTP MCP config for non-Codex clients)
+- `.mcp.json` (shared MCP config for Claude, Cursor, and generic hosts)
+- `codex.mcp.json` (Codex MCP config)
+- `mcp.json` (legacy alias for the shared hosted HTTP MCP config)
 - `.plugin/plugin.json` (vendor-neutral manifest)
 - `.codex-plugin/plugin.json` (Codex manifest)
 - `.cursor-plugin/plugin.json` and `.claude-plugin/plugin.json` for tool-specific compatibility
@@ -82,9 +83,12 @@ To remove the Codex plugin later, use the bundled uninstaller:
 
 The installer copies the plugin into `~/.codex/plugins/sanka-plugin` and merges a single `sanka-plugin` entry into `~/.agents/plugins/marketplace.json`. Existing marketplace entries are preserved so this flow does not remove other local plugins.
 
-The Codex bundle follows the canonical `plugin-creator` pattern and points its
-`.codex-plugin/plugin.json` manifest at `./.mcp.json`. That Codex MCP file now
-uses the same direct hosted HTTP MCP shape as the official plugins. The native
+Claude, Cursor, and the generic plugin manifest should keep using the canonical
+shared `./.mcp.json` path. Codex uses its own `./codex.mcp.json` file so the
+Codex-specific server alias can stay isolated from the generic clients.
+
+The Codex bundle uses a dedicated `codex.mcp.json` file with the same direct
+hosted HTTP MCP shape as the official plugins. The native
 OAuth path depends on `mcp.sanka.com` exposing same-origin OAuth discovery and
 auth endpoints, so Codex can show its standard install/use auth screen instead
 of relying on a vendored wrapper.
@@ -147,10 +151,11 @@ cp -R /absolute/path/to/sanka-plugin ~/.codex/plugins/sanka-plugin
 
 4. Complete the browser-based Sanka OAuth flow when Codex prompts during install or first use.
 
-This repo keeps the shared `.plugin/` manifest for generic hosts and uses the
-canonical `.codex-plugin/` plus `.mcp.json` shape for Codex. The legacy
-`codex.mcp.json` file is kept in the bundle as a compatibility alias, but the
-Codex manifest should point at `./.mcp.json`.
+This repo keeps the shared `.plugin/` manifest plus `./.mcp.json` for Claude,
+Cursor, and generic hosts, and uses `.codex-plugin/` plus `./codex.mcp.json`
+for Codex. Keep those client-specific MCP paths separate. A Codex-only manifest
+change can break the Claude/Cursor upload flow if it drifts the shared clients
+off the canonical `./.mcp.json` path.
 
 If you previously configured Sanka manually in Codex, disable or remove any
 global entry like this from `~/.codex/config.toml` before testing the plugin:
@@ -168,6 +173,11 @@ instead of the plugin wrapper.
 ## Cursor and Claude
 
 Use [Sanka-Plugin.zip](https://github.com/sankaHQ/sanka-plugin/releases/latest/download/Sanka-Plugin.zip) for Claude and Cursor. That archive has the client manifests at the ZIP root, including `.claude-plugin/plugin.json`, so it can be uploaded directly. The same archive also contains the `Codex/` installer folder for Codex users.
+
+If Claude opens an "Add custom connector" sheet instead of attaching the
+packaged connector normally, first confirm the uploaded ZIP still has
+`.claude-plugin/plugin.json` pointing at `./.mcp.json`. The working Claude
+releases use that canonical shared MCP path.
 
 ## Troubleshooting
 
