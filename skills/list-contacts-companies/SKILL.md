@@ -26,7 +26,7 @@ Do not use MCP registry search as a blocking preflight. In some clients, uploade
 1. Decide whether the user intent is about contacts, companies, or both.
 2. Do not stop on an empty MCP registry search result. Treat that as a client-side lazy-load issue and continue with the intended CRM tool call.
 3. If the user explicitly asks whether OAuth is required or whether the connector is connected, call `auth_status`.
-4. If the user wants contact or company data, call `list_contacts` or `list_companies` directly instead of using `auth_status` as a preflight. Protected tool calls are what trigger OAuth in clients like Codex and Claude via `mcp-remote`.
+4. If the user wants contact or company data, call `list_contacts` or `list_companies` directly instead of using `auth_status` as a preflight. Protected tool calls are what trigger OAuth in clients like Codex and Claude.
 5. If `auth_status` reports missing auth, or the protected call returns an auth challenge, tell the user to approve the OAuth prompt in the client and stop there.
 6. If the protected CRM tool itself is unavailable at call time, tell the user the connector did not load correctly in the client and ask them to reinstall or restart the plugin.
 7. Call `list_contacts` or `list_companies` with narrow filters first:

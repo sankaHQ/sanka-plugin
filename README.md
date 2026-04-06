@@ -111,7 +111,7 @@ cp -R /absolute/path/to/sanka-plugin ~/.codex/plugins/sanka-plugin
 
 3. Restart Codex, open the Plugins menu, and install `Sanka Plugin`.
 
-4. On first use, complete the browser-based Sanka OAuth flow when prompted by `mcp-remote`.
+4. On first use, complete the browser-based Sanka OAuth flow when prompted by the client.
 
 This repo keeps the shared `.plugin/` manifest for generic hosts and adds `.codex-plugin/` plus `codex.mcp.json` as the Codex-specific adapter.
 
@@ -126,7 +126,7 @@ If Claude or Cursor shows `search_docs` / `execute` instead of `auth_status` / `
 Try this reset flow:
 
 1. Remove the installed connector/plugin from the client.
-2. Clear cached OAuth tokens with `rm -rf ~/.mcp-auth`.
+2. Restart the client so it reloads the hosted connector configuration.
 3. Reinstall the plugin after GitHub raw cache has refreshed.
 4. Start a fresh chat and confirm the available Sanka tools are `auth_status`, `list_contacts`, and `list_companies`.
 
