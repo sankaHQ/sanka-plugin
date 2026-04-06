@@ -15,9 +15,9 @@ Use this skill when the user wants to find contacts or companies in Sanka CRM.
 
 ## Required tools
 
-- `crm.auth_status`
-- `crm.list_contacts`
-- `crm.list_companies`
+- `auth_status`
+- `list_contacts`
+- `list_companies`
 
 Do not use MCP registry search as a blocking preflight. In some clients, uploaded plugins lazily expose MCP tools and the registry can appear empty before the first connector call. Do not fall back to `search_docs`, `execute`, SDK method calls, or any create/update/delete path.
 
@@ -25,11 +25,11 @@ Do not use MCP registry search as a blocking preflight. In some clients, uploade
 
 1. Decide whether the user intent is about contacts, companies, or both.
 2. Do not stop on an empty MCP registry search result. Treat that as a client-side lazy-load issue and continue with the intended CRM tool call.
-3. If the user explicitly asks whether OAuth is required or whether the connector is connected, call `crm.auth_status`.
-4. If the user wants contact or company data, call `crm.list_contacts` or `crm.list_companies` directly instead of using `crm.auth_status` as a preflight. Protected tool calls are what trigger OAuth in clients like Codex and Claude via `mcp-remote`.
-5. If `crm.auth_status` reports missing auth, or the protected call returns an auth challenge, tell the user to approve the OAuth prompt in the client and stop there.
+3. If the user explicitly asks whether OAuth is required or whether the connector is connected, call `auth_status`.
+4. If the user wants contact or company data, call `list_contacts` or `list_companies` directly instead of using `auth_status` as a preflight. Protected tool calls are what trigger OAuth in clients like Codex and Claude.
+5. If `auth_status` reports missing auth, or the protected call returns an auth challenge, tell the user to approve the OAuth prompt in the client and stop there.
 6. If the protected CRM tool itself is unavailable at call time, tell the user the connector did not load correctly in the client and ask them to reinstall or restart the plugin.
-7. Call `crm.list_contacts` or `crm.list_companies` with narrow filters first:
+7. Call `list_contacts` or `list_companies` with narrow filters first:
    - `search` for free-text terms
    - `limit` for concise results (default 10, max 100)
    - `page` for pagination
