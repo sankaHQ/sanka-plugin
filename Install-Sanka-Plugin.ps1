@@ -92,7 +92,7 @@ try {
         }
         policy = [pscustomobject]@{
             installation = "AVAILABLE"
-            authentication = "ON_INSTALL"
+            authentication = "ON_USE"
         }
         category = "Productivity"
     }
