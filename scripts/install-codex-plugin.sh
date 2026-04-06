@@ -6,6 +6,7 @@ export COPYFILE_DISABLE=1
 PLUGIN_NAME="sanka-plugin"
 PLUGIN_SOURCE_DIR="${1:-}"
 PLUGIN_DEST_DIR="$HOME/.codex/plugins/$PLUGIN_NAME"
+PLUGIN_CACHE_DIR="$HOME/.codex/plugins/cache/personal/$PLUGIN_NAME"
 MARKETPLACE_DIR="$HOME/.agents/plugins"
 MARKETPLACE_FILE="$MARKETPLACE_DIR/marketplace.json"
 CODEX_CONFIG_FILE="$HOME/.codex/config.toml"
@@ -45,6 +46,11 @@ mkdir -p "$STAGING_DIR"
 
 rm -rf "$PLUGIN_DEST_DIR"
 mv "$STAGING_DIR" "$PLUGIN_DEST_DIR"
+
+if [ -d "$PLUGIN_CACHE_DIR" ]; then
+  rm -rf "$PLUGIN_CACHE_DIR"
+  echo "Cleared stale personal plugin cache at $PLUGIN_CACHE_DIR."
+fi
 
 if [ -f "$MARKETPLACE_FILE" ]; then
   cp "$MARKETPLACE_FILE" "$MARKETPLACE_FILE.bak-$BACKUP_SUFFIX"

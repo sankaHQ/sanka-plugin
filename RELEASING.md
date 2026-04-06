@@ -1,12 +1,14 @@
 # Releasing `sanka-plugin`
 
-## `v0.4.12` release checklist
+## `v0.4.13` release checklist
 
 Use this checklist for the release that includes:
 
 - the Codex OAuth scope fix (`contacts:read companies:read` only)
 - the vendored callback error fix for OAuth provider errors
 - the Codex guidance to start from the installed plugin chip, not a raw skill link
+- the Codex manifest alignment back to the canonical `./.mcp.json` path
+- the installer cache purge for `~/.codex/plugins/cache/personal/sanka-plugin`
 
 1. Use the dedicated macOS release machine that has:
    - a valid `Developer ID Application` signing certificate
@@ -52,11 +54,11 @@ Expected result:
 7. Verify the final ZIP preserves the notarized apps after extraction:
 
 ```bash
-rm -rf /tmp/sanka-plugin-v0.4.12
-mkdir -p /tmp/sanka-plugin-v0.4.12
-unzip -q dist/Sanka-Plugin.zip -d /tmp/sanka-plugin-v0.4.12
-spctl -a -vvv "/tmp/sanka-plugin-v0.4.12/Codex/Install Sanka Plugin.app"
-spctl -a -vvv "/tmp/sanka-plugin-v0.4.12/Codex/Uninstall Sanka Plugin.app"
+rm -rf /tmp/sanka-plugin-v0.4.13
+mkdir -p /tmp/sanka-plugin-v0.4.13
+unzip -q dist/Sanka-Plugin.zip -d /tmp/sanka-plugin-v0.4.13
+spctl -a -vvv "/tmp/sanka-plugin-v0.4.13/Codex/Install Sanka Plugin.app"
+spctl -a -vvv "/tmp/sanka-plugin-v0.4.13/Codex/Uninstall Sanka Plugin.app"
 ```
 
 8. Smoke-test the installer on a clean Codex setup:
@@ -70,10 +72,10 @@ spctl -a -vvv "/tmp/sanka-plugin-v0.4.12/Codex/Uninstall Sanka Plugin.app"
 9. Publish the GitHub release from the notarized ZIP only:
 
 ```bash
-gh release create v0.4.12 'dist/Sanka-Plugin.zip#Sanka-Plugin.zip' \
+gh release create v0.4.13 'dist/Sanka-Plugin.zip#Sanka-Plugin.zip' \
   --repo sankaHQ/sanka-plugin \
   --target main \
-  --title v0.4.12
+  --title v0.4.13
 ```
 
 10. Download the published asset and verify it again:
@@ -81,7 +83,7 @@ gh release create v0.4.12 'dist/Sanka-Plugin.zip#Sanka-Plugin.zip' \
 ```bash
 rm -rf /tmp/sanka-plugin-release-check
 mkdir -p /tmp/sanka-plugin-release-check
-gh release download v0.4.12 -R sankaHQ/sanka-plugin -D /tmp/sanka-plugin-release-check
+gh release download v0.4.13 -R sankaHQ/sanka-plugin -D /tmp/sanka-plugin-release-check
 unzip -q /tmp/sanka-plugin-release-check/Sanka-Plugin.zip -d /tmp/sanka-plugin-release-check/unzip
 spctl -a -vvv "/tmp/sanka-plugin-release-check/unzip/Codex/Install Sanka Plugin.app"
 ```
@@ -93,5 +95,5 @@ spctl -a -vvv "/tmp/sanka-plugin-release-check/unzip/Codex/Install Sanka Plugin.
 - `./scripts/build-plugin-package.sh` is now guarded and should fail on unsigned macOS apps by default.
 - `SANKA_ALLOW_UNSIGNED_MACOS_APPS=1` exists only for local development and should never be used for a published GitHub release.
 - `./scripts/macos-signing-env.sh` auto-loads the sibling `../sanka/.env` file before falling back to manually exported values.
-- `codex.mcp.json` intentionally uses the vendored `vendor/mcp-remote/proxy.mjs` wrapper for Codex. Do not swap it back to raw upstream `npx mcp-remote` unless upstream fixes the late-401 callback-server bug and you have re-smoke-tested OAuth.
+- `.mcp.json` intentionally uses the vendored `vendor/mcp-remote/proxy.mjs` wrapper for Codex. Do not swap it back to raw upstream `npx mcp-remote` unless upstream fixes the late-401 callback-server bug and you have re-smoke-tested OAuth.
 - If you update the vendored Codex proxy, rebuild the runtime artifact with `./scripts/rebuild-codex-mcp-remote-vendor.sh` before packaging a release.
