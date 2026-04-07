@@ -1,6 +1,6 @@
 # sanka-plugin
 
-Open Plugins-compatible Sanka plugin with a read-only CRM skill for listing contacts and companies.
+Open Plugins-compatible Sanka plugin with read-only CRM skills for listing contacts and companies.
 
 ## Download
 
@@ -19,7 +19,8 @@ Important:
 
 ## Included components
 
-- `skills/list-contacts-companies/SKILL.md`
+- `skills/list_companies/SKILL.md`
+- `skills/list_contacts/SKILL.md`
 - `.mcp.json` (shared MCP config for Claude, Cursor, and generic hosts)
 - `codex.mcp.json` (Codex MCP config)
 - `mcp.json` (legacy alias for the shared hosted HTTP MCP config)
@@ -43,7 +44,7 @@ The config targets the unified Sanka MCP endpoint and relies on the MCP client's
 - `list_companies`
 
 For Codex, the packaged plugin currently requests only the read scopes it needs
-for that skill:
+for those CRM skills:
 
 - `contacts:read`
 - `companies:read`
@@ -197,9 +198,10 @@ no browser OAuth window opens, inspect `~/.codex/config.toml`. A stale global
 `[mcp_servers.sanka]` block will hijack `mcp__sanka__*` calls and bypass the
 plugin's `sanka_plugin` server attachment.
 
-If the session says the `sanka-plugin:list-contacts-companies` skill is present
-but `mcp__sanka_plugin__list_companies` is unavailable, the thread likely loaded
-only the skill instructions. Start a new thread from the installed plugin chip
+If the session says the `sanka-plugin:list_companies` or
+`sanka-plugin:list_contacts` skill is present but the matching
+`mcp__sanka_plugin__list_*` tool is unavailable, the thread likely loaded only
+the skill instructions. Start a new thread from the installed plugin chip
 `[@sanka-plugin](plugin://sanka-plugin@personal)` instead of invoking the skill
 file directly.
 
