@@ -1,6 +1,6 @@
 # sanka-plugin
 
-Open Plugins-compatible Sanka plugin with CRM and expense management skills for contacts, companies, and expenses.
+Open Plugins-compatible Sanka plugin that attaches Sanka's hosted MCP server for CRM and expense workflows.
 
 ## Download
 
@@ -19,10 +19,7 @@ Important:
 
 ## Included components
 
-- `skills/list_companies/SKILL.md`
-- `skills/list_contacts/SKILL.md`
-- `skills/list_expenses/SKILL.md`
-- `skills/manage_expenses/SKILL.md`
+- `skills/sanka/SKILL.md` (thin plugin guardrail skill)
 - `.mcp.json` (shared MCP config for Claude, Cursor, and generic hosts)
 - `codex.mcp.json` (Codex MCP config)
 - `mcp.json` (legacy alias for the shared hosted HTTP MCP config)
@@ -50,6 +47,8 @@ The config targets the unified Sanka MCP endpoint and relies on the MCP client's
 - `create_expense`
 - `update_expense`
 - `delete_expense`
+
+The hosted MCP server is the source of truth for tool behavior, schemas, and workflow guidance. The packaged plugin stays intentionally thin so new MCP capabilities can ship without requiring a plugin reinstall whenever possible.
 
 ## Setup
 
@@ -196,8 +195,7 @@ no browser OAuth window opens, inspect `~/.codex/config.toml`. A stale global
 `[mcp_servers.sanka]` block will hijack `mcp__sanka__*` calls and bypass the
 plugin's `sanka_plugin` server attachment.
 
-If the session says the `sanka-plugin:list_companies`,
-`sanka-plugin:list_contacts`, `sanka-plugin:list_expenses`, or `sanka-plugin:manage_expenses` skill is present but the matching
+If the session says the `sanka-plugin:sanka` skill is present but the matching
 `mcp__sanka_plugin__*` tool is unavailable, the thread likely loaded only
 the skill instructions. Start a new thread from the installed plugin chip
 `[@sanka-plugin](plugin://sanka-plugin@personal)` instead of invoking the skill
