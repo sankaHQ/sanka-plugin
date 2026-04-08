@@ -10,6 +10,11 @@ trap cleanup_sanka_macos_signing_env EXIT
 setup_sanka_macos_signing_env
 
 IDENTITY="${APPLE_CODESIGN_IDENTITY:-${2:-}}"
+KEYCHAIN_ARGS=()
+
+if [ -n "${SANKA_MACOS_TEMP_KEYCHAIN:-}" ]; then
+  KEYCHAIN_ARGS=(--keychain "$SANKA_MACOS_TEMP_KEYCHAIN")
+fi
 
 if [ ! -d "$APP_PATH" ]; then
   if [ "$(basename "$APP_PATH")" = "Uninstall Sanka Plugin.app" ]; then
@@ -24,6 +29,7 @@ fi
   --deep \
   --options runtime \
   --timestamp \
+  "${KEYCHAIN_ARGS[@]}" \
   --sign "$IDENTITY" \
   "$APP_PATH"
 
