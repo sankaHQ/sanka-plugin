@@ -1,7 +1,7 @@
 {
   "name": "sanka-plugin",
-  "version": "0.4.17",
-  "description": "Sanka CRM plugin with MCP-powered contact, company, and expense management skills using native OAuth sign-in.",
+  "version": "0.4.18",
+  "description": "Thin Sanka plugin that attaches the hosted MCP server for CRM and expense workflows using native OAuth sign-in.",
   "author": {
     "name": "Sanka",
     "url": "https://sanka.com"
@@ -22,7 +22,7 @@
   "interface": {
     "displayName": "Sanka Plugin",
     "shortDescription": "Manage Sanka CRM and expenses with native OAuth",
-    "longDescription": "Use Sanka's hosted MCP endpoint and Sanka CRM skills to find contacts, companies, and manage expenses from Codex through the native browser-based OAuth flow. In Codex, start from the installed Sanka Plugin chip so the MCP server is attached to the thread. These queries and actions must come from the hosted MCP tools, not from any local Sanka repo, Django shell, or Postgres fallback.",
+    "longDescription": "Use Sanka's hosted MCP endpoint for live CRM and expense workflows from Codex through the native browser-based OAuth flow. The packaged plugin stays intentionally thin: the hosted MCP server carries the tool behavior and workflow guidance. In Codex, start from the installed Sanka Plugin chip so the MCP server is attached to the thread. These queries and actions must come from the hosted MCP tools, not from any local Sanka repo, Django shell, or Postgres fallback.",
     "developerName": "Sanka",
     "category": "Productivity",
     "capabilities": [
