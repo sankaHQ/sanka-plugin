@@ -1,6 +1,6 @@
 # sanka-plugin
 
-Open Plugins-compatible Sanka plugin with read-only CRM skills for listing contacts and companies.
+Open Plugins-compatible Sanka plugin with CRM and expense management skills for contacts, companies, and expenses.
 
 ## Download
 
@@ -21,6 +21,8 @@ Important:
 
 - `skills/list_companies/SKILL.md`
 - `skills/list_contacts/SKILL.md`
+- `skills/list_expenses/SKILL.md`
+- `skills/manage_expenses/SKILL.md`
 - `.mcp.json` (shared MCP config for Claude, Cursor, and generic hosts)
 - `codex.mcp.json` (Codex MCP config)
 - `mcp.json` (legacy alias for the shared hosted HTTP MCP config)
@@ -42,16 +44,12 @@ The config targets the unified Sanka MCP endpoint and relies on the MCP client's
 - `auth_status`
 - `list_contacts`
 - `list_companies`
-
-For Codex, the packaged plugin currently requests only the read scopes it needs
-for those CRM skills:
-
-- `contacts:read`
-- `companies:read`
-
-It does not request `prospect:read`. The Sanka OAuth scope registry does not
-currently publish that scope, so requesting it would cause the authorize step to
-fail with `invalid_scope` before any authorization code is issued.
+- `list_expenses`
+- `get_expense`
+- `upload_expense_attachment`
+- `create_expense`
+- `update_expense`
+- `delete_expense`
 
 ## Setup
 
@@ -182,14 +180,14 @@ releases use that canonical shared MCP path.
 
 ## Troubleshooting
 
-If Claude or Cursor shows `search_docs` / `execute` instead of `auth_status` / `list_contacts` / `list_companies`, the connector is not running in the intended CRM-only profile yet. In that state, the model may fall back to SDK-style execution and show confusing API-key/auth errors.
+If Claude or Cursor shows `search_docs` / `execute` instead of the dedicated Sanka tools such as `list_contacts`, `list_companies`, `list_expenses`, or `create_expense`, the connector is not running in the intended profile yet. In that state, the model may fall back to SDK-style execution and show confusing API-key/auth errors.
 
 Try this reset flow:
 
 1. Remove the installed connector/plugin from the client.
 2. Restart the client so it reloads the hosted connector configuration.
 3. Reinstall the plugin after GitHub raw cache has refreshed.
-4. Start a fresh chat and confirm the available Sanka tools are `auth_status`, `list_contacts`, and `list_companies`.
+4. Start a fresh chat and confirm the available Sanka tools include `auth_status`, `list_contacts`, `list_companies`, `list_expenses`, `get_expense`, `upload_expense_attachment`, `create_expense`, `update_expense`, and `delete_expense`.
 
 If the client still exposes `search_docs` and `execute`, that is a profile-selection bug in the MCP/plugin integration rather than a missing workspace API key.
 
@@ -198,9 +196,9 @@ no browser OAuth window opens, inspect `~/.codex/config.toml`. A stale global
 `[mcp_servers.sanka]` block will hijack `mcp__sanka__*` calls and bypass the
 plugin's `sanka_plugin` server attachment.
 
-If the session says the `sanka-plugin:list_companies` or
-`sanka-plugin:list_contacts` skill is present but the matching
-`mcp__sanka_plugin__list_*` tool is unavailable, the thread likely loaded only
+If the session says the `sanka-plugin:list_companies`,
+`sanka-plugin:list_contacts`, `sanka-plugin:list_expenses`, or `sanka-plugin:manage_expenses` skill is present but the matching
+`mcp__sanka_plugin__*` tool is unavailable, the thread likely loaded only
 the skill instructions. Start a new thread from the installed plugin chip
 `[@sanka-plugin](plugin://sanka-plugin@personal)` instead of invoking the skill
 file directly.
@@ -217,10 +215,6 @@ cache or reinstall with the bundled installer. The installer now removes
 `~/.codex/plugins/cache/personal/sanka-plugin` so Codex does not keep resolving
 an older cached bundle while the installed plugin has newer manifests.
 
-If the browser returns to `127.0.0.1:19550/oauth/callback` with
-`error=invalid_scope`, the plugin is requesting a scope that Sanka's OAuth
-server does not publish. The current Codex package should only request
-`contacts:read companies:read`.
 
 ## macOS installer build
 
