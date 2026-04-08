@@ -1,7 +1,7 @@
 {
   "name": "sanka-plugin",
-  "version": "0.4.16",
-  "description": "Sanka CRM plugin with MCP-powered contact and company discovery skills using native OAuth sign-in.",
+  "version": "0.4.17",
+  "description": "Sanka CRM plugin with MCP-powered contact, company, and expense management skills using native OAuth sign-in.",
   "author": {
     "name": "Sanka"
   },
