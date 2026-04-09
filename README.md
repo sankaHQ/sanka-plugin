@@ -47,6 +47,11 @@ The currently attached Sanka tool list in each thread is the source of truth for
 - `list_deals`
 - `get_deal`
 - `list_deal_pipelines`
+- `list_private_messages`
+- `sync_private_messages`
+- `get_private_message_thread`
+- `reply_private_message_thread`
+- `archive_private_message_thread`
 - `list_expenses`
 - `get_expense`
 - `upload_expense_attachment`
@@ -102,7 +107,7 @@ In Codex, the plugin MCP server is intentionally named `sanka_plugin`, not
 `[mcp_servers.sanka]` entry in `~/.codex/config.toml`.
 
 When testing in Codex, start from the installed plugin itself, for example
-`[@sanka-plugin](plugin://sanka-plugin@personal) Find a company in Sanka`.
+`[@sanka-plugin](plugin://sanka-plugin@personal) Review my latest private inbox threads in Sanka`.
 
 A direct skill-file invocation can still load the skill instructions without
 attaching the plugin MCP server to that thread, so the installed plugin chip is
@@ -185,7 +190,7 @@ releases use that canonical shared MCP path.
 
 ## Troubleshooting
 
-If Claude or Cursor shows `search_docs` / `execute` instead of the dedicated Sanka tools such as `list_contacts`, `list_companies`, `list_deals`, `list_expenses`, or `create_expense`, the connector is not running in the intended profile yet. In that state, the model may fall back to SDK-style execution and show confusing API-key/auth errors.
+If Claude or Cursor shows `search_docs` / `execute` instead of the dedicated Sanka tools such as `list_private_messages`, `list_contacts`, `list_companies`, `list_deals`, `list_expenses`, or `create_expense`, the connector is not running in the intended profile yet. In that state, the model may fall back to SDK-style execution and show confusing API-key/auth errors.
 
 Try this reset flow:
 
@@ -193,7 +198,7 @@ Try this reset flow:
 2. If the new hosted tools are still missing, reconnect or remove/re-add the installed connector/plugin.
 3. Restart the client so it reloads the hosted connector configuration.
 4. Reinstall the plugin only when the plugin bundle itself changed.
-5. Start a fresh chat and confirm the available Sanka tools include the currently hosted surface, such as `auth_status`, `list_contacts`, `list_companies`, `list_deals`, `get_deal`, `list_deal_pipelines`, `list_expenses`, `get_expense`, `upload_expense_attachment`, `create_expense`, `update_expense`, and `delete_expense`.
+5. Start a fresh chat and confirm the available Sanka tools include the currently hosted surface, such as `list_private_messages`, `sync_private_messages`, `get_private_message_thread`, `reply_private_message_thread`, `archive_private_message_thread`, `list_contacts`, `list_companies`, `list_deals`, `get_deal`, `list_deal_pipelines`, `list_expenses`, `get_expense`, `upload_expense_attachment`, `create_expense`, `update_expense`, and `delete_expense`.
 
 If the client still exposes `search_docs` and `execute`, that is a profile-selection bug in the MCP/plugin integration rather than a missing workspace API key.
 
