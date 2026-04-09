@@ -1,6 +1,6 @@
 {
   "name": "sanka-plugin",
-  "version": "0.4.19",
+  "version": "0.4.20",
   "description": "Thin Sanka plugin that attaches the hosted MCP server for live Sanka workflows using native OAuth sign-in.",
   "author": {
     "name": "Sanka"
