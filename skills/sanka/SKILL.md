@@ -1,6 +1,6 @@
 ---
 name: sanka
-description: Use the installed Sanka Plugin as a remote-only MCP entrypoint for live CRM and expense work. Start from the plugin attachment, use `mcp__sanka_plugin__*` tools directly, and never fall back to local repo or database access.
+description: Use the installed Sanka Plugin as a remote-only MCP entrypoint for live Sanka work. Start from the plugin attachment, use `mcp__sanka_plugin__*` tools directly, and never fall back to local repo or database access.
 ---
 
 # Sanka
@@ -17,7 +17,8 @@ This skill is intentionally thin. The hosted MCP server is the source of truth f
 
 - Treat the plugin as remote-only. Live Sanka data and writes must come from `mcp__sanka_plugin__*`.
 - Prefer starting from the installed plugin chip such as `[@sanka-plugin](plugin://sanka-plugin@personal)`.
-- Call the matching protected MCP tool directly for real CRM or expense requests. Do not preflight with `auth_status`.
+- Treat the currently attached `mcp__sanka_plugin__*` tool list in this thread as the source of truth. If a newly deployed hosted MCP tool is present, use it even if this skill text does not mention it explicitly.
+- Call the matching protected MCP tool directly for live Sanka requests. Do not preflight with `auth_status` unless the user is explicitly debugging auth.
 - Protected tools are the OAuth trigger in clients like Codex, Claude, and Cursor.
 - Never substitute local code search, `.env`, `manage.py shell`, `psql`, Django ORM, terminal commands, or repo-local data access for a plugin request.
 - Do not use `mcp__sanka__*` in Codex. That usually indicates a stale global server entry instead of the installed plugin attachment.
@@ -25,4 +26,5 @@ This skill is intentionally thin. The hosted MCP server is the source of truth f
 ## If The Plugin Is Not Attached
 
 - If `mcp__sanka_plugin__*` tools are unavailable in the current thread, stop and say the plugin did not attach correctly.
-- Ask the user to start a new thread from the installed `Sanka Plugin` chip or reinstall/restart the plugin if needed.
+- If a newly deployed hosted MCP tool is missing, ask the user to start a new thread or reconnect the plugin/connector first.
+- Only suggest reinstalling or updating the plugin when the bundle itself changed. Hosted MCP-only changes should not require a reinstall.

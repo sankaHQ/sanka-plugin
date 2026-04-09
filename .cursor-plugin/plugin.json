@@ -2,7 +2,7 @@
   "name": "sanka-plugin",
   "displayName": "Sanka Plugin",
   "version": "0.4.19",
-  "description": "Thin Sanka plugin that attaches the hosted MCP server for CRM and expense workflows using native OAuth sign-in.",
+  "description": "Thin Sanka plugin that attaches the hosted MCP server for live Sanka workflows using native OAuth sign-in.",
   "author": {
     "name": "Sanka",
     "url": "https://sanka.com"
@@ -17,7 +17,9 @@
     "mcp",
     "contacts",
     "companies",
-    "expenses"
+    "deals",
+    "expenses",
+    "workflows"
   ],
   "skills": "./skills/",
   "mcpServers": "./.mcp.json"
