@@ -40,7 +40,7 @@ The config targets the unified Sanka MCP endpoint and relies on the MCP client's
 
 The hosted MCP server is the source of truth for tool behavior, schemas, and workflow guidance. The packaged plugin stays intentionally thin so new MCP capabilities can ship without requiring a plugin reinstall whenever possible.
 
-The currently attached `mcp__sanka_plugin__*` tool list in each thread is the source of truth for what the client can do at that moment. Common hosted tools include:
+The currently attached Sanka tool list in each thread is the source of truth for what the client can do at that moment. In Codex, that namespace is usually `mcp__sanka_plugin__*`. In Claude, Cursor, or other hosts, the namespace may be host-generated or opaque such as `mcp__<connector_id>__*`. Common hosted tools include:
 
 - `list_contacts`
 - `list_companies`
@@ -204,11 +204,15 @@ no browser OAuth window opens, inspect `~/.codex/config.toml`. A stale global
 `[mcp_servers.sanka]` block will hijack `mcp__sanka__*` calls and bypass the
 plugin's `sanka_plugin` server attachment.
 
-If the session says the `sanka-plugin:sanka` skill is present but the matching
-`mcp__sanka_plugin__*` tool is unavailable, the thread likely loaded only
-the skill instructions. Start a new thread from the installed plugin chip
+If the session says the `sanka-plugin:sanka` skill is present but there are no
+attached live Sanka MCP tools in the thread, the thread likely loaded only the
+skill instructions. Start a new thread from the installed plugin chip
 `[@sanka-plugin](plugin://sanka-plugin@personal)` instead of invoking the skill
 file directly.
+
+If Claude shows attached Sanka tools under an opaque namespace like
+`mcp__0e3f8181__*`, that is still a valid plugin attachment. Do not treat that
+alone as an attachment failure.
 
 If Codex answers a Sanka Plugin CRM query by referencing local Django models,
 `manage.py shell`, `.env`, `DB_HOST`, `psql`, or repo-local records, that answer
