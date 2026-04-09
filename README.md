@@ -1,6 +1,6 @@
 # sanka-plugin
 
-Open Plugins-compatible Sanka plugin that attaches Sanka's hosted MCP server for CRM and expense workflows.
+Open Plugins-compatible Sanka plugin that attaches Sanka's hosted MCP server for live Sanka workflows.
 
 ## Download
 
@@ -36,11 +36,17 @@ This plugin uses Sanka's hosted MCP endpoint:
 
 - `https://mcp.sanka.com/mcp`
 
-The config targets the unified Sanka MCP endpoint and relies on the MCP client's OAuth flow instead of a pasted API key:
+The config targets the unified Sanka MCP endpoint and relies on the MCP client's OAuth flow instead of a pasted API key.
 
-- `auth_status`
+The hosted MCP server is the source of truth for tool behavior, schemas, and workflow guidance. The packaged plugin stays intentionally thin so new MCP capabilities can ship without requiring a plugin reinstall whenever possible.
+
+The currently attached `mcp__sanka_plugin__*` tool list in each thread is the source of truth for what the client can do at that moment. Common hosted tools include:
+
 - `list_contacts`
 - `list_companies`
+- `list_deals`
+- `get_deal`
+- `list_deal_pipelines`
 - `list_expenses`
 - `get_expense`
 - `upload_expense_attachment`
@@ -48,7 +54,7 @@ The config targets the unified Sanka MCP endpoint and relies on the MCP client's
 - `update_expense`
 - `delete_expense`
 
-The hosted MCP server is the source of truth for tool behavior, schemas, and workflow guidance. The packaged plugin stays intentionally thin so new MCP capabilities can ship without requiring a plugin reinstall whenever possible.
+That list may expand over time as new hosted MCP tools ship.
 
 ## Setup
 
@@ -179,16 +185,19 @@ releases use that canonical shared MCP path.
 
 ## Troubleshooting
 
-If Claude or Cursor shows `search_docs` / `execute` instead of the dedicated Sanka tools such as `list_contacts`, `list_companies`, `list_expenses`, or `create_expense`, the connector is not running in the intended profile yet. In that state, the model may fall back to SDK-style execution and show confusing API-key/auth errors.
+If Claude or Cursor shows `search_docs` / `execute` instead of the dedicated Sanka tools such as `list_contacts`, `list_companies`, `list_deals`, `list_expenses`, or `create_expense`, the connector is not running in the intended profile yet. In that state, the model may fall back to SDK-style execution and show confusing API-key/auth errors.
 
 Try this reset flow:
 
-1. Remove the installed connector/plugin from the client.
-2. Restart the client so it reloads the hosted connector configuration.
-3. Reinstall the plugin after GitHub raw cache has refreshed.
-4. Start a fresh chat and confirm the available Sanka tools include `auth_status`, `list_contacts`, `list_companies`, `list_expenses`, `get_expense`, `upload_expense_attachment`, `create_expense`, `update_expense`, and `delete_expense`.
+1. Start a fresh chat or thread first so the client refreshes the attached tool list.
+2. If the new hosted tools are still missing, reconnect or remove/re-add the installed connector/plugin.
+3. Restart the client so it reloads the hosted connector configuration.
+4. Reinstall the plugin only when the plugin bundle itself changed.
+5. Start a fresh chat and confirm the available Sanka tools include the currently hosted surface, such as `auth_status`, `list_contacts`, `list_companies`, `list_deals`, `get_deal`, `list_deal_pipelines`, `list_expenses`, `get_expense`, `upload_expense_attachment`, `create_expense`, `update_expense`, and `delete_expense`.
 
 If the client still exposes `search_docs` and `execute`, that is a profile-selection bug in the MCP/plugin integration rather than a missing workspace API key.
+
+If Claude says a live Sanka object like Deals does not exist even though the hosted MCP server supports it, the most likely cause is stale connector metadata in that session. Refresh the connector surface first before trusting the answer.
 
 If Codex returns a native `streamable_http_client ... Auth required` error and
 no browser OAuth window opens, inspect `~/.codex/config.toml`. A stale global
