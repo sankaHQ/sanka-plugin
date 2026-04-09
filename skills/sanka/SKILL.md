@@ -26,4 +26,3 @@ This skill is intentionally thin. The hosted MCP server is the source of truth f
 
 - If `mcp__sanka_plugin__*` tools are unavailable in the current thread, stop and say the plugin did not attach correctly.
 - Ask the user to start a new thread from the installed `Sanka Plugin` chip or reinstall/restart the plugin if needed.
-- Do not fall back to `search_docs`, `execute`, SDK code, or local workspace access for live user data requests.
