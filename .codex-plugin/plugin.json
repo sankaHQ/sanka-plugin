@@ -1,7 +1,7 @@
 {
   "name": "sanka-plugin",
-  "version": "0.4.20",
-  "description": "Thin Sanka plugin that attaches the hosted MCP server for live Sanka workflows using native OAuth sign-in.",
+  "version": "0.4.21",
+  "description": "Sanka plugin that attaches the hosted MCP server for live Sanka workflows, including private inbox, CRM, Estimates, Billing, and expenses, and more using native OAuth sign-in.",
   "author": {
     "name": "Sanka",
     "url": "https://sanka.com"
@@ -11,6 +11,10 @@
   "license": "MIT",
   "keywords": [
     "sanka",
+    "email",
+    "inbox",
+    "private inbox",
+    "messages",
     "crm",
     "mcp",
     "contacts",
@@ -23,8 +27,8 @@
   "mcpServers": "./codex.mcp.json",
   "interface": {
     "displayName": "Sanka Plugin",
-    "shortDescription": "Work with live Sanka data via native OAuth",
-    "longDescription": "Use Sanka's hosted MCP endpoint for live Sanka workflows from Codex through the native browser-based OAuth flow. The packaged plugin stays intentionally thin: the hosted MCP server carries the tool behavior, schemas, and workflow guidance, so new hosted tools can ship without a plugin reinstall whenever the client refreshes the attached tool list. In Codex, start from the installed Sanka Plugin chip so the MCP server is attached to the thread. Live Sanka queries and actions must come from the attached hosted MCP tools, not from any local Sanka repo, Django shell, or Postgres fallback.",
+    "shortDescription": "Work with live Sanka data and private inbox via native OAuth",
+    "longDescription": "Use Sanka's hosted MCP endpoint for live Sanka workflows from Codex through the native browser-based OAuth flow. The packaged plugin stays intentionally thin: the hosted MCP server carries the tool behavior, schemas, and workflow guidance, so new hosted tools can ship without a plugin reinstall whenever the client refreshes the attached tool list. This includes private inbox workflows when the hosted MCP exposes them. In Codex, start from the installed Sanka Plugin chip so the MCP server is attached to the thread. Live Sanka queries and actions must come from the attached hosted MCP tools, not from any local Sanka repo, Django shell, or Postgres fallback.",
     "developerName": "Sanka",
     "category": "Productivity",
     "capabilities": [
@@ -34,9 +38,10 @@
     ],
     "websiteURL": "https://sanka.com",
     "defaultPrompt": [
+      "Review my latest private inbox threads in Sanka",
+      "Open the newest private email thread and summarize it",
       "Find a company in Sanka by name",
       "List the most recent deals in Sanka",
-      "List recent contacts that match a search term",
       "Create an expense in Sanka from a receipt"
     ],
     "brandColor": "#3B82F6",
