@@ -100,8 +100,6 @@ required_paths = [
     "mcp.json",
     "codex.mcp.json",
     "skills/connect/SKILL.md",
-    "skills/list-companies/SKILL.md",
-    "skills/list-contacts/SKILL.md",
     "Codex/Install Sanka Plugin.app/Contents/Info.plist",
     "Codex/Install Sanka Plugin.bat",
 ]
@@ -109,6 +107,19 @@ required_paths = [
 for relative_path in required_paths:
     if not (unpacked_root / relative_path).exists():
         raise AssertionError(f"Missing packaged file: {relative_path}")
+
+source_skills = sorted(
+    path.relative_to(plugin_root).as_posix()
+    for path in (plugin_root / "skills").glob("*/SKILL.md")
+)
+
+for relative_path in source_skills:
+    packaged_path = unpacked_root / relative_path
+    if not packaged_path.exists():
+        raise AssertionError(f"Missing packaged skill: {relative_path}")
+    source_path = plugin_root / relative_path
+    if source_path.read_text(encoding="utf-8") != packaged_path.read_text(encoding="utf-8"):
+        raise AssertionError(f"Packaged skill drifted from repo copy: {relative_path}")
 
 for source, packaged in [
     (plugin_root / ".claude-plugin" / "plugin.json", unpacked_root / ".claude-plugin" / "plugin.json"),

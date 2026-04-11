@@ -14,7 +14,7 @@ Recommended for Claude Code users:
 
 After install, open `/plugin`, go to `Marketplaces`, select `sanka`, and enable auto-update if you want Claude Code to pull future plugin updates from GitHub at startup instead of re-uploading a ZIP.
 
-After the plugin is attached, you can use plugin skills like `/sanka:connect`, `/sanka:list-companies`, and `/sanka:list-contacts`, or ask in normal chat. The first protected tool call should trigger the native Sanka OAuth flow when authentication is missing.
+After the plugin is attached, you can use plugin skills like `/sanka:connect`, `/sanka:prospect-companies`, `/sanka:list-private-messages`, `/sanka:list-companies`, `/sanka:list-contacts`, and other `sanka:<mcp-tool-name>` skills, or ask in normal chat. The first protected tool call should trigger the native Sanka OAuth flow when authentication is missing.
 
 ## Download
 
@@ -39,6 +39,7 @@ Important:
 - `.plugin/plugin.json` (vendor-neutral manifest)
 - `.codex-plugin/plugin.json` (Codex manifest)
 - `.claude-plugin/plugin.json` for Claude upload compatibility
+- `skills/` (thin namespaced wrappers such as `sanka:list-companies`)
 - `vendor/mcp-remote/` (vendored Codex-only MCP proxy patch)
 - `macos/installer-app/` (macOS app bundle template)
 - `scripts/` (payload, build, signing, notarization, and release helpers)
