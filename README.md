@@ -16,20 +16,6 @@ After install, open `/plugin`, go to `Marketplaces`, select `sanka`, and enable 
 
 After the plugin is attached, you can use plugin skills like `/sanka:connect`, `/sanka:prospect-companies`, `/sanka:list-private-messages`, `/sanka:list-companies`, `/sanka:list-contacts`, and other `sanka:<mcp-tool-name>` skills, or ask in normal chat. The first protected tool call should trigger the native Sanka OAuth flow when authentication is missing.
 
-## Download
-
-This repo ships one shared release asset:
-
-- [Sanka-Plugin.zip](https://github.com/sankaHQ/sanka-plugin/releases/latest/download/Sanka-Plugin.zip)
-  - Use this as a fallback upload for Claude Code or for manual packaging tests.
-- Release page: [sankaHQ/sanka-plugin Releases](https://github.com/sankaHQ/sanka-plugin/releases)
-
-Important:
-
-- Do not use GitHub's green `Code` button and `Download ZIP`.
-- Do not use the auto-generated `Source code (zip)` file on the Releases page.
-- `Sanka-Plugin.zip` contains `.claude-plugin/`, `.codex-plugin/`, and the shared MCP files at the ZIP root.
-
 ## Included components
 
 - `.mcp.json` (shared MCP config for Claude and generic hosts)
@@ -40,7 +26,7 @@ Important:
 - `.claude-plugin/plugin.json` for Claude upload compatibility
 - `skills/` (thin namespaced wrappers such as `sanka:list-companies`)
 - `vendor/mcp-remote/` (vendored Codex-only MCP proxy patch)
-- `scripts/` (payload, build, signing, notarization, and release helpers)
+- `scripts/rebuild-codex-mcp-remote-vendor.sh` (vendor refresh helper)
 
 ## MCP endpoint
 
@@ -75,7 +61,7 @@ That list may expand over time as new hosted MCP tools ship.
 
 ## Setup
 
-No API key is required for the packaged plugin flow.
+No API key is required for the plugin flow.
 
 On install or first protected tool use, the MCP client should prompt you to sign in to Sanka and approve the requested access.
 
@@ -192,26 +178,6 @@ workspace.
 If this keeps happening after reinstalling, clear the installed personal plugin
 cache or reinstall the plugin from the repo-local marketplace so Codex does not
 keep resolving an older cached bundle while the installed plugin has newer manifests.
-
-## Release packaging
-
-To build the shared package for Claude, ChatGPT Codex, and other compatible clients:
-
-```bash
-./scripts/build-plugin-package.sh
-```
-
-The packaging scripts now refuse to emit a release ZIP unless the staged
-app bundles pass both `codesign` verification and Gatekeeper assessment via
-`spctl`. That is intentional. Production releases must come from the notarized flow.
-
-For local-only unsigned test builds, use:
-
-```bash
-SANKA_ALLOW_UNSIGNED_MACOS_APPS=1 ./scripts/build-plugin-package.sh
-```
-
-See [RELEASING.md](RELEASING.md) for the current packaging, signing, and release checklist.
 
 ## Legacy local server / raw API use
 
