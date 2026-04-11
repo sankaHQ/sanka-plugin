@@ -13,7 +13,6 @@ fi
 PAYLOAD_ITEMS=(
   ".claude-plugin"
   ".codex-plugin"
-  ".cursor-plugin"
   ".mcp.json"
   ".plugin"
   "LICENSE"

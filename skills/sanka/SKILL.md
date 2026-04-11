@@ -5,7 +5,7 @@ description: Use the installed Sanka Plugin as a remote-only MCP entrypoint for 
 
 # Sanka
 
-Use this skill when the user is working through the installed Sanka Plugin in Codex, Claude, or Cursor.
+Use this skill when the user is working through the installed Sanka Plugin in Codex or Claude Code.
 
 This skill is intentionally thin. The hosted MCP server is the source of truth for:
 - tool descriptions
@@ -19,10 +19,10 @@ This skill is intentionally thin. The hosted MCP server is the source of truth f
 - Prefer starting from the installed plugin chip such as `[@sanka-plugin](plugin://sanka-plugin@personal)`.
 - Treat the currently attached Sanka tool list in this thread as the source of truth. If a newly deployed hosted MCP tool is present, use it even if this skill text does not mention it explicitly.
 - In Codex, the attached namespace is usually `mcp__sanka_plugin__*`.
-- In Claude, Cursor, or other hosts, the attached namespace may be host-generated or opaque, such as `mcp__<connector_id>__*`.
+- In Claude Code or other hosts, the attached namespace may be host-generated or opaque, such as `mcp__<connector_id>__*`.
 - Do not reject attached live Sanka tools solely because the namespace is not literally `mcp__sanka_plugin__*`.
 - Call the matching protected MCP tool directly for live Sanka requests. Do not preflight with `auth_status` unless the user is explicitly debugging auth.
-- Protected tools are the OAuth trigger in clients like Codex, Claude, and Cursor.
+- Protected tools are the OAuth trigger in clients like Codex and Claude Code.
 - Never substitute local code search, `.env`, `manage.py shell`, `psql`, Django ORM, terminal commands, or repo-local data access for a plugin request.
 - Do not use `mcp__sanka__*` in Codex. That usually indicates a stale global server entry instead of the installed plugin attachment.
 

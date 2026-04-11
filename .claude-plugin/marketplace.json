@@ -1,0 +1,21 @@
+{
+  "name": "sanka",
+  "owner": {
+    "name": "Sanka"
+  },
+  "metadata": {
+    "description": "Official Sanka plugins for Claude Code.",
+    "version": "0.4.22"
+  },
+  "plugins": [
+    {
+      "name": "sanka-plugin",
+      "description": "Sanka plugin that attaches the hosted MCP server for live Sanka workflows, including private inbox, CRM, Estimates, Billing, and expenses, and more using native OAuth sign-in.",
+      "version": "0.4.22",
+      "author": {
+        "name": "Sanka"
+      },
+      "source": "./"
+    }
+  ]
+}
