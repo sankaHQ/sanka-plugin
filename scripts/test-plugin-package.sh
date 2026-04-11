@@ -66,7 +66,11 @@ assert_equal(claude_marketplace["name"], "sanka", "Claude marketplace must expos
 assert_equal(claude_marketplace["plugins"][0]["name"], "sanka-plugin", "Claude marketplace must expose the Sanka plugin")
 assert_equal(claude_marketplace["plugins"][0]["source"], "./", "Claude marketplace must install from the repo root")
 assert_equal(generic_manifest["mcpServers"], "./.mcp.json", "Generic plugin manifest must use the canonical shared MCP path")
+if "skills" in generic_manifest:
+    raise AssertionError("Generic plugin manifest must not expose a slash-command skill surface")
 assert_equal(codex_manifest["mcpServers"], "./codex.mcp.json", "Codex manifest must use its dedicated MCP config")
+if "skills" in codex_manifest:
+    raise AssertionError("Codex manifest must not expose a slash-command skill surface")
 
 expected_shared = {
     "mcpServers": {
