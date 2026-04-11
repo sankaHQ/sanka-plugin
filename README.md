@@ -24,7 +24,7 @@ After the plugin is attached, you can use plugin skills like `/sanka:connect`, `
 - `.plugin/plugin.json` (vendor-neutral manifest)
 - `.codex-plugin/plugin.json` (Codex manifest)
 - `.claude-plugin/plugin.json` for Claude upload compatibility
-- `skills/` (thin namespaced wrappers such as `sanka:list-companies`)
+- `skills/` (thin namespaced wrappers such as `sanka:list-companies`, each with `agents/openai.yaml` metadata so supported Codex builds can install/refresh the hosted `sanka_plugin` MCP dependency before invocation)
 - `vendor/mcp-remote/` (vendored Codex-only MCP proxy patch)
 - `scripts/rebuild-codex-mcp-remote-vendor.sh` (vendor refresh helper)
 

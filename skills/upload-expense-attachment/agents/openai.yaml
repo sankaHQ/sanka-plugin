@@ -1,0 +1,15 @@
+interface:
+  display_name: "Upload Expense Attachment"
+  short_description: "Upload expense attachment into live Sanka."
+  default_prompt: "Use $sanka:upload-expense-attachment to upload expense attachment into live Sanka."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "sanka_plugin"
+      description: "Hosted Sanka MCP server for live Sanka workflows"
+      transport: "streamable_http"
+      url: "https://mcp.sanka.com/mcp"
+
+policy:
+  allow_implicit_invocation: false

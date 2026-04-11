@@ -1,0 +1,15 @@
+interface:
+  display_name: "Create Expense"
+  short_description: "Create expense in live Sanka."
+  default_prompt: "Use $sanka:create-expense to create expense in live Sanka."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "sanka_plugin"
+      description: "Hosted Sanka MCP server for live Sanka workflows"
+      transport: "streamable_http"
+      url: "https://mcp.sanka.com/mcp"
+
+policy:
+  allow_implicit_invocation: false
