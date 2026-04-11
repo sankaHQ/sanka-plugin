@@ -21,7 +21,7 @@ After the plugin is attached, you can use plugin skills like `/sanka:connect`, `
 This repo ships one shared release asset:
 
 - [Sanka-Plugin.zip](https://github.com/sankaHQ/sanka-plugin/releases/latest/download/Sanka-Plugin.zip)
-  - Use this for ChatGPT Codex and as a fallback upload for Claude Code.
+  - Use this as a fallback upload for Claude Code or for manual packaging tests.
 - Release page: [sankaHQ/sanka-plugin Releases](https://github.com/sankaHQ/sanka-plugin/releases)
 
 Important:
@@ -29,7 +29,6 @@ Important:
 - Do not use GitHub's green `Code` button and `Download ZIP`.
 - Do not use the auto-generated `Source code (zip)` file on the Releases page.
 - `Sanka-Plugin.zip` contains `.claude-plugin/`, `.codex-plugin/`, and the shared MCP files at the ZIP root.
-- The same ZIP also includes a visible `Codex/` folder with the macOS and Windows Codex installers.
 
 ## Included components
 
@@ -41,7 +40,6 @@ Important:
 - `.claude-plugin/plugin.json` for Claude upload compatibility
 - `skills/` (thin namespaced wrappers such as `sanka:list-companies`)
 - `vendor/mcp-remote/` (vendored Codex-only MCP proxy patch)
-- `macos/installer-app/` (macOS app bundle template)
 - `scripts/` (payload, build, signing, notarization, and release helpers)
 
 ## MCP endpoint
@@ -85,35 +83,17 @@ ChatGPT Codex also uses the same hosted MCP OAuth flow. No separate ChatGPT app 
 
 ## ChatGPT Codex
 
-### Recommended for end users
+### Recommended flow
 
-For non-technical users, distribute a Release ZIP and use the bundled installer:
-
-1. Download [Sanka-Plugin.zip](https://github.com/sankaHQ/sanka-plugin/releases/latest/download/Sanka-Plugin.zip).
-2. Extract the ZIP.
-3. Open the extracted `Codex` folder.
-4. Run the installer for the user's OS:
-   - macOS: `Install Sanka Plugin.app`
-   - Windows: `Install Sanka Plugin.bat`
-5. Restart Codex.
-6. Open the Plugins screen, choose `Personal Plugins`, and install `Sanka Plugin`.
-7. On first protected tool use, sign in to Sanka when ChatGPT Codex prompts for OAuth.
-
-To remove the Codex plugin later, use the bundled uninstaller:
-
-- macOS: `Uninstall Sanka Plugin.app`
-- Windows: `Uninstall Sanka Plugin.bat`
-
-The installer copies the plugin into `~/.codex/plugins/sanka` and merges a single `sanka` entry into `~/.agents/plugins/marketplace.json`. Existing marketplace entries are preserved so this flow does not remove other local plugins. The installer also removes the legacy `sanka-plugin` local install if it is still present.
-
-### Git-backed repo flow for technical users
-
-If you prefer to keep the plugin in a cloned Git repo and update it with `git pull`, this repo now includes a repo-local Codex marketplace at `.agents/plugins/marketplace.json`.
+For Codex, the preferred path is to keep the plugin in a cloned Git repo and update it with `git pull`. This repo includes a repo-local Codex marketplace at `.agents/plugins/marketplace.json`.
 
 1. Clone `sankaHQ/sanka-plugin`.
 2. Open that repo in Codex.
 3. Restart Codex so the repo marketplace is discovered.
 4. Open Plugins, choose `Sanka Local Plugins`, and install `Sanka Plugin`.
+5. On first protected tool use, sign in to Sanka when Codex prompts for OAuth.
+
+This keeps updates simple because users can pull the latest plugin changes from GitHub instead of re-running a packaged installer.
 
 Codex does not yet document a self-serve public GitHub marketplace flow like Claude Code. The supported low-friction Git-backed option today is the repo marketplace inside a local clone.
 
@@ -145,46 +125,6 @@ update, use:
 ./scripts/rebuild-codex-mcp-remote-vendor.sh
 ```
 
-### Manual setup for developers
-
-Codex custom plugins are installed through a local marketplace, not directly from the repo root.
-
-1. Copy this repo into `~/.codex/plugins/sanka`.
-
-```bash
-mkdir -p ~/.codex/plugins
-cp -R /absolute/path/to/sanka-plugin ~/.codex/plugins/sanka
-```
-
-2. Add or update `~/.agents/plugins/marketplace.json`.
-
-```json
-{
-  "name": "personal",
-  "interface": {
-    "displayName": "Personal Plugins"
-  },
-  "plugins": [
-    {
-      "name": "sanka",
-      "source": {
-        "source": "local",
-        "path": "./.codex/plugins/sanka"
-      },
-      "policy": {
-        "installation": "AVAILABLE",
-        "authentication": "ON_INSTALL"
-      },
-      "category": "Productivity"
-    }
-  ]
-}
-```
-
-3. Restart Codex, open the Plugins menu, and install `Sanka Plugin`.
-
-4. Complete the browser-based Sanka OAuth flow when Codex prompts during install or first use.
-
 This repo keeps the shared `.plugin/` manifest plus `./.mcp.json` for Claude
 and generic hosts, and uses `.codex-plugin/` plus `./codex.mcp.json`
 for Codex. Keep those client-specific MCP paths separate. A Codex-only manifest
@@ -203,11 +143,6 @@ url = "https://mcp.sanka.com/mcp"
 enabled = true
 url = "https://mcp.sanka.com/mcp"
 ```
-
-The installer app now removes duplicate global MCP blocks that point at
-`https://mcp.sanka.com/mcp` unless the section is the plugin-owned
-`[mcp_servers.sanka_plugin]` entry. Otherwise Codex can route calls to the
-direct HTTP server instead of the plugin wrapper.
 
 ## Claude Code
 
@@ -255,20 +190,8 @@ and report a plugin attachment failure instead of falling back to the local
 workspace.
 
 If this keeps happening after reinstalling, clear the installed personal plugin
-cache or reinstall with the bundled installer. The installer now removes
-`~/.codex/plugins/cache/personal/sanka` so Codex does not keep resolving
-an older cached bundle while the installed plugin has newer manifests.
-
-
-## macOS installer build
-
-To build the macOS `.app` bundle from the repository, run:
-
-```bash
-./scripts/build-macos-installer-app.sh
-```
-
-The script writes `dist/macos/Install Sanka Plugin.app` and generates the app icon from `assets/logo.svg`.
+cache or reinstall the plugin from the repo-local marketplace so Codex does not
+keep resolving an older cached bundle while the installed plugin has newer manifests.
 
 ## Release packaging
 
@@ -278,8 +201,8 @@ To build the shared package for Claude, ChatGPT Codex, and other compatible clie
 ./scripts/build-plugin-package.sh
 ```
 
-The packaging scripts now refuse to emit a macOS installer ZIP unless the staged
-`.app` bundles pass both `codesign` verification and Gatekeeper assessment via
+The packaging scripts now refuse to emit a release ZIP unless the staged
+app bundles pass both `codesign` verification and Gatekeeper assessment via
 `spctl`. That is intentional. Production releases must come from the notarized flow.
 
 For local-only unsigned test builds, use:
@@ -288,49 +211,7 @@ For local-only unsigned test builds, use:
 SANKA_ALLOW_UNSIGNED_MACOS_APPS=1 ./scripts/build-plugin-package.sh
 ```
 
-The script writes `dist/Sanka-Plugin.zip` with:
-
-- plugin manifests at the ZIP root for Claude, Codex, and generic hosts
-- `Codex/Install Sanka Plugin.app` for macOS
-- `Codex/Uninstall Sanka Plugin.app` for macOS
-- `Codex/Install Sanka Plugin.bat` and `Codex/Install-Sanka-Plugin.ps1` for Windows
-- `Codex/Uninstall Sanka Plugin.bat` and `Codex/Uninstall-Sanka-Plugin.ps1` for Windows
-
-## Signing and notarization
-
-On Sanka developer machines, the release helpers can auto-load the Apple signing
-and notarization variables from the sibling `../sanka/.env` file when they are not
-already exported in the shell. That includes:
-
-- `MACOS_APPLE_CERTIFICATE`
-- `MACOS_APPLE_CERTIFICATE_PASSWORD`
-- `MACOS_APPLE_SIGNING_IDENTITY`
-- `MACOS_APPLE_TEAM_ID`
-- `MACOS_APPLE_ID`
-- `MACOS_APPLE_APP_SPECIFIC_PASSWORD`
-- `APPLE_NOTARY_PROFILE` (optional, if you prefer notarytool keychain profiles)
-
-To sign the macOS app bundle with a Developer ID Application certificate:
-
-```bash
-APPLE_CODESIGN_IDENTITY="Developer ID Application: Example, Inc. (TEAMID1234)" \
-./scripts/sign-macos-installer-app.sh
-```
-
-To produce a notarized release package:
-
-```bash
-./scripts/release-codex-package.sh
-```
-
-If you are not relying on auto-loaded `.env` values, set either:
-
-- `APPLE_NOTARY_PROFILE`, or
-- `MACOS_APPLE_ID`, `MACOS_APPLE_TEAM_ID`, and `MACOS_APPLE_APP_SPECIFIC_PASSWORD`
-
-before running the release script.
-
-See [RELEASING.md](RELEASING.md) for the current release checklist.
+See [RELEASING.md](RELEASING.md) for the current packaging, signing, and release checklist.
 
 ## Legacy local server / raw API use
 
