@@ -20,6 +20,7 @@ PAYLOAD_ITEMS=(
   "assets"
   "codex.mcp.json"
   "mcp.json"
+  "skills"
   "vendor"
 )
 

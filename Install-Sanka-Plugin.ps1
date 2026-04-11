@@ -1,14 +1,18 @@
 $ErrorActionPreference = "Stop"
 
-$pluginName = "sanka-plugin"
+$pluginName = "sanka"
+$legacyPluginName = "sanka-plugin"
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $packagedPayloadDir = Join-Path $scriptDir "Support\payload"
 $pluginSourceDir = if (Test-Path $packagedPayloadDir) { $packagedPayloadDir } else { $scriptDir }
 $pluginDestDir = Join-Path $HOME ".codex\plugins\$pluginName"
+$legacyPluginDestDir = Join-Path $HOME ".codex\plugins\$legacyPluginName"
+$pluginCacheDir = Join-Path $HOME ".codex\plugins\cache\personal\$pluginName"
+$legacyPluginCacheDir = Join-Path $HOME ".codex\plugins\cache\personal\$legacyPluginName"
 $marketplaceDir = Join-Path $HOME ".agents\plugins"
 $marketplaceFile = Join-Path $marketplaceDir "marketplace.json"
 $backupSuffix = Get-Date -Format "yyyyMMddHHmmss"
-$tmpDir = Join-Path ([System.IO.Path]::GetTempPath()) ("sanka-plugin-" + [System.Guid]::NewGuid().ToString("N"))
+$tmpDir = Join-Path ([System.IO.Path]::GetTempPath()) ("sanka-" + [System.Guid]::NewGuid().ToString("N"))
 
 function Write-Utf8NoBom {
     param(
@@ -47,7 +51,19 @@ try {
         Remove-Item -Path $pluginDestDir -Recurse -Force
     }
 
+    if (Test-Path $legacyPluginDestDir) {
+        Remove-Item -Path $legacyPluginDestDir -Recurse -Force
+    }
+
     Move-Item -Path $stagingDir -Destination $pluginDestDir
+
+    if (Test-Path $pluginCacheDir) {
+        Remove-Item -Path $pluginCacheDir -Recurse -Force
+    }
+
+    if (Test-Path $legacyPluginCacheDir) {
+        Remove-Item -Path $legacyPluginCacheDir -Recurse -Force
+    }
 
     if (Test-Path $marketplaceFile) {
         Copy-Item -Path $marketplaceFile -Destination "$marketplaceFile.bak-$backupSuffix" -Force
@@ -81,14 +97,14 @@ try {
 
     $existingPlugins = @()
     if ($marketplace.PSObject.Properties.Name -contains "plugins" -and $null -ne $marketplace.plugins) {
-        $existingPlugins = @($marketplace.plugins | Where-Object { $_.name -ne "sanka-plugin" })
+        $existingPlugins = @($marketplace.plugins | Where-Object { $_.name -ne "sanka" -and $_.name -ne "sanka-plugin" })
     }
 
     $entry = [pscustomobject]@{
-        name = "sanka-plugin"
+        name = "sanka"
         source = [pscustomobject]@{
             source = "local"
-            path = "./.codex/plugins/sanka-plugin"
+            path = "./.codex/plugins/sanka"
         }
         policy = [pscustomobject]@{
             installation = "AVAILABLE"

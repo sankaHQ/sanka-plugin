@@ -61,16 +61,18 @@ shared_mcp = load_json(unpacked_root / ".mcp.json")
 legacy_mcp = load_json(unpacked_root / "mcp.json")
 codex_mcp = load_json(unpacked_root / "codex.mcp.json")
 
+assert_equal(claude_manifest["name"], "sanka", "Claude manifest must use the short plugin namespace")
 assert_equal(claude_manifest["mcpServers"], "./.mcp.json", "Claude manifest must use the canonical shared MCP path")
+assert_equal(claude_manifest["skills"], "./skills/", "Claude manifest must expose packaged skills")
 assert_equal(claude_marketplace["name"], "sanka", "Claude marketplace must expose the expected marketplace name")
-assert_equal(claude_marketplace["plugins"][0]["name"], "sanka-plugin", "Claude marketplace must expose the Sanka plugin")
+assert_equal(claude_marketplace["plugins"][0]["name"], "sanka", "Claude marketplace must expose the Sanka plugin")
 assert_equal(claude_marketplace["plugins"][0]["source"], "./", "Claude marketplace must install from the repo root")
+assert_equal(generic_manifest["name"], "sanka", "Generic plugin manifest must use the short plugin namespace")
 assert_equal(generic_manifest["mcpServers"], "./.mcp.json", "Generic plugin manifest must use the canonical shared MCP path")
-if "skills" in generic_manifest:
-    raise AssertionError("Generic plugin manifest must not expose a slash-command skill surface")
+assert_equal(generic_manifest["skills"], "./skills/", "Generic plugin manifest must expose packaged skills")
+assert_equal(codex_manifest["name"], "sanka", "Codex manifest must use the short plugin namespace")
 assert_equal(codex_manifest["mcpServers"], "./codex.mcp.json", "Codex manifest must use its dedicated MCP config")
-if "skills" in codex_manifest:
-    raise AssertionError("Codex manifest must not expose a slash-command skill surface")
+assert_equal(codex_manifest["skills"], "./skills/", "Codex manifest must expose packaged skills")
 
 expected_shared = {
     "mcpServers": {
@@ -97,6 +99,9 @@ required_paths = [
     ".mcp.json",
     "mcp.json",
     "codex.mcp.json",
+    "skills/connect/SKILL.md",
+    "skills/list-companies/SKILL.md",
+    "skills/list-contacts/SKILL.md",
     "Codex/Install Sanka Plugin.app/Contents/Info.plist",
     "Codex/Install Sanka Plugin.bat",
 ]

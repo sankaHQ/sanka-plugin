@@ -2,8 +2,12 @@
 
 set -euo pipefail
 
-PLUGIN_NAME="sanka-plugin"
+PLUGIN_NAME="sanka"
+LEGACY_PLUGIN_NAME="sanka-plugin"
 PLUGIN_DEST_DIR="$HOME/.codex/plugins/$PLUGIN_NAME"
+LEGACY_PLUGIN_DEST_DIR="$HOME/.codex/plugins/$LEGACY_PLUGIN_NAME"
+PLUGIN_CACHE_DIR="$HOME/.codex/plugins/cache/personal/$PLUGIN_NAME"
+LEGACY_PLUGIN_CACHE_DIR="$HOME/.codex/plugins/cache/personal/$LEGACY_PLUGIN_NAME"
 MARKETPLACE_FILE="$HOME/.agents/plugins/marketplace.json"
 BACKUP_SUFFIX="$(date +%Y%m%d%H%M%S)"
 
@@ -15,6 +19,21 @@ if [ -d "$PLUGIN_DEST_DIR" ]; then
   echo "Removed plugin files from $PLUGIN_DEST_DIR."
 else
   echo "Plugin files were already removed."
+fi
+
+if [ -d "$LEGACY_PLUGIN_DEST_DIR" ]; then
+  rm -rf "$LEGACY_PLUGIN_DEST_DIR"
+  echo "Removed legacy plugin files from $LEGACY_PLUGIN_DEST_DIR."
+fi
+
+if [ -d "$PLUGIN_CACHE_DIR" ]; then
+  rm -rf "$PLUGIN_CACHE_DIR"
+  echo "Removed plugin cache from $PLUGIN_CACHE_DIR."
+fi
+
+if [ -d "$LEGACY_PLUGIN_CACHE_DIR" ]; then
+  rm -rf "$LEGACY_PLUGIN_CACHE_DIR"
+  echo "Removed legacy plugin cache from $LEGACY_PLUGIN_CACHE_DIR."
 fi
 
 if [ -f "$MARKETPLACE_FILE" ]; then
@@ -72,7 +91,7 @@ if (!Array.isArray(marketplace.plugins)) {
 }
 
 marketplace.plugins = marketplace.plugins.filter(function(plugin) {
-  return plugin && plugin.name !== "sanka-plugin";
+  return plugin && plugin.name !== "sanka" && plugin.name !== "sanka-plugin";
 });
 
 JSON.stringify(marketplace, null, 2);

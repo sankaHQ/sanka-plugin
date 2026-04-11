@@ -8,13 +8,13 @@ Recommended for Claude Code users:
 
 ```text
 /plugin marketplace add sankaHQ/sanka-plugin
-/plugin install sanka-plugin@sanka
+/plugin install sanka@sanka
 /reload-plugins
 ```
 
 After install, open `/plugin`, go to `Marketplaces`, select `sanka`, and enable auto-update if you want Claude Code to pull future plugin updates from GitHub at startup instead of re-uploading a ZIP.
 
-For live Sanka queries in Claude Code, use normal chat after the plugin is attached. Do not start requests with `/sanka`. Ask something like `Sanka Pluginを使って最近の会社10件を表示してください。`
+After the plugin is attached, you can use plugin skills like `/sanka:connect`, `/sanka:list-companies`, and `/sanka:list-contacts`, or ask in normal chat. The first protected tool call should trigger the native Sanka OAuth flow when authentication is missing.
 
 ## Download
 
@@ -103,7 +103,7 @@ To remove the Codex plugin later, use the bundled uninstaller:
 - macOS: `Uninstall Sanka Plugin.app`
 - Windows: `Uninstall Sanka Plugin.bat`
 
-The installer copies the plugin into `~/.codex/plugins/sanka-plugin` and merges a single `sanka-plugin` entry into `~/.agents/plugins/marketplace.json`. Existing marketplace entries are preserved so this flow does not remove other local plugins.
+The installer copies the plugin into `~/.codex/plugins/sanka` and merges a single `sanka` entry into `~/.agents/plugins/marketplace.json`. Existing marketplace entries are preserved so this flow does not remove other local plugins. The installer also removes the legacy `sanka-plugin` local install if it is still present.
 
 ### Git-backed repo flow for technical users
 
@@ -131,7 +131,7 @@ In Codex, the plugin MCP server is intentionally named `sanka_plugin`, not
 `[mcp_servers.sanka]` or `[mcp_servers.sanka_key]` entry in `~/.codex/config.toml`.
 
 When testing in Codex, start from the installed plugin itself, for example
-`[@sanka-plugin](plugin://sanka-plugin@personal) Review my latest private inbox threads in Sanka`.
+`[@sanka](plugin://sanka@personal) Review my latest private inbox threads in Sanka`.
 
 A direct skill-file invocation can still load the skill instructions without
 attaching the plugin MCP server to that thread, so the installed plugin chip is
@@ -148,11 +148,11 @@ update, use:
 
 Codex custom plugins are installed through a local marketplace, not directly from the repo root.
 
-1. Copy this repo into `~/.codex/plugins/sanka-plugin`.
+1. Copy this repo into `~/.codex/plugins/sanka`.
 
 ```bash
 mkdir -p ~/.codex/plugins
-cp -R /absolute/path/to/sanka-plugin ~/.codex/plugins/sanka-plugin
+cp -R /absolute/path/to/sanka-plugin ~/.codex/plugins/sanka
 ```
 
 2. Add or update `~/.agents/plugins/marketplace.json`.
@@ -165,10 +165,10 @@ cp -R /absolute/path/to/sanka-plugin ~/.codex/plugins/sanka-plugin
   },
   "plugins": [
     {
-      "name": "sanka-plugin",
+      "name": "sanka",
       "source": {
         "source": "local",
-        "path": "./.codex/plugins/sanka-plugin"
+        "path": "./.codex/plugins/sanka"
       },
       "policy": {
         "installation": "AVAILABLE",
@@ -255,7 +255,7 @@ workspace.
 
 If this keeps happening after reinstalling, clear the installed personal plugin
 cache or reinstall with the bundled installer. The installer now removes
-`~/.codex/plugins/cache/personal/sanka-plugin` so Codex does not keep resolving
+`~/.codex/plugins/cache/personal/sanka` so Codex does not keep resolving
 an older cached bundle while the installed plugin has newer manifests.
 
 
