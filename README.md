@@ -14,6 +14,8 @@ Recommended for Claude Code users:
 
 After install, open `/plugin`, go to `Marketplaces`, select `sanka`, and enable auto-update if you want Claude Code to pull future plugin updates from GitHub at startup instead of re-uploading a ZIP.
 
+For live Sanka queries in Claude Code, use normal chat after the plugin is attached. Do not start requests with `/sanka`. Ask something like `Sanka Pluginを使って最近の会社10件を表示してください。`
+
 ## Download
 
 This repo ships one shared release asset:
@@ -31,7 +33,6 @@ Important:
 
 ## Included components
 
-- `skills/sanka/SKILL.md` (thin plugin guardrail skill)
 - `.mcp.json` (shared MCP config for Claude and generic hosts)
 - `codex.mcp.json` (Codex MCP config)
 - `mcp.json` (legacy alias for the shared hosted HTTP MCP config)
@@ -235,11 +236,11 @@ block like `[mcp_servers.sanka]` or `[mcp_servers.sanka_key]` can hijack
 `mcp__sanka__*` or `mcp__sanka_key__*` calls and bypass the plugin's
 `sanka_plugin` server attachment.
 
-If the session says the `sanka-plugin:sanka` skill is present but there are no
-attached live Sanka MCP tools in the thread, the thread likely loaded only the
-skill instructions. Start a new thread from the installed plugin chip
-`[@sanka-plugin](plugin://sanka-plugin@personal)` instead of invoking the skill
-file directly.
+If Claude answers a Sanka request by reading the local repo, local database, or
+terminal output instead of prompting for OAuth and using attached MCP tools,
+the thread is not using the installed plugin correctly. In Claude Code, do not
+start Sanka requests with `/sanka`. Ask in normal chat after the plugin is
+attached, or start a fresh thread and reconnect the installed plugin first.
 
 If Claude shows attached Sanka tools under an opaque namespace like
 `mcp__0e3f8181__*`, that is still a valid plugin attachment. Do not treat that
