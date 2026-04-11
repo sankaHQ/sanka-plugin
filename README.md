@@ -2,30 +2,42 @@
 
 Open Plugins-compatible Sanka plugin that attaches Sanka's hosted MCP server for live Sanka workflows.
 
+## Claude Code
+
+Recommended for Claude Code users:
+
+```text
+/plugin marketplace add sankaHQ/sanka-plugin
+/plugin install sanka-plugin@sanka
+/reload-plugins
+```
+
+After install, open `/plugin`, go to `Marketplaces`, select `sanka`, and enable auto-update if you want Claude Code to pull future plugin updates from GitHub at startup instead of re-uploading a ZIP.
+
 ## Download
 
 This repo ships one shared release asset:
 
 - [Sanka-Plugin.zip](https://github.com/sankaHQ/sanka-plugin/releases/latest/download/Sanka-Plugin.zip)
-  - Use this for Claude, Cursor, and Codex.
+  - Use this for ChatGPT Codex and as a fallback upload for Claude Code.
 - Release page: [sankaHQ/sanka-plugin Releases](https://github.com/sankaHQ/sanka-plugin/releases)
 
 Important:
 
 - Do not use GitHub's green `Code` button and `Download ZIP`.
 - Do not use the auto-generated `Source code (zip)` file on the Releases page.
-- `Sanka-Plugin.zip` contains `.claude-plugin/`, `.cursor-plugin/`, `.codex-plugin/`, and the shared MCP files at the ZIP root.
+- `Sanka-Plugin.zip` contains `.claude-plugin/`, `.codex-plugin/`, and the shared MCP files at the ZIP root.
 - The same ZIP also includes a visible `Codex/` folder with the macOS and Windows Codex installers.
 
 ## Included components
 
 - `skills/sanka/SKILL.md` (thin plugin guardrail skill)
-- `.mcp.json` (shared MCP config for Claude, Cursor, and generic hosts)
+- `.mcp.json` (shared MCP config for Claude and generic hosts)
 - `codex.mcp.json` (Codex MCP config)
 - `mcp.json` (legacy alias for the shared hosted HTTP MCP config)
 - `.plugin/plugin.json` (vendor-neutral manifest)
 - `.codex-plugin/plugin.json` (Codex manifest)
-- `.cursor-plugin/plugin.json` and `.claude-plugin/plugin.json` for tool-specific compatibility
+- `.claude-plugin/plugin.json` for Claude upload compatibility
 - `vendor/mcp-remote/` (vendored Codex-only MCP proxy patch)
 - `macos/installer-app/` (macOS app bundle template)
 - `scripts/` (payload, build, signing, notarization, and release helpers)
@@ -40,7 +52,7 @@ The config targets the unified Sanka MCP endpoint and relies on the MCP client's
 
 The hosted MCP server is the source of truth for tool behavior, schemas, and workflow guidance. The packaged plugin stays intentionally thin so new MCP capabilities can ship without requiring a plugin reinstall whenever possible.
 
-The currently attached Sanka tool list in each thread is the source of truth for what the client can do at that moment. In Codex, that namespace is usually `mcp__sanka_plugin__*`. In Claude, Cursor, or other hosts, the namespace may be host-generated or opaque such as `mcp__<connector_id>__*`. Common hosted tools include:
+The currently attached Sanka tool list in each thread is the source of truth for what the client can do at that moment. In Codex, that namespace is usually `mcp__sanka_plugin__*`. In Claude Code or other hosts, the namespace may be host-generated or opaque such as `mcp__<connector_id>__*`. Common hosted tools include:
 
 - `list_contacts`
 - `list_companies`
@@ -67,9 +79,9 @@ No API key is required for the packaged plugin flow.
 
 On install or first protected tool use, the MCP client should prompt you to sign in to Sanka and approve the requested access.
 
-Codex also uses the same hosted MCP OAuth flow. No separate ChatGPT app install is required.
+ChatGPT Codex also uses the same hosted MCP OAuth flow. No separate ChatGPT app install is required.
 
-## Codex install
+## ChatGPT Codex
 
 ### Recommended for end users
 
@@ -83,7 +95,7 @@ For non-technical users, distribute a Release ZIP and use the bundled installer:
    - Windows: `Install Sanka Plugin.bat`
 5. Restart Codex.
 6. Open the Plugins screen, choose `Personal Plugins`, and install `Sanka Plugin`.
-7. On first protected tool use, sign in to Sanka when Codex prompts for OAuth.
+7. On first protected tool use, sign in to Sanka when ChatGPT Codex prompts for OAuth.
 
 To remove the Codex plugin later, use the bundled uninstaller:
 
@@ -92,7 +104,18 @@ To remove the Codex plugin later, use the bundled uninstaller:
 
 The installer copies the plugin into `~/.codex/plugins/sanka-plugin` and merges a single `sanka-plugin` entry into `~/.agents/plugins/marketplace.json`. Existing marketplace entries are preserved so this flow does not remove other local plugins.
 
-Claude, Cursor, and the generic plugin manifest should keep using the canonical
+### Git-backed repo flow for technical users
+
+If you prefer to keep the plugin in a cloned Git repo and update it with `git pull`, this repo now includes a repo-local Codex marketplace at `.agents/plugins/marketplace.json`.
+
+1. Clone `sankaHQ/sanka-plugin`.
+2. Open that repo in Codex.
+3. Restart Codex so the repo marketplace is discovered.
+4. Open Plugins, choose `Sanka Local Plugins`, and install `Sanka Plugin`.
+
+Codex does not yet document a self-serve public GitHub marketplace flow like Claude Code. The supported low-friction Git-backed option today is the repo marketplace inside a local clone.
+
+Claude and the generic plugin manifest should keep using the canonical
 shared `./.mcp.json` path. Codex uses its own `./codex.mcp.json` file so the
 Codex-specific server alias can stay isolated from the generic clients.
 
@@ -104,7 +127,7 @@ of relying on a vendored wrapper.
 
 In Codex, the plugin MCP server is intentionally named `sanka_plugin`, not
 `sanka`. That avoids collisions with any stale global
-`[mcp_servers.sanka]` entry in `~/.codex/config.toml`.
+`[mcp_servers.sanka]` or `[mcp_servers.sanka_key]` entry in `~/.codex/config.toml`.
 
 When testing in Codex, start from the installed plugin itself, for example
 `[@sanka-plugin](plugin://sanka-plugin@personal) Review my latest private inbox threads in Sanka`.
@@ -160,37 +183,39 @@ cp -R /absolute/path/to/sanka-plugin ~/.codex/plugins/sanka-plugin
 
 4. Complete the browser-based Sanka OAuth flow when Codex prompts during install or first use.
 
-This repo keeps the shared `.plugin/` manifest plus `./.mcp.json` for Claude,
-Cursor, and generic hosts, and uses `.codex-plugin/` plus `./codex.mcp.json`
+This repo keeps the shared `.plugin/` manifest plus `./.mcp.json` for Claude
+and generic hosts, and uses `.codex-plugin/` plus `./codex.mcp.json`
 for Codex. Keep those client-specific MCP paths separate. A Codex-only manifest
-change can break the Claude/Cursor upload flow if it drifts the shared clients
+change can break the Claude upload flow if it drifts the shared clients
 off the canonical `./.mcp.json` path.
 
-If you previously configured Sanka manually in Codex, disable or remove any
-global entry like this from `~/.codex/config.toml` before testing the plugin:
+If you previously configured Sanka manually in Codex, remove any duplicate
+global entry like these from `~/.codex/config.toml` before testing the plugin:
 
 ```toml
 [mcp_servers.sanka]
 enabled = true
 url = "https://mcp.sanka.com/mcp"
+
+[mcp_servers.sanka_key]
+enabled = true
+url = "https://mcp.sanka.com/mcp"
 ```
 
-The installer app now disables that stale global block automatically when it
-finds it, because otherwise Codex can route calls to the direct HTTP server
-instead of the plugin wrapper.
+The installer app now removes duplicate global MCP blocks that point at
+`https://mcp.sanka.com/mcp` unless the section is the plugin-owned
+`[mcp_servers.sanka_plugin]` entry. Otherwise Codex can route calls to the
+direct HTTP server instead of the plugin wrapper.
 
-## Cursor and Claude
+## Claude Code
 
-Use [Sanka-Plugin.zip](https://github.com/sankaHQ/sanka-plugin/releases/latest/download/Sanka-Plugin.zip) for Claude and Cursor. That archive has the client manifests at the ZIP root, including `.claude-plugin/plugin.json`, so it can be uploaded directly. The same archive also contains the `Codex/` installer folder for Codex users.
+The recommended Claude Code flow is the GitHub-backed marketplace install shown above. The packaged ZIP is still useful as a fallback when `/plugin` is unavailable or when you need to test the uploaded connector path explicitly.
 
-If Claude opens an "Add custom connector" sheet instead of attaching the
-packaged connector normally, first confirm the uploaded ZIP still has
-`.claude-plugin/plugin.json` pointing at `./.mcp.json`. The working Claude
-releases use that canonical shared MCP path.
+If Claude opens an "Add custom connector" sheet instead of attaching the packaged connector normally, first confirm the uploaded ZIP still has `.claude-plugin/plugin.json` pointing at `./.mcp.json`. The working Claude releases use that canonical shared MCP path.
 
 ## Troubleshooting
 
-If Claude or Cursor shows `search_docs` / `execute` instead of the dedicated Sanka tools such as `list_private_messages`, `list_contacts`, `list_companies`, `list_deals`, `list_expenses`, or `create_expense`, the connector is not running in the intended profile yet. In that state, the model may fall back to SDK-style execution and show confusing API-key/auth errors.
+If Claude shows `search_docs` / `execute` instead of the dedicated Sanka tools such as `list_private_messages`, `list_contacts`, `list_companies`, `list_deals`, `list_expenses`, or `create_expense`, the connector is not running in the intended profile yet. In that state, the model may fall back to SDK-style execution and show confusing API-key/auth errors.
 
 Try this reset flow:
 
@@ -206,8 +231,9 @@ If Claude says a live Sanka object like Deals does not exist even though the hos
 
 If Codex returns a native `streamable_http_client ... Auth required` error and
 no browser OAuth window opens, inspect `~/.codex/config.toml`. A stale global
-`[mcp_servers.sanka]` block will hijack `mcp__sanka__*` calls and bypass the
-plugin's `sanka_plugin` server attachment.
+block like `[mcp_servers.sanka]` or `[mcp_servers.sanka_key]` can hijack
+`mcp__sanka__*` or `mcp__sanka_key__*` calls and bypass the plugin's
+`sanka_plugin` server attachment.
 
 If the session says the `sanka-plugin:sanka` skill is present but there are no
 attached live Sanka MCP tools in the thread, the thread likely loaded only the
@@ -244,7 +270,7 @@ The script writes `dist/macos/Install Sanka Plugin.app` and generates the app ic
 
 ## Release packaging
 
-To build the shared package for Claude, Cursor, Codex, and other compatible clients:
+To build the shared package for Claude, ChatGPT Codex, and other compatible clients:
 
 ```bash
 ./scripts/build-plugin-package.sh
@@ -262,7 +288,7 @@ SANKA_ALLOW_UNSIGNED_MACOS_APPS=1 ./scripts/build-plugin-package.sh
 
 The script writes `dist/Sanka-Plugin.zip` with:
 
-- plugin manifests at the ZIP root for Claude, Cursor, Codex, and generic hosts
+- plugin manifests at the ZIP root for Claude, Codex, and generic hosts
 - `Codex/Install Sanka Plugin.app` for macOS
 - `Codex/Uninstall Sanka Plugin.app` for macOS
 - `Codex/Install Sanka Plugin.bat` and `Codex/Install-Sanka-Plugin.ps1` for Windows

@@ -15,7 +15,6 @@ TMP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/sanka-plugin.XXXXXX")"
 PAYLOAD_ITEMS=(
   ".claude-plugin"
   ".codex-plugin"
-  ".cursor-plugin"
   ".mcp.json"
   ".plugin"
   "LICENSE"
@@ -163,36 +162,58 @@ import shutil
 
 path = Path(os.environ["CODEX_CONFIG_FILE"])
 text = path.read_text(encoding="utf-8")
-match = re.search(r"(?ms)^\[mcp_servers\.sanka\]\n(.*?)(?=^\[|\Z)", text)
-if not match:
-    print("missing")
+pattern = re.compile(r"(?ms)^(?P<header>\[mcp_servers\.(?P<name>[^\]]+)\]\n)(?P<body>.*?)(?=^\[|\Z)")
+target_url = "https://mcp.sanka.com/mcp"
+protected_sections = {"sanka_plugin"}
+removed_sections = []
+segments = []
+cursor = 0
+
+for match in pattern.finditer(text):
+    name = match.group("name").strip()
+    body = match.group("body")
+    url_match = re.search(r'(?m)^url\s*=\s*"([^"]+)"\s*$', body)
+    url = url_match.group(1).strip() if url_match else None
+    normalized_url = url.rstrip("/") if url is not None else None
+    is_duplicate_hosted_entry = (
+        name not in protected_sections
+        and (
+            name in {"sanka", "sanka_key"}
+            or normalized_url == target_url
+        )
+    )
+    if not is_duplicate_hosted_entry:
+        continue
+
+    removed_sections.append(name)
+    segments.append(text[cursor:match.start()])
+    cursor = match.end()
+
+if not removed_sections:
+    print("none")
     raise SystemExit
 
-block = match.group(1)
-if re.search(r"(?m)^enabled\s*=\s*false\s*$", block):
-    print("already-disabled")
-    raise SystemExit
-
-if re.search(r"(?m)^enabled\s*=.*$", block):
-    new_block = re.sub(r"(?m)^enabled\s*=.*$", "enabled = false", block, count=1)
-else:
-    new_block = "enabled = false\n" + block
+segments.append(text[cursor:])
+new_text = "".join(segments)
+new_text = re.sub(r"\n{3,}", "\n\n", new_text)
 
 backup_path = f"{path}.bak-{os.environ['BACKUP_SUFFIX']}"
 shutil.copy2(path, backup_path)
-new_text = text[: match.start(1)] + new_block + text[match.end(1) :]
 path.write_text(new_text, encoding="utf-8")
-print(f"disabled::{backup_path}")
+print(f"removed::{','.join(removed_sections)}::{backup_path}")
 PY
 )"
 
   case "$CONFLICT_STATUS" in
-    disabled::*)
-      echo "Disabled conflicting global MCP server in $CODEX_CONFIG_FILE."
-      echo "Backup written to ${CONFLICT_STATUS#disabled::}."
+    removed::*)
+      REMOVED_SECTIONS="${CONFLICT_STATUS#removed::}"
+      REMOVED_SECTIONS="${REMOVED_SECTIONS%%::*}"
+      BACKUP_PATH="${CONFLICT_STATUS##*::}"
+      echo "Removed conflicting global MCP server entries ($REMOVED_SECTIONS) from $CODEX_CONFIG_FILE."
+      echo "Backup written to $BACKUP_PATH."
       ;;
-    already-disabled)
-      echo "Global MCP server conflict was already disabled in $CODEX_CONFIG_FILE."
+    none)
+      echo "No conflicting global MCP server entries were found in $CODEX_CONFIG_FILE."
       ;;
   esac
 fi

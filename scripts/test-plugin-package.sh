@@ -54,7 +54,7 @@ def assert_equal(actual, expected, message):
         raise AssertionError(f"{message}: expected {expected!r}, got {actual!r}")
 
 claude_manifest = load_json(unpacked_root / ".claude-plugin" / "plugin.json")
-cursor_manifest = load_json(unpacked_root / ".cursor-plugin" / "plugin.json")
+claude_marketplace = load_json(unpacked_root / ".claude-plugin" / "marketplace.json")
 generic_manifest = load_json(unpacked_root / ".plugin" / "plugin.json")
 codex_manifest = load_json(unpacked_root / ".codex-plugin" / "plugin.json")
 shared_mcp = load_json(unpacked_root / ".mcp.json")
@@ -62,7 +62,9 @@ legacy_mcp = load_json(unpacked_root / "mcp.json")
 codex_mcp = load_json(unpacked_root / "codex.mcp.json")
 
 assert_equal(claude_manifest["mcpServers"], "./.mcp.json", "Claude manifest must use the canonical shared MCP path")
-assert_equal(cursor_manifest["mcpServers"], "./.mcp.json", "Cursor manifest must use the canonical shared MCP path")
+assert_equal(claude_marketplace["name"], "sanka", "Claude marketplace must expose the expected marketplace name")
+assert_equal(claude_marketplace["plugins"][0]["name"], "sanka-plugin", "Claude marketplace must expose the Sanka plugin")
+assert_equal(claude_marketplace["plugins"][0]["source"], "./", "Claude marketplace must install from the repo root")
 assert_equal(generic_manifest["mcpServers"], "./.mcp.json", "Generic plugin manifest must use the canonical shared MCP path")
 assert_equal(codex_manifest["mcpServers"], "./codex.mcp.json", "Codex manifest must use its dedicated MCP config")
 
@@ -74,7 +76,7 @@ expected_shared = {
         }
     }
 }
-assert_equal(shared_mcp, expected_shared, "Shared MCP config must stay Claude/Cursor compatible")
+assert_equal(shared_mcp, expected_shared, "Shared MCP config must stay Claude/generic compatible")
 assert_equal(legacy_mcp, expected_shared, "Legacy mcp.json alias must match the shared MCP config")
 
 codex_server = codex_mcp.get("mcpServers", {}).get("sanka_plugin", {})
@@ -85,7 +87,7 @@ if "OAuth" not in codex_server.get("note", ""):
 
 required_paths = [
     ".claude-plugin/plugin.json",
-    ".cursor-plugin/plugin.json",
+    ".claude-plugin/marketplace.json",
     ".plugin/plugin.json",
     ".codex-plugin/plugin.json",
     ".mcp.json",
@@ -101,6 +103,7 @@ for relative_path in required_paths:
 
 for source, packaged in [
     (plugin_root / ".claude-plugin" / "plugin.json", unpacked_root / ".claude-plugin" / "plugin.json"),
+    (plugin_root / ".claude-plugin" / "marketplace.json", unpacked_root / ".claude-plugin" / "marketplace.json"),
     (plugin_root / ".codex-plugin" / "plugin.json", unpacked_root / ".codex-plugin" / "plugin.json"),
     (plugin_root / ".mcp.json", unpacked_root / ".mcp.json"),
     (plugin_root / "codex.mcp.json", unpacked_root / "codex.mcp.json"),

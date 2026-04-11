@@ -8,10 +8,10 @@ Use this checklist for the release that includes:
 - the vendored callback error fix for OAuth provider errors
 - the Codex guidance to start from the installed plugin chip, not a raw skill link
 - the client manifest split:
-  - Claude, Cursor, and generic hosts use `./.mcp.json`
+  - Claude and generic hosts use `./.mcp.json`
   - Codex uses `./codex.mcp.json`
 - the installer cache purge for `~/.codex/plugins/cache/personal/sanka-plugin`
-- the package regression test that prevents Claude/Cursor from drifting onto the
+- the package regression test that prevents Claude/generic manifests from drifting onto the
   Codex-only MCP config
 
 1. Use the dedicated macOS release machine that has:
@@ -116,6 +116,6 @@ spctl -a -vvv "/tmp/sanka-plugin-release-check/unzip/Codex/Install Sanka Plugin.
 - `./scripts/build-plugin-package.sh` is now guarded and should fail on unsigned macOS apps by default.
 - `SANKA_ALLOW_UNSIGNED_MACOS_APPS=1` exists only for local development and should never be used for a published GitHub release.
 - `./scripts/macos-signing-env.sh` auto-loads the sibling `../sanka/.env` file before falling back to manually exported values.
-- `.mcp.json` is the shared hosted HTTP MCP config for Claude, Cursor, and generic hosts.
+- `.mcp.json` is the shared hosted HTTP MCP config for Claude and generic hosts.
 - `codex.mcp.json` is the dedicated Codex MCP config and should not be repointed back to `./.mcp.json`.
 - If Claude stops recognizing the uploaded ZIP as a packaged connector, first inspect `.claude-plugin/plugin.json` inside the ZIP and confirm it still points at `./.mcp.json`.

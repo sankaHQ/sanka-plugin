@@ -18,7 +18,6 @@ ALLOW_UNSIGNED_MACOS_APPS=0
 PAYLOAD_ITEMS=(
   ".claude-plugin"
   ".codex-plugin"
-  ".cursor-plugin"
   ".mcp.json"
   ".plugin"
   "LICENSE"
@@ -32,7 +31,6 @@ PAYLOAD_ITEMS=(
 PACKAGE_ITEMS=(
   ".claude-plugin"
   ".codex-plugin"
-  ".cursor-plugin"
   ".mcp.json"
   ".plugin"
   "Codex"
