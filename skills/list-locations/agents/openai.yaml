@@ -1,0 +1,15 @@
+interface:
+  display_name: "List Locations"
+  short_description: "List or search locations in live Sanka."
+  default_prompt: "Use $sanka:list-locations to list or search locations in live Sanka."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "sanka_plugin"
+      description: "Hosted Sanka MCP server for live Sanka workflows"
+      transport: "streamable_http"
+      url: "https://mcp.sanka.com/mcp"
+
+policy:
+  allow_implicit_invocation: false

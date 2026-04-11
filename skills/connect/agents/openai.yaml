@@ -1,0 +1,15 @@
+interface:
+  display_name: "Connect Sanka"
+  short_description: "Connect or re-authenticate the installed Sanka plugin in this thread."
+  default_prompt: "Use $sanka:connect to connect or re-authenticate the installed Sanka plugin in this thread."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "sanka_plugin"
+      description: "Hosted Sanka MCP server for live Sanka workflows"
+      transport: "streamable_http"
+      url: "https://mcp.sanka.com/mcp"
+
+policy:
+  allow_implicit_invocation: false

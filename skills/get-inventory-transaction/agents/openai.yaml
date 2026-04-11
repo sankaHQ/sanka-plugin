@@ -1,0 +1,15 @@
+interface:
+  display_name: "Get Inventory Transaction"
+  short_description: "Load one inventory transaction from live Sanka."
+  default_prompt: "Use $sanka:get-inventory-transaction to load one inventory transaction from live Sanka."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "sanka_plugin"
+      description: "Hosted Sanka MCP server for live Sanka workflows"
+      transport: "streamable_http"
+      url: "https://mcp.sanka.com/mcp"
+
+policy:
+  allow_implicit_invocation: false

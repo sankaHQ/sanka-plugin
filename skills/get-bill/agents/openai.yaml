@@ -1,0 +1,15 @@
+interface:
+  display_name: "Get Bill"
+  short_description: "Load one bill from live Sanka."
+  default_prompt: "Use $sanka:get-bill to load one bill from live Sanka."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "sanka_plugin"
+      description: "Hosted Sanka MCP server for live Sanka workflows"
+      transport: "streamable_http"
+      url: "https://mcp.sanka.com/mcp"
+
+policy:
+  allow_implicit_invocation: false

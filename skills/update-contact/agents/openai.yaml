@@ -1,0 +1,15 @@
+interface:
+  display_name: "Update Contact"
+  short_description: "Update contact in live Sanka."
+  default_prompt: "Use $sanka:update-contact to update contact in live Sanka."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "sanka_plugin"
+      description: "Hosted Sanka MCP server for live Sanka workflows"
+      transport: "streamable_http"
+      url: "https://mcp.sanka.com/mcp"
+
+policy:
+  allow_implicit_invocation: false

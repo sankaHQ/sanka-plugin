@@ -1,0 +1,15 @@
+interface:
+  display_name: "Push Integration Sync"
+  short_description: "Queue an outbound integration sync from Sanka."
+  default_prompt: "Use $sanka:push-integration-sync to queue an outbound integration sync from Sanka."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "sanka_plugin"
+      description: "Hosted Sanka MCP server for live Sanka workflows"
+      transport: "streamable_http"
+      url: "https://mcp.sanka.com/mcp"
+
+policy:
+  allow_implicit_invocation: false

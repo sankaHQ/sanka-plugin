@@ -1,0 +1,15 @@
+interface:
+  display_name: "Delete Expense"
+  short_description: "Delete expense from live Sanka."
+  default_prompt: "Use $sanka:delete-expense to delete expense from live Sanka."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "sanka_plugin"
+      description: "Hosted Sanka MCP server for live Sanka workflows"
+      transport: "streamable_http"
+      url: "https://mcp.sanka.com/mcp"
+
+policy:
+  allow_implicit_invocation: false

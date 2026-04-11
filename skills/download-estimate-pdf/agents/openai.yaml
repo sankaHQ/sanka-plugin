@@ -1,0 +1,15 @@
+interface:
+  display_name: "Download Estimate PDF"
+  short_description: "Download estimate PDF from live Sanka."
+  default_prompt: "Use $sanka:download-estimate-pdf to download estimate PDF from live Sanka."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "sanka_plugin"
+      description: "Hosted Sanka MCP server for live Sanka workflows"
+      transport: "streamable_http"
+      url: "https://mcp.sanka.com/mcp"
+
+policy:
+  allow_implicit_invocation: false

@@ -1,0 +1,15 @@
+interface:
+  display_name: "Apply Company Price Table Items"
+  short_description: "Apply a company-wide price-table percentage across all items in live Sanka."
+  default_prompt: "Use $sanka:apply-company-price-table-items to apply a company-wide price-table percentage across all items in live Sanka."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "sanka_plugin"
+      description: "Hosted Sanka MCP server for live Sanka workflows"
+      transport: "streamable_http"
+      url: "https://mcp.sanka.com/mcp"
+
+policy:
+  allow_implicit_invocation: false

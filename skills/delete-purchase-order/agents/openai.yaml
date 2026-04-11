@@ -1,0 +1,15 @@
+interface:
+  display_name: "Delete Purchase Order"
+  short_description: "Delete purchase order from live Sanka."
+  default_prompt: "Use $sanka:delete-purchase-order to delete purchase order from live Sanka."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "sanka_plugin"
+      description: "Hosted Sanka MCP server for live Sanka workflows"
+      transport: "streamable_http"
+      url: "https://mcp.sanka.com/mcp"
+
+policy:
+  allow_implicit_invocation: false

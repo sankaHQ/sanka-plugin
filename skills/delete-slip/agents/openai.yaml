@@ -1,0 +1,15 @@
+interface:
+  display_name: "Delete Slip"
+  short_description: "Delete slip from live Sanka."
+  default_prompt: "Use $sanka:delete-slip to delete slip from live Sanka."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "sanka_plugin"
+      description: "Hosted Sanka MCP server for live Sanka workflows"
+      transport: "streamable_http"
+      url: "https://mcp.sanka.com/mcp"
+
+policy:
+  allow_implicit_invocation: false
