@@ -3,15 +3,18 @@
 set -euo pipefail
 export COPYFILE_DISABLE=1
 
-PLUGIN_NAME="sanka-plugin"
+PLUGIN_NAME="sanka"
+LEGACY_PLUGIN_NAME="sanka-plugin"
 PLUGIN_SOURCE_DIR="${1:-}"
 PLUGIN_DEST_DIR="$HOME/.codex/plugins/$PLUGIN_NAME"
 PLUGIN_CACHE_DIR="$HOME/.codex/plugins/cache/personal/$PLUGIN_NAME"
+LEGACY_PLUGIN_DEST_DIR="$HOME/.codex/plugins/$LEGACY_PLUGIN_NAME"
+LEGACY_PLUGIN_CACHE_DIR="$HOME/.codex/plugins/cache/personal/$LEGACY_PLUGIN_NAME"
 MARKETPLACE_DIR="$HOME/.agents/plugins"
 MARKETPLACE_FILE="$MARKETPLACE_DIR/marketplace.json"
 CODEX_CONFIG_FILE="$HOME/.codex/config.toml"
 BACKUP_SUFFIX="$(date +%Y%m%d%H%M%S)"
-TMP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/sanka-plugin.XXXXXX")"
+TMP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/sanka.XXXXXX")"
 PAYLOAD_ITEMS=(
   ".claude-plugin"
   ".codex-plugin"
@@ -22,6 +25,7 @@ PAYLOAD_ITEMS=(
   "assets"
   "codex.mcp.json"
   "mcp.json"
+  "skills"
   "vendor"
 )
 
@@ -58,11 +62,17 @@ for item in "${PAYLOAD_ITEMS[@]}"; do
 done
 
 rm -rf "$PLUGIN_DEST_DIR"
+rm -rf "$LEGACY_PLUGIN_DEST_DIR"
 mv "$STAGING_DIR" "$PLUGIN_DEST_DIR"
 
 if [ -d "$PLUGIN_CACHE_DIR" ]; then
   rm -rf "$PLUGIN_CACHE_DIR"
   echo "Cleared stale personal plugin cache at $PLUGIN_CACHE_DIR."
+fi
+
+if [ -d "$LEGACY_PLUGIN_CACHE_DIR" ]; then
+  rm -rf "$LEGACY_PLUGIN_CACHE_DIR"
+  echo "Cleared legacy personal plugin cache at $LEGACY_PLUGIN_CACHE_DIR."
 fi
 
 if [ -f "$MARKETPLACE_FILE" ]; then
@@ -97,10 +107,10 @@ function readJSON(path) {
 
 const marketplacePath = $.NSProcessInfo.processInfo.environment.objectForKey("MARKETPLACE_FILE").js;
 const entry = {
-  name: "sanka-plugin",
+  name: "sanka",
   source: {
     source: "local",
-    path: "./.codex/plugins/sanka-plugin"
+    path: "./.codex/plugins/sanka"
   },
   policy: {
     installation: "AVAILABLE",
@@ -136,7 +146,7 @@ if (!Array.isArray(marketplace.plugins)) {
 const otherPlugins = [];
 for (let index = 0; index < marketplace.plugins.length; index += 1) {
   const plugin = marketplace.plugins[index];
-  if (!plugin || plugin.name !== "sanka-plugin") {
+  if (!plugin || (plugin.name !== "sanka" && plugin.name !== "sanka-plugin")) {
     otherPlugins.push(plugin);
   }
 }

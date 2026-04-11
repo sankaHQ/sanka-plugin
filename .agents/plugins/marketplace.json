@@ -5,7 +5,7 @@
   },
   "plugins": [
     {
-      "name": "sanka-plugin",
+      "name": "sanka",
       "source": {
         "source": "local",
         "path": "./"

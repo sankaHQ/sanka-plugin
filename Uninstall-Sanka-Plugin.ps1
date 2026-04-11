@@ -1,7 +1,11 @@
 $ErrorActionPreference = "Stop"
 
-$pluginName = "sanka-plugin"
+$pluginName = "sanka"
+$legacyPluginName = "sanka-plugin"
 $pluginDestDir = Join-Path $HOME ".codex\plugins\$pluginName"
+$legacyPluginDestDir = Join-Path $HOME ".codex\plugins\$legacyPluginName"
+$pluginCacheDir = Join-Path $HOME ".codex\plugins\cache\personal\$pluginName"
+$legacyPluginCacheDir = Join-Path $HOME ".codex\plugins\cache\personal\$legacyPluginName"
 $marketplaceFile = Join-Path $HOME ".agents\plugins\marketplace.json"
 $backupSuffix = Get-Date -Format "yyyyMMddHHmmss"
 
@@ -23,6 +27,21 @@ if (Test-Path $pluginDestDir) {
     Write-Host "Removed plugin files from $pluginDestDir."
 } else {
     Write-Host "Plugin files were already removed."
+}
+
+if (Test-Path $legacyPluginDestDir) {
+    Remove-Item -Path $legacyPluginDestDir -Recurse -Force
+    Write-Host "Removed legacy plugin files from $legacyPluginDestDir."
+}
+
+if (Test-Path $pluginCacheDir) {
+    Remove-Item -Path $pluginCacheDir -Recurse -Force
+    Write-Host "Removed plugin cache from $pluginCacheDir."
+}
+
+if (Test-Path $legacyPluginCacheDir) {
+    Remove-Item -Path $legacyPluginCacheDir -Recurse -Force
+    Write-Host "Removed legacy plugin cache from $legacyPluginCacheDir."
 }
 
 if (Test-Path $marketplaceFile) {
@@ -48,7 +67,7 @@ if (Test-Path $marketplaceFile) {
 
     $existingPlugins = @()
     if ($marketplace.PSObject.Properties.Name -contains "plugins" -and $null -ne $marketplace.plugins) {
-        $existingPlugins = @($marketplace.plugins | Where-Object { $_ -and $_.name -ne "sanka-plugin" })
+        $existingPlugins = @($marketplace.plugins | Where-Object { $_ -and $_.name -ne "sanka" -and $_.name -ne "sanka-plugin" })
     }
 
     $marketplace | Add-Member -NotePropertyName plugins -NotePropertyValue $existingPlugins -Force
