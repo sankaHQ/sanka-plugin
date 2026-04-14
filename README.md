@@ -158,6 +158,19 @@ block like `[mcp_servers.sanka]` or `[mcp_servers.sanka_key]` can hijack
 `mcp__sanka__*` or `mcp__sanka_key__*` calls and bypass the plugin's
 `sanka_plugin` server attachment.
 
+If Codex keeps suggesting version-pinned linked skill prompts like
+`[$sanka:create-task](.../plugins/cache/personal/sanka/<old-version>/...)` after
+the plugin was updated, normalize the local prompt history so future suggestions
+use plain `$sanka:...` mentions instead of stale cache paths:
+
+```bash
+node ./scripts/normalize-codex-prompt-history.mjs
+```
+
+Codex currently stores linked skill mentions in prompt history with the absolute
+cache path that was active when the prompt was first used. Plain `$sanka:...`
+mentions survive plugin version changes more reliably than old versioned links.
+
 If Claude answers a Sanka request by reading the local repo, local database, or
 terminal output instead of prompting for OAuth and using attached MCP tools,
 the thread is not using the installed plugin correctly. In Claude Code, do not
