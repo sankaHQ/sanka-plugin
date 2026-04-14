@@ -1,6 +1,6 @@
 {
   "name": "sanka",
-  "version": "0.4.25",
+  "version": "0.4.26",
   "description": "Sanka plugin that attaches the hosted MCP server for live Sanka workflows, including private inbox, CRM, Estimates, Billing, and expenses, and more using native OAuth sign-in.",
   "author": {
     "name": "Sanka"
