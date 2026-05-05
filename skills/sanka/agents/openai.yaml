@@ -1,0 +1,15 @@
+interface:
+  display_name: "Sanka"
+  short_description: "Route natural-language Sanka requests to the right live Sanka workflow, record, inbox, billing, expense, refresh, or connect action."
+  default_prompt: "Use $sanka:sanka to route natural-language Sanka requests to the right live Sanka workflow, record, inbox, billing, expense, refresh, or connect action."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "sanka_plugin"
+      description: "Hosted Sanka MCP server for live Sanka workflows"
+      transport: "streamable_http"
+      url: "https://mcp.sanka.com/mcp"
+
+policy:
+  allow_implicit_invocation: false

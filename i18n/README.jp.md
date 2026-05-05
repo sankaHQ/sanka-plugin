@@ -1,6 +1,6 @@
 # sanka-plugin
 
-Sankaは、Sankaのhosted MCP serverをCodexとClaude Codeに接続するためのpluginです。SankaのCRM、見積、承認、請求、private inbox、経費、workflow intentをlive dataで操作できます。
+Sankaは、Sankaのhosted MCP serverをCodexとClaude Codeに接続するためのpluginです。SankaのCRM、見積、承認、請求、private inbox、経費、workflow intentをlive dataで操作できます。具体的なskillを選ばせたくない場合は、Sanka routerから開始できます。
 
 ## インストール
 
@@ -22,7 +22,7 @@ Sanka chipまたは$sanka:... mentionから開始する
 /plugin marketplace add sankaHQ/sanka-plugin
 /plugin install sanka@sanka
 /reload-plugins
-通常のchatまたは/sanka:... skillから開始する
+/sanka:sankaで自然文routerを使う、または具体的な/sanka:... skillから開始する
 ```
 
 Claude CodeでGitHubからfuture updateをpullしたい場合は、`/plugin` からauto-updateを有効化してください。
@@ -32,6 +32,7 @@ Claude CodeでGitHubからfuture updateをpullしたい場合は、`/plugin` か
 例:
 
 ```text
+$sanka:sanka このHubSpot Deal URLから見積を作成して。
 $sanka:deal-to-estimate https://app.hubspot.com/contacts/.../record/0-3/... 見積をpreviewして、まだ作成しないで。
 $sanka:deal-to-estimate https://app.hubspot.com/contacts/.../record/0-3/... Sankaに同期済みなら見積を作成して。
 $sanka:list-deals 最近の取引を見せて。
@@ -39,7 +40,9 @@ $sanka:create-expense この領収書から経費を作成して。
 $sanka:refresh
 ```
 
-HubSpot Deal URLからSankaの見積、承認依頼、workflow run、audit trailを作る場合は、`$sanka:deal-to-estimate` のようなSanka workflow skillを使ってください。HubSpotはsource recordであり、business actionはSankaが実行します。
+Claude Codeでは、ユーザーに自然文で依頼させたい場合は `/sanka:sanka` をSankaの入口として使ってください。workflowが明確な場合は `/sanka:deal-to-estimate` のような個別skillも使えます。
+
+HubSpot Deal URLからSankaの見積、承認依頼、workflow run、audit trailを作る場合は、Sanka routerまたはSanka workflow skillを使ってください。HubSpotはsource recordであり、business actionはSankaが実行します。
 
 ## 更新
 
