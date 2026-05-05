@@ -1,7 +1,7 @@
 {
   "name": "sanka",
-  "version": "0.4.26",
-  "description": "Sanka plugin that attaches the hosted MCP server for live Sanka workflows, including private inbox, CRM, Estimates, Billing, and expenses, and more using native OAuth sign-in.",
+  "version": "0.4.27",
+  "description": "Sanka plugin that attaches the hosted MCP server for live Sanka workflows, including CRM, estimates, billing, private inbox, expenses, and workflow intents.",
   "author": {
     "name": "Sanka",
     "url": "https://sanka.com"
@@ -28,7 +28,7 @@
   "interface": {
     "displayName": "Sanka Plugin",
     "shortDescription": "Work with live Sanka data and private inbox via native OAuth",
-    "longDescription": "Use Sanka's hosted MCP endpoint for live Sanka workflows from Codex through the native browser-based OAuth flow. The packaged plugin stays intentionally thin: the hosted MCP server carries the tool behavior, schemas, and workflow guidance, so new hosted tools can ship without a plugin reinstall whenever the client refreshes the attached tool list. This includes private inbox workflows when the hosted MCP exposes them. In Codex, start from the installed Sanka Plugin chip so the MCP server is attached to the thread. Live Sanka queries and actions must come from the attached hosted MCP tools, not from any local Sanka repo, Django shell, or Postgres fallback.",
+    "longDescription": "Use Sanka's hosted MCP endpoint for live Sanka workflows from Codex through native OAuth. Start from the installed Sanka Plugin chip or a $sanka:... skill so Sanka owns CRM, estimates, approvals, billing, private inbox, expenses, and workflow intents such as deal-to-estimate. If a Sanka MCP response says the plugin is outdated, ask whether to refresh it; when the user says yes, refresh the local sanka-plugin repo, reload or reinstall the plugin, and start a fresh thread. Live Sanka operations must come from attached hosted MCP tools, not local repo files, Django shell, Postgres, or HubSpot MCP fallbacks.",
     "developerName": "Sanka",
     "category": "Productivity",
     "capabilities": [
@@ -38,11 +38,10 @@
     ],
     "websiteURL": "https://sanka.com",
     "defaultPrompt": [
-      "Review my latest private inbox threads in Sanka",
-      "Open the newest private email thread and summarize it",
-      "Find a company in Sanka by name",
-      "List the most recent deals in Sanka",
-      "Create an expense in Sanka from a receipt"
+      "Use $sanka:deal-to-estimate to preview an estimate from a HubSpot deal URL",
+      "Use $sanka:list-deals to list recent deals in Sanka",
+      "Use $sanka:create-expense to create an expense from a receipt",
+      "Use $sanka:refresh to refresh Sanka Plugin"
     ],
     "brandColor": "#3B82F6",
     "composerIcon": "./assets/logo.svg",

@@ -88,6 +88,9 @@ function buildOpenAiYaml(skillName, title, description) {
 }
 
 function operationForSkill(skillDirName) {
+  if (skillDirName === 'deal-to-estimate') {
+    return 'write';
+  }
   return /^(create|update|delete|upload|reply|archive|cancel|reschedule|import|export|generate|push|sync|apply)-/.test(
     skillDirName,
   )
@@ -175,6 +178,13 @@ function scopeKeyForSkill(skillDirName) {
 }
 
 function requiredScopesForSkill(skillDirName) {
+  if (skillDirName === 'deal-to-estimate') {
+    return {
+      mode: 'static',
+      values: ['deals:read', 'estimates:write', 'workflows:write'],
+    };
+  }
+
   if (skillDirName.includes('property')) {
     return { mode: 'dynamic' };
   }
@@ -248,6 +258,10 @@ function renumberWorkflowSection(body) {
 }
 
 function updateAuthWorkflow(body, skillDirName) {
+  if (skillDirName === 'refresh') {
+    return body;
+  }
+
   if (skillDirName === 'connect') {
     return body.replace(
       /^\d+\.\s+(?:If the tool returns an authentication challenge, tell the user to complete the native Sanka sign-in flow shown by the client, then retry the original request\.|If `auth_status` returns `connected: false`.+)$/m,
@@ -262,6 +276,10 @@ function updateAuthWorkflow(body, skillDirName) {
 }
 
 function injectGuardrails(body, skillDirName) {
+  if (skillDirName === 'refresh') {
+    return body;
+  }
+
   const guardrailsMarker = 'Guardrails:\n';
   const guardrailsStart = body.indexOf(guardrailsMarker);
   if (guardrailsStart === -1) {
