@@ -4,13 +4,17 @@ Sanka Plugin attaches Sanka's hosted MCP server to Codex and Claude Code. Use it
 
 ## Install
 
+Codex uses a repo-local marketplace, while Claude Code supports a GitHub marketplace command. The install paths differ, but both attach the same hosted Sanka MCP server and the same `$sanka:...` skills.
+
 ### Codex
 
-1. Clone this repo.
-2. Open the repo in Codex.
-3. Restart Codex so `.agents/plugins/marketplace.json` is discovered.
-4. Install **Sanka Plugin** from **Sanka Local Plugins**.
-5. Start Sanka work from the installed plugin chip or a plain `$sanka:...` mention.
+```text
+Clone sankaHQ/sanka-plugin
+Open the cloned repo in Codex
+Restart Codex
+Install Sanka Plugin from Sanka Local Plugins
+Start with the Sanka Plugin chip or a plain $sanka:... mention
+```
 
 ### Claude Code
 
@@ -18,6 +22,7 @@ Sanka Plugin attaches Sanka's hosted MCP server to Codex and Claude Code. Use it
 /plugin marketplace add sankaHQ/sanka-plugin
 /plugin install sanka@sanka
 /reload-plugins
+Start with normal chat or a /sanka:... skill
 ```
 
 Enable auto-update from `/plugin` if you want Claude Code to pull future updates from GitHub.
@@ -27,9 +32,10 @@ Enable auto-update from `/plugin` if you want Claude Code to pull future updates
 Examples:
 
 ```text
-$sanka:deal-to-estimate https://app.hubspot.com/contacts/.../record/0-3/... 見積もりをプレビューして
-$sanka:list-deals 直近の取引を見せて
-$sanka:create-expense この領収書で経費を作って
+$sanka:deal-to-estimate https://app.hubspot.com/contacts/.../record/0-3/... Preview the estimate and do not create it yet.
+$sanka:deal-to-estimate https://app.hubspot.com/contacts/.../record/0-3/... Create the estimate if the deal is synced in Sanka.
+$sanka:list-deals Show recent deals.
+$sanka:create-expense Create an expense from this receipt.
 $sanka:refresh
 ```
 
@@ -37,14 +43,16 @@ For HubSpot deal URLs, use Sanka workflow skills such as `$sanka:deal-to-estimat
 
 ## Refresh
 
-If Sanka says the plugin is outdated, the user should only need to answer "はい".
+If Sanka says the plugin is outdated, the user should only need to answer "yes".
 
 User-facing prompt:
 
 ```text
-Sanka Pluginが古いバージョンの可能性があります。
-更新しますか？
-「はい」と返信すると、CodexがSanka Pluginを最新化して、新しいSanka skillが使える状態にします。
+Sanka Plugin may be outdated.
+This action needs a newer Sanka workflow skill.
+
+Update Sanka Plugin?
+Reply "yes" and Codex will refresh Sanka Plugin and make the new Sanka skills available.
 ```
 
 Codex can then run:

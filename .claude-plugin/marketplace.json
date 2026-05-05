@@ -5,13 +5,13 @@
   },
   "metadata": {
     "description": "Official Sanka plugins for Claude Code.",
-    "version": "0.4.27"
+    "version": "0.4.28"
   },
   "plugins": [
     {
       "name": "sanka",
       "description": "Sanka plugin that attaches the hosted MCP server for live Sanka workflows, including CRM, estimates, billing, private inbox, expenses, and workflow intents.",
-      "version": "0.4.27",
+      "version": "0.4.28",
       "author": {
         "name": "Sanka"
       },
