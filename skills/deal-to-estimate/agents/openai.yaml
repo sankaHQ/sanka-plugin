@@ -1,0 +1,15 @@
+interface:
+  display_name: "Deal To Estimate"
+  short_description: "Create or preview a Sanka estimate workflow from a Sanka deal or HubSpot deal URL."
+  default_prompt: "Use $sanka:deal-to-estimate to create or preview a Sanka estimate workflow from a Sanka deal or HubSpot deal URL."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "sanka_plugin"
+      description: "Hosted Sanka MCP server for live Sanka workflows"
+      transport: "streamable_http"
+      url: "https://mcp.sanka.com/mcp"
+
+policy:
+  allow_implicit_invocation: false
