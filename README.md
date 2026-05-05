@@ -1,6 +1,6 @@
 # sanka-plugin
 
-Sanka attaches Sanka's hosted MCP server to Codex and Claude Code. Use it for live Sanka CRM, estimates, approvals, billing, private inbox, expenses, and workflow intents.
+Sanka attaches Sanka's hosted MCP server to Codex and Claude Code. Use it for live Sanka CRM, estimates, approvals, billing, private inbox, expenses, and workflow intents. Start with the general Sanka router when you do not want to choose a specific skill.
 
 ## Install
 
@@ -22,7 +22,7 @@ Start with the Sanka chip or a plain $sanka:... mention
 /plugin marketplace add sankaHQ/sanka-plugin
 /plugin install sanka@sanka
 /reload-plugins
-Start with normal chat or a /sanka:... skill
+Start with /sanka:sanka for natural-language routing, or a specific /sanka:... skill
 ```
 
 Enable auto-update from `/plugin` if you want Claude Code to pull future updates from GitHub.
@@ -32,6 +32,7 @@ Enable auto-update from `/plugin` if you want Claude Code to pull future updates
 Examples:
 
 ```text
+$sanka:sanka Create an estimate from this HubSpot deal URL.
 $sanka:deal-to-estimate https://app.hubspot.com/contacts/.../record/0-3/... Preview the estimate and do not create it yet.
 $sanka:deal-to-estimate https://app.hubspot.com/contacts/.../record/0-3/... Create the estimate if the deal is synced in Sanka.
 $sanka:list-deals Show recent deals.
@@ -39,7 +40,9 @@ $sanka:create-expense Create an expense from this receipt.
 $sanka:refresh
 ```
 
-For HubSpot deal URLs, use Sanka workflow skills such as `$sanka:deal-to-estimate` when the outcome is a Sanka estimate, approval request, workflow run, or audit trail. HubSpot is only the source record; Sanka owns the business action.
+For Claude Code, use `/sanka:sanka` as the general Sanka entrypoint when the user wants to say the request naturally. Use narrower skills like `/sanka:deal-to-estimate` when the workflow is already obvious.
+
+For HubSpot deal URLs, use the Sanka router or workflow skills when the outcome is a Sanka estimate, approval request, workflow run, or audit trail. HubSpot is only the source record; Sanka owns the business action.
 
 ## Refresh
 
