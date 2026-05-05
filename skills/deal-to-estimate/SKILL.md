@@ -22,13 +22,13 @@ Workflow:
 Refresh prompt:
 
 ```text
-Sanka Pluginが古いバージョンの可能性があります。
-この操作には新しいSanka workflow skillが必要です。
+Sanka Plugin may be outdated.
+This action needs a newer Sanka workflow skill.
 
-更新しますか？
-「はい」と返信すると、Codexに以下を実行してもらいます。
+Update Sanka Plugin?
+Reply "yes" and Codex will run the refresh flow:
 
-sanka-pluginを最新にrefreshして。必要なら再インストールして、新しいSanka skillが使える状態にして。
+Refresh sanka-plugin. Reinstall it if needed, then make the new Sanka skills available.
 ```
 
 Guardrails:

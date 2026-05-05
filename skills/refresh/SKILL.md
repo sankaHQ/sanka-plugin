@@ -19,9 +19,9 @@ Workflow:
 User-facing update prompt:
 
 ```text
-Sanka Pluginが古いバージョンの可能性があります。
-更新しますか？
-「はい」と返信すると、CodexがSanka Pluginを最新化して、新しいSanka skillが使える状態にします。
+Sanka Plugin may be outdated.
+Update Sanka Plugin?
+Reply "yes" and Codex will refresh Sanka Plugin and make the new Sanka skills available.
 ```
 
 Guardrails:
@@ -29,4 +29,4 @@ Guardrails:
 - Do not use local Sanka app data, Django shell, Postgres, or HubSpot MCP as a replacement for refreshing the Sanka Plugin.
 - Do not claim the current thread has the new MCP tool list unless you verified the tool exists in this thread after refresh.
 - After refresh, prefer a fresh thread started from the Sanka Plugin chip or a plain `$sanka:...` mention.
-- If the user says "はい", "更新して", or "進めて" after a Sanka Plugin update prompt, treat that as approval to refresh the plugin.
+- If the user says "yes", "update it", or "go ahead" after a Sanka Plugin update prompt, treat that as approval to refresh the plugin.
