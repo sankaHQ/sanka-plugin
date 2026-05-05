@@ -70,3 +70,8 @@ After refresh, reload or reinstall Sanka Plugin in Codex and start a fresh threa
 - Codex MCP server name: `sanka_plugin`
 - Live Sanka work must use attached hosted MCP tools. Do not substitute local Django shell, Postgres, repo files, or HubSpot MCP for Sanka actions.
 - If only `search_docs` / `execute` appear, refresh the plugin attachment or start a fresh plugin-attached thread.
+
+## Translations
+
+- [English](./README.md)
+- [Japanese / 日本語](./i18n/README.jp.md)
