@@ -1,6 +1,6 @@
 # sanka-plugin
 
-Sanka Plugin attaches Sanka's hosted MCP server to Codex and Claude Code. Use it for live Sanka CRM, estimates, approvals, billing, private inbox, expenses, and workflow intents.
+Sanka attaches Sanka's hosted MCP server to Codex and Claude Code. Use it for live Sanka CRM, estimates, approvals, billing, private inbox, expenses, and workflow intents.
 
 ## Install
 
@@ -12,8 +12,8 @@ Codex uses a repo-local marketplace, while Claude Code supports a GitHub marketp
 Clone sankaHQ/sanka-plugin
 Open the cloned repo in Codex
 Restart Codex
-Install Sanka Plugin from Sanka Local Plugins
-Start with the Sanka Plugin chip or a plain $sanka:... mention
+Install Sanka from Sanka Local Plugins
+Start with the Sanka chip or a plain $sanka:... mention
 ```
 
 ### Claude Code
@@ -48,11 +48,11 @@ If Sanka says the plugin is outdated, the user should only need to answer "yes".
 User-facing prompt:
 
 ```text
-Sanka Plugin may be outdated.
+Sanka may be outdated.
 This action needs a newer Sanka workflow skill.
 
-Update Sanka Plugin?
-Reply "yes" and Codex will refresh Sanka Plugin and make the new Sanka skills available.
+Update Sanka?
+Reply "yes" and Codex will refresh Sanka and make the new Sanka skills available.
 ```
 
 Codex can then run:
@@ -62,7 +62,7 @@ cd /Users/haegwan/Sites/sanka/sanka-plugin
 ./scripts/refresh-codex-plugin.sh
 ```
 
-After refresh, reload or reinstall Sanka Plugin in Codex and start a fresh thread from the Sanka Plugin chip or `$sanka:...`. Existing threads may keep an old MCP tool list.
+After refresh, reload or reinstall Sanka in Codex and start a fresh thread from the Sanka chip or `$sanka:...`. Existing threads may keep an old MCP tool list.
 
 ## Notes
 

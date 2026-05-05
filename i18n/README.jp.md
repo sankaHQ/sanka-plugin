@@ -1,6 +1,6 @@
 # sanka-plugin
 
-Sanka Pluginは、Sankaのhosted MCP serverをCodexとClaude Codeに接続するためのpluginです。SankaのCRM、見積、承認、請求、private inbox、経費、workflow intentをlive dataで操作できます。
+Sankaは、Sankaのhosted MCP serverをCodexとClaude Codeに接続するためのpluginです。SankaのCRM、見積、承認、請求、private inbox、経費、workflow intentをlive dataで操作できます。
 
 ## インストール
 
@@ -12,8 +12,8 @@ Codexはrepo-local marketplaceを使い、Claude CodeはGitHub marketplace comma
 sankaHQ/sanka-pluginをcloneする
 cloneしたrepoをCodexで開く
 Codexをrestartする
-Sanka Local PluginsからSanka Pluginをinstallする
-Sanka Plugin chipまたは$sanka:... mentionから開始する
+Sanka Local PluginsからSankaをinstallする
+Sanka chipまたは$sanka:... mentionから開始する
 ```
 
 ### Claude Code
@@ -43,16 +43,16 @@ HubSpot Deal URLからSankaの見積、承認依頼、workflow run、audit trail
 
 ## 更新
 
-Sanka Pluginが古いと表示された場合、ユーザーは「はい」と答えるだけで更新できます。
+Sankaが古いと表示された場合、ユーザーは「はい」と答えるだけで更新できます。
 
 ユーザーに表示するプロンプト:
 
 ```text
-Sanka Pluginが古いバージョンの可能性があります。
+Sankaが古いバージョンの可能性があります。
 この操作には新しいSanka workflow skillが必要です。
 
-Sanka Pluginを更新しますか？
-「はい」と返信すると、CodexがSanka Pluginをrefreshして、新しいSanka skillを使える状態にします。
+Sankaを更新しますか？
+「はい」と返信すると、CodexがSankaをrefreshして、新しいSanka skillを使える状態にします。
 ```
 
 その後、Codexは以下を実行できます。
@@ -62,7 +62,7 @@ cd /Users/haegwan/Sites/sanka/sanka-plugin
 ./scripts/refresh-codex-plugin.sh
 ```
 
-更新後はCodexでSanka Pluginをreloadまたはreinstallし、Sanka Plugin chipまたは `$sanka:...` からfresh threadを開始してください。既存threadは古いMCP tool listを保持している可能性があります。
+更新後はCodexでSankaをreloadまたはreinstallし、Sanka chipまたは `$sanka:...` からfresh threadを開始してください。既存threadは古いMCP tool listを保持している可能性があります。
 
 ## 補足
 
