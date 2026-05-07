@@ -12,17 +12,18 @@ Workflow:
 
 1. Classify the user's intent from the request, pasted URL, record id, or attached file.
 2. Prefer high-level Sanka workflow tools over low-level object writes when a workflow exists.
-3. For HubSpot deal URLs, Sanka deal ids, estimate, quote, approval, or deal-to-estimate requests, run the deal-to-estimate route: extract the source deal, call `preview_workflow` with `workflow_type: "deal_to_estimate"`, summarize amount, line item count, approval requirement, warnings, planned records, and source status, then call `start_workflow` only when the user clearly asked to create and the preview says the source is synced in Sanka.
-4. If the deal-to-estimate preview says `source_status: "external_only"`, do not call `start_workflow`. Explain that Sanka preview used the external source directly, but creation requires syncing or importing the deal into Sanka first.
-5. For workflow status requests, call `get_workflow_run` when the user gives a workflow run id or asks for the status of a prior Sanka workflow.
-6. For read requests, call the matching `list_*`, `get_*`, `download_*`, or `resolve_record` tool. Ask a concise follow-up only when multiple candidates remain ambiguous.
-7. For explicit create or update requests, gather only missing required values, then call the matching `create_*`, `update_*`, upload, reply, import, export, sync, or apply tool.
-8. For delete, cancel, archive, or other destructive requests, ask for confirmation unless the user's confirmation is already explicit in the same request.
-9. For auth or connection requests, call `auth_status` once and surface reconnect instructions from the tool result.
-10. For refresh, update, outdated plugin, or missing skill requests, stop live Sanka work and show the refresh prompt below.
+3. For Salesforce Opportunity quote-readiness requests such as "Can this Salesforce Opportunity be quoted?", extract the Salesforce Opportunity reference, call `preview_workflow` with `workflow_type: "quote_readiness"`, `source_system: "salesforce"`, and `object_type: "opportunity"`, then summarize hard blockers, warnings, suggested fixes, Salesforce source records, and Sanka records. Do not call `start_workflow` for quote readiness.
+4. For HubSpot deal URLs, Sanka deal ids, estimate, quote, approval, or deal-to-estimate requests, run the deal-to-estimate route: extract the source deal, call `preview_workflow` with `workflow_type: "deal_to_estimate"`, summarize amount, line item count, approval requirement, warnings, planned records, and source status, then call `start_workflow` only when the user clearly asked to create and the preview says the source is synced in Sanka.
+5. If the deal-to-estimate preview says `source_status: "external_only"`, do not call `start_workflow`. Explain that Sanka preview used the external source directly, but creation requires syncing or importing the deal into Sanka first.
+6. For workflow status requests, call `get_workflow_run` when the user gives a workflow run id or asks for the status of a prior Sanka workflow.
+7. For read requests, call the matching `list_*`, `get_*`, `download_*`, or `resolve_record` tool. Ask a concise follow-up only when multiple candidates remain ambiguous.
+8. For explicit create or update requests, gather only missing required values, then call the matching `create_*`, `update_*`, upload, reply, import, export, sync, or apply tool.
+9. For delete, cancel, archive, or other destructive requests, ask for confirmation unless the user's confirmation is already explicit in the same request.
+10. For auth or connection requests, call `auth_status` once and surface reconnect instructions from the tool result.
+11. For refresh, update, outdated plugin, or missing skill requests, stop live Sanka work and show the refresh prompt below.
 
 Intent routes:
-- Deals, HubSpot deal URLs, estimates, quotes, approvals, workflow runs: `resolve_record`, `preview_workflow`, `start_workflow`, `get_workflow_run`
+- Deals, HubSpot deal URLs, Salesforce Opportunity quote readiness, estimates, quotes, approvals, workflow runs: `resolve_record`, `preview_workflow`, `start_workflow`, `get_workflow_run`
 - CRM records: companies, contacts, deals, tickets, tasks, properties, pipelines
 - Sales and billing records: estimates, invoices, bills, orders, slips, payments, purchase orders, subscriptions, disbursements
 - Expenses: expenses and expense attachments
@@ -52,5 +53,6 @@ Guardrails:
 - If `auth_status` only returns OAuth metadata such as `authorization_server_url`, `resource_metadata_url`, `resource_url`, `reconnect_rpc_method`, or `reconnect_server_name`, tell the user to trigger the MCP client's native Sanka OAuth flow or reconnect action and then retry.
 - Use this router as the Sanka entrypoint; do not force the user to choose a narrower Sanka skill when the intent is clear.
 - Do not use HubSpot MCP tools for Sanka business actions. HubSpot may be a source record, but Sanka owns estimates, approvals, invoices, workflow runs, audit trails, and record writes.
+- Do not use Salesforce MCP tools for Sanka quote-readiness actions. Salesforce may be a source record, but Sanka owns readiness checks, approval rules, source references, and permission handling.
 - If the needed Sanka MCP tool is unavailable, show the refresh prompt and stop instead of falling back to local repo files, terminal commands, Django shell, Postgres, HubSpot MCP, or generic web search.
 - Do not invent business values, line items, commercial terms, approval outcomes, ids, or URLs that are not supplied by the user or returned by Sanka MCP.

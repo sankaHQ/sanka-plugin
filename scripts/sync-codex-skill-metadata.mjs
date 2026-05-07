@@ -184,6 +184,12 @@ function requiredScopesForSkill(skillDirName) {
       values: ['deals:read', 'estimates:write', 'workflows:write'],
     };
   }
+  if (skillDirName === 'quote-readiness') {
+    return {
+      mode: 'static',
+      values: ['deals:read', 'workflows:read'],
+    };
+  }
 
   if (skillDirName.includes('property')) {
     return { mode: 'dynamic' };

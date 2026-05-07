@@ -1,7 +1,7 @@
 {
   "name": "sanka",
   "version": "0.4.30",
-  "description": "Sanka plugin that attaches the hosted MCP server for live Sanka workflows, including CRM, estimates, billing, private inbox, expenses, and workflow intents.",
+  "description": "Sanka plugin that attaches the hosted MCP server for live Sanka workflows, including CRM, estimates, quote readiness, billing, private inbox, expenses, and workflow intents.",
   "author": {
     "name": "Sanka",
     "url": "https://sanka.com"
@@ -28,7 +28,7 @@
   "interface": {
     "displayName": "Sanka",
     "shortDescription": "Work with live Sanka data and private inbox via native OAuth",
-    "longDescription": "Use Sanka's hosted MCP endpoint for live Sanka workflows from Codex through native OAuth. Start from the installed Sanka chip, the $sanka:sanka router, or a specific $sanka:... skill so Sanka owns CRM, estimates, approvals, billing, private inbox, expenses, and workflow intents such as deal-to-estimate. If a Sanka MCP response says the plugin is outdated, ask whether to refresh it; when the user says yes, refresh the local sanka-plugin repo, reload or reinstall Sanka, and start a fresh thread. Live Sanka operations must come from attached hosted MCP tools, not local repo files, Django shell, Postgres, or HubSpot MCP fallbacks.",
+    "longDescription": "Use Sanka's hosted MCP endpoint for live Sanka workflows from Codex through native OAuth. Start from the installed Sanka chip, the $sanka:sanka router, or a specific $sanka:... skill so Sanka owns CRM, estimates, approvals, quote readiness, billing, private inbox, expenses, and workflow intents such as deal-to-estimate and Salesforce Opportunity quote readiness. If a Sanka MCP response says the plugin is outdated, ask whether to refresh it; when the user says yes, refresh the local sanka-plugin repo, reload or reinstall Sanka, and start a fresh thread. Live Sanka operations must come from attached hosted MCP tools, not local repo files, Django shell, Postgres, Salesforce MCP, or HubSpot MCP fallbacks.",
     "developerName": "Sanka",
     "category": "Productivity",
     "capabilities": [
@@ -40,6 +40,7 @@
     "defaultPrompt": [
       "Use $sanka:sanka to route a natural-language Sanka request",
       "Use $sanka:deal-to-estimate to preview an estimate from a HubSpot deal URL",
+      "Use $sanka:quote-readiness to check whether a Salesforce Opportunity can be quoted",
       "Use $sanka:list-deals to list recent deals in Sanka",
       "Use $sanka:create-expense to create an expense from a receipt",
       "Use $sanka:refresh to refresh Sanka"
