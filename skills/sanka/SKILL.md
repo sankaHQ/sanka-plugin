@@ -12,7 +12,7 @@ Workflow:
 
 1. Classify the user's intent from the request, pasted URL, record id, or attached file.
 2. Prefer high-level Sanka workflow tools over low-level object writes when a workflow exists.
-3. For Salesforce Opportunity quote-readiness requests such as "Can this Salesforce Opportunity be quoted?", extract the Salesforce Opportunity reference, call `preview_workflow` with `workflow_type: "quote_readiness"`, `source_system: "salesforce"`, and `object_type: "opportunity"`, then summarize hard blockers, warnings, suggested fixes, Salesforce source records, and Sanka records. Do not call `start_workflow` for quote readiness.
+3. For Salesforce Opportunity quote-readiness requests such as "Can this Salesforce Opportunity be quoted?", extract the Salesforce Opportunity reference, call `preview_workflow` with `workflow_type: "quote_readiness"`, `source_system: "salesforce"`, and `object_type: "opportunity"`, then summarize readiness, the target estimate preview, financials, approval requirement, hard blockers, warnings, suggested fixes, Salesforce source records, and Sanka records. Do not call `start_workflow` for quote readiness.
 4. For HubSpot deal URLs, Sanka deal ids, estimate, quote, approval, or deal-to-estimate requests, run the deal-to-estimate route: extract the source deal, call `preview_workflow` with `workflow_type: "deal_to_estimate"`, summarize amount, line item count, approval requirement, warnings, planned records, and source status, then call `start_workflow` only when the user clearly asked to create and the preview says the source is synced in Sanka.
 5. If the deal-to-estimate preview says `source_status: "external_only"`, do not call `start_workflow`. Explain that Sanka preview used the external source directly, but creation requires syncing or importing the deal into Sanka first.
 6. For workflow status requests, call `get_workflow_run` when the user gives a workflow run id or asks for the status of a prior Sanka workflow.
@@ -54,5 +54,6 @@ Guardrails:
 - Use this router as the Sanka entrypoint; do not force the user to choose a narrower Sanka skill when the intent is clear.
 - Do not use HubSpot MCP tools for Sanka business actions. HubSpot may be a source record, but Sanka owns estimates, approvals, invoices, workflow runs, audit trails, and record writes.
 - Do not use Salesforce MCP tools for Sanka quote-readiness actions. Salesforce may be a source record, but Sanka owns readiness checks, approval rules, source references, and permission handling.
+- Treat Salesforce quote-readiness previews as read-only and do not call write tools when `preview_workflow` returns `read_only: true`.
 - If the needed Sanka MCP tool is unavailable, show the refresh prompt and stop instead of falling back to local repo files, terminal commands, Django shell, Postgres, HubSpot MCP, or generic web search.
 - Do not invent business values, line items, commercial terms, approval outcomes, ids, or URLs that are not supplied by the user or returned by Sanka MCP.
