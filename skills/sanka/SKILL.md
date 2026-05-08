@@ -12,15 +12,16 @@ Workflow:
 
 1. Classify the user's intent from the request, pasted URL, record id, or attached file.
 2. Prefer high-level Sanka workflow tools over low-level object writes when a workflow exists.
-3. For Salesforce Opportunity quote-readiness requests such as "Can this Salesforce Opportunity be quoted?", extract the Salesforce Opportunity reference, call `preview_workflow` with `workflow_type: "quote_readiness"`, `source_system: "salesforce"`, and `object_type: "opportunity"`, then summarize readiness, the target estimate preview, financials, approval requirement, hard blockers, warnings, suggested fixes, Salesforce source records, and Sanka records. Do not call `start_workflow` for quote readiness.
+3. For Salesforce Opportunity quote-readiness requests such as "Can this Salesforce Opportunity be quoted?", extract the Salesforce Opportunity reference, call `preview_workflow` with `workflow_type: "quote_readiness"`, `source_system: "salesforce"`, and `object_type: "opportunity"`. The hosted tool routes this read-only preview through Sanka's `/api/v1/salesforce/*` API surface. Summarize readiness, the target estimate preview, financials, line item checks, approval requirement, hard blockers, warnings, suggested fixes, Salesforce source records, Sanka records, and the generic `orchestration_plan` showing which Companies, Contacts, Items, and platform mappings would be reused or created. Do not call `start_workflow` for quote readiness.
 4. For HubSpot deal URLs, Sanka deal ids, estimate, quote, approval, or deal-to-estimate requests, run the deal-to-estimate route: extract the source deal, call `preview_workflow` with `workflow_type: "deal_to_estimate"`, summarize amount, line item count, approval requirement, warnings, planned records, and source status, then call `start_workflow` only when the user clearly asked to create and the preview says the source is synced in Sanka.
 5. If the deal-to-estimate preview says `source_status: "external_only"`, do not call `start_workflow`. Explain that Sanka preview used the external source directly, but creation requires syncing or importing the deal into Sanka first.
 6. For workflow status requests, call `get_workflow_run` when the user gives a workflow run id or asks for the status of a prior Sanka workflow.
 7. For read requests, call the matching `list_*`, `get_*`, `download_*`, or `resolve_record` tool. Ask a concise follow-up only when multiple candidates remain ambiguous.
-8. For explicit create or update requests, gather only missing required values, then call the matching `create_*`, `update_*`, upload, reply, import, export, sync, or apply tool.
-9. For delete, cancel, archive, or other destructive requests, ask for confirmation unless the user's confirmation is already explicit in the same request.
-10. For auth or connection requests, call `auth_status` once and surface reconnect instructions from the tool result.
-11. For refresh, update, outdated plugin, or missing skill requests, stop live Sanka work and show the refresh prompt below.
+8. For integration-record reads, keep the generic Sanka tool name. Use `scope: "integration", provider: "salesforce"` for live Salesforce-side reads, and use `scope: "sanka", provider: "salesforce"` for Sanka records linked to Salesforce. If a tool returns `unavailable_reason`, surface it and do not retry as a Sanka-only read unless the user explicitly asks for Sanka-side records.
+9. For explicit create or update requests, gather only missing required values, then call the matching generic `create_*`, `update_*`, upload, reply, import, export, sync, or apply tool. Use `target: "sanka"` for Sanka-only writes, `target: "integration"` for provider-only writes, and `target: "both"` only when the Sanka API allows both-side sync.
+10. For delete, cancel, archive, or other destructive requests, ask for confirmation unless the user's confirmation is already explicit in the same request. Use `dry_run: true` for provider-side destructive checks when available.
+11. For auth or connection requests, call `auth_status` once and surface reconnect instructions from the tool result.
+12. For refresh, update, outdated plugin, or missing skill requests, stop live Sanka work and show the refresh prompt below.
 
 Intent routes:
 - Deals, HubSpot deal URLs, Salesforce Opportunity quote readiness, estimates, quotes, approvals, workflow runs: `resolve_record`, `preview_workflow`, `start_workflow`, `get_workflow_run`
@@ -55,5 +56,9 @@ Guardrails:
 - Do not use HubSpot MCP tools for Sanka business actions. HubSpot may be a source record, but Sanka owns estimates, approvals, invoices, workflow runs, audit trails, and record writes.
 - Do not use Salesforce MCP tools for Sanka quote-readiness actions. Salesforce may be a source record, but Sanka owns readiness checks, approval rules, source references, and permission handling.
 - Treat Salesforce quote-readiness previews as read-only and do not call write tools when `preview_workflow` returns `read_only: true`.
+- Do not use or expect Salesforce-specific all-in-one create tools. If a future create flow is explicitly supported and requested, compose generic Sanka tools for company, contact, item, estimate, approval, and workflow-run operations using the returned platform mapping metadata.
+- Do not invent provider-specific Sanka tool names such as `list_companies_salesforce` or `create_salesforce_company`. Use existing generic tools with `scope`, `provider`, `channel_id`, `external_object_type`, `target`, `operation`, and `dry_run`.
+- Distinguish Sanka-side synced data from live provider-side data: `scope: "sanka", provider: "salesforce"` means Sanka records linked to Salesforce, while `scope: "integration", provider: "salesforce"` means live Salesforce records from the connected channel.
+- Preserve returned line item readiness details, including product, quantity, price, currency mismatch, total mismatch, and duplicate-product warnings.
 - If the needed Sanka MCP tool is unavailable, show the refresh prompt and stop instead of falling back to local repo files, terminal commands, Django shell, Postgres, HubSpot MCP, or generic web search.
 - Do not invent business values, line items, commercial terms, approval outcomes, ids, or URLs that are not supplied by the user or returned by Sanka MCP.
