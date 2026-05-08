@@ -12,7 +12,7 @@ Workflow:
 
 1. Extract the Salesforce Opportunity reference. For a Salesforce Opportunity URL, pass it as `source_record.url` with `source_system: "salesforce"` and `object_type: "opportunity"`. For a Salesforce Opportunity id, pass it as `source_record.record_id`.
 2. If the user gives only a company, deal, or opportunity phrase, call `resolve_record` first and ask a concise follow-up only when multiple candidates remain ambiguous.
-3. Call `preview_workflow` with `workflow_type: "quote_readiness"` before any write. Summarize `ready`, hard blockers, warnings, suggested fixes, Salesforce source records, and Sanka records.
+3. Call `preview_workflow` with `workflow_type: "quote_readiness"` before any write. Summarize `ready`, `target_record`, `financials`, `approval`, hard blockers, warnings, suggested fixes, Salesforce source records, and Sanka records.
 4. Stop after the preview result. Do not call `start_workflow`, create quotes, create estimates, or generate quote drafts for this workflow.
 5. If the user explicitly asks to update Salesforce fields, only proceed when a dedicated Sanka MCP tool exposes safe writeback. Do not use generic code execution, local files, Salesforce MCP, or direct Salesforce APIs as a fallback.
 6. If a Sanka MCP response includes `refresh_required`, `refresh_recommended`, or `suggested_user_facing_reply`, pause the workflow and show the refresh prompt before making further calls.
@@ -43,5 +43,6 @@ Guardrails:
 - Do not use local repo files, terminal commands, Django shell, Postgres, or any repo-local fallback for live Sanka data.
 - Do not call `search_docs` or `execute` when `preview_workflow` covers the request.
 - Do not create quotes, estimates, orders, line items, or approval requests from quote readiness.
+- Treat the preview as read-only. If the response includes `read_only: true`, preserve that in the summary and do not call write tools.
 - Do not auto-fill pricing, quantity, discounts, currency, tax, payment terms, or other financial fields.
 - Do not invent Salesforce or Sanka records, links, blockers, warnings, fixes, approval rules, or permission status that are not returned by Sanka MCP.
