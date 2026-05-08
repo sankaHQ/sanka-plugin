@@ -10,6 +10,9 @@ Use only the attached Sanka MCP tools in this thread.
 Workflow:
 
 1. Gather the required creation details from the request. If key required fields are missing, ask a concise follow-up.
+   - Default to `target: "sanka"` for Sanka-only company creation.
+   - Use `target: "integration", provider: "salesforce"` only when the user explicitly asks to create/update the Salesforce-side Account.
+   - Use `target: "both"` only when the Sanka API allows both-side sync and the user asked for both.
 2. Call `create_company` directly.
 3. If the direct tool call returns `Auth required`, `missing_scope`, or `insufficient_scope`, call `auth_status` exactly once with `{ required_scopes: ["companies:write"] }`. If it returns an explicit reconnect URL such as `connect_url` or `authorization_url`, show that URL verbatim. If it only returns OAuth metadata and not a reconnect URL, tell the user to launch the MCP client's native Sanka OAuth flow or reconnect action for this server, then retry the same Sanka request.
 4. Summarize the created company and surface any returned ids or important fields.
@@ -23,6 +26,7 @@ Guardrails:
 - Do not fabricate a manual connect, OAuth, or login URL. Only repeat reconnect URLs returned by `auth_status`.
 - If `auth_status` only returns OAuth metadata such as `authorization_server_url`, `resource_metadata_url`, `resource_url`, `reconnect_rpc_method`, or `reconnect_server_name`, tell the user to trigger the MCP client's native Sanka OAuth flow or reconnect action and then retry.
 - Call the named Sanka MCP tool directly instead of probing attachment state through discovery tools.
+- Do not use provider-specific tool names such as `create_salesforce_company`; use `create_company` with `target`, `provider`, `channel_id`, `operation`, and `dry_run` where needed.
 - Do not use local repo files, terminal commands, Django shell, Postgres, or any repo-local fallback for live Sanka data.
 - Do not call `search_docs` or `execute` when `create_company` covers the request.
 - Do not invent required business values that the user did not provide or clearly imply.
