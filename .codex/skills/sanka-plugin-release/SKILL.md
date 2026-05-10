@@ -5,7 +5,7 @@ description: Use when releasing or repairing the sanka-plugin package, especiall
 
 # Sanka Plugin Release
 
-Use this skill when working in `<SANKA_PLUGIN_REPOSITORY>` on release packaging, macOS installer signing, notarization, or recovery releases.
+Use this skill when working in the Sanka Plugin repository on release packaging, macOS installer signing, notarization, or recovery releases.
 
 ## Rules
 
@@ -17,7 +17,7 @@ Use this skill when working in `<SANKA_PLUGIN_REPOSITORY>` on release packaging,
 
 ## Workflow
 
-1. Read [RELEASING.md](<SANKA_PLUGIN_REPOSITORY>/RELEASING.md).
+1. Review the repository release instructions when present.
 2. Confirm the plugin versions are bumped for the intended release tag.
 3. Run `rm -rf dist && ./scripts/release-codex-package.sh`.
 4. Verify:

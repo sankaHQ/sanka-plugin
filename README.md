@@ -61,7 +61,6 @@ Reply "yes" and Codex will refresh Sanka and make the new Sanka skills available
 Codex can then run:
 
 ```bash
-cd <SANKA_PLUGIN_REPOSITORY>
 ./scripts/refresh-codex-plugin.sh
 ```
 

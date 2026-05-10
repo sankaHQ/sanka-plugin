@@ -11,7 +11,7 @@ Refresh the installed Sanka Plugin when a Sanka MCP response says the plugin is 
 Workflow:
 
 1. Tell the user you will refresh Sanka Plugin and that the current thread may not receive a new MCP tool list automatically.
-2. If you have local shell access and the repo exists at `<SANKA_PLUGIN_REPOSITORY>`, run `./scripts/refresh-codex-plugin.sh` from that repo.
+2. If you have local shell access to a Sanka Plugin repository checkout, run `./scripts/refresh-codex-plugin.sh` from the repository root.
 3. If the refresh script is unavailable, run `git fetch origin`, `git pull --ff-only`, and `node scripts/sync-codex-skill-metadata.mjs --check` when the metadata script exists.
 4. If the plugin repo changed or the requested skill was missing, tell the user to reload/reinstall Sanka Plugin from Codex Plugins, then start a fresh thread from the Sanka Plugin chip or `$sanka:...`.
 5. If you cannot access the local repo or plugin installer, provide the same concise refresh instruction instead of shell commands.

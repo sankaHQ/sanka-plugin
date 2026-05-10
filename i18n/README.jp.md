@@ -61,7 +61,6 @@ Sankaを更新しますか？
 その後、Codexは以下を実行できます。
 
 ```bash
-cd <SANKA_PLUGIN_REPOSITORY>
 ./scripts/refresh-codex-plugin.sh
 ```
 
