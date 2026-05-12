@@ -17,7 +17,8 @@ Workflow:
 5. If the user explicitly asked to create and preview has no blockers, call `start_workflow` with the same source record and a stable idempotency key based on the workflow type and source deal reference.
 6. If preview returns blockers, explain them and do not call `start_workflow` until the user resolves or explicitly changes the request.
 7. If `start_workflow` returns a run id, summarize the created invoice, approval status, created records, and the run id. Call `get_workflow_run` only when the start result is incomplete or the user asks for status.
-8. If a Sanka MCP response includes `refresh_required`, `refresh_recommended`, or `suggested_user_facing_reply`, pause the workflow and show the refresh prompt before making further write calls.
+8. If the user also asked to sync the created invoices to freee, treat that as a separate workflow step. First call `preview_workflow` with `workflow_type: "invoice_export"`, `source_record: { "source_system": "sanka", "object_type": "invoice" }`, `options.target_system: "freee"`, `options.sync_scope: "created_in_workflow_run"`, and `options.workflow_run_id` set to the deal-to-invoice run id. Only call `start_workflow` for `invoice_export` after the user explicitly approved the freee sync preview.
+9. If a Sanka MCP response includes `refresh_required`, `refresh_recommended`, or `suggested_user_facing_reply`, pause the workflow and show the refresh prompt before making further write calls.
 
 Refresh prompt:
 
@@ -45,7 +46,11 @@ Guardrails:
 - Do not use local repo files, terminal commands, Django shell, Postgres, or any repo-local fallback for live Sanka data.
 - Do not call `search_docs` or `execute` when `preview_workflow` or `start_workflow` covers the request.
 - Do not invent commercial terms, line items, or approval outcomes that are not returned by Sanka MCP.
-- freee sync is intentionally out of scope for this phase. Do not attempt to sync created invoices to freee.
+- freee sync is optional and separate from deal-to-invoice. Do not combine HubSpot invoice creation and freee sync into one invented tool, endpoint, or workflow type.
+- Never sync all Sanka invoices to freee by default. If the user says "sync Sanka invoices to freee invoice drafts" without a scope, use `preview_workflow` for `invoice_export` to return `needs_confirmation` or ask the user to choose a scope.
+- Supported freee sync scopes are invoices created in a workflow run, selected invoice IDs, selected record IDs, filtered unsynced invoice drafts, and all eligible unsynced invoices only with explicit `confirm_all`.
+- Existing freee mappings are duplicate warnings. Re-sync or multiple freee drafts require explicit user intent and `allow_resync` or `allow_multiple_freee_drafts`.
+- freee arguments must be passed through backend-validated `freee_args`; do not pass arbitrary freee payloads or provider fields.
 - If duplicate invoices exist for the deal, warn the user clearly. Only create another invoice when the user explicitly requests it or when `allow_multiple_invoices` is set in options.
 - Customer resolution should come from HubSpot Bill to, Billing customer, Customer, or similar association labels when available. If no custom customer association exists, Sanka may fall back to associated company/contact.
-- Preserve platform mapping expectations in summaries: HubSpot Deal ID maps to the Sanka invoice platform id, HubSpot Company/Contact IDs map to Sanka customer records when created or reused, and HubSpot line item/product IDs should remain visible in returned line item details when available.
+- Preserve platform mapping expectations in summaries: HubSpot Deal ID maps to the Sanka invoice platform id, HubSpot Company/Contact IDs map to Sanka customer records when created or reused, HubSpot line item/product IDs should remain visible in returned line item details when available, and freee invoice draft IDs map back to the Sanka invoice through the returned freee platform mapping.
