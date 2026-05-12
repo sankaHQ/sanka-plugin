@@ -12,10 +12,10 @@ Workflow:
 
 1. Extract the source deal reference. For a HubSpot deal URL, pass it as `source_record.url` with `source_system: "hubspot"` and `object_type: "deal"`.
 2. If the user gives only a company or deal phrase, call `resolve_record` first and ask a concise follow-up only when multiple candidates remain ambiguous.
-3. Call `preview_workflow` with `workflow_type: "deal_to_invoice"` before any write. Summarize amount, line item count, approval requirement, source status, duplicate warnings, and planned records.
+3. Call `preview_workflow` with `workflow_type: "deal_to_invoice"` before any write. Summarize amount, line item count, approval requirement, source status, customer resolution, duplicate warnings, blockers, and planned records.
 4. If the user asked only to preview, summarize and stop.
-5. If the user explicitly asked to create and the preview `source_status` is `synced`, call `start_workflow` with the same source record and a stable idempotency key based on the workflow type and source deal reference.
-6. If the preview `source_status` is `external_only`, do not call `start_workflow`. Explain that Sanka preview used HubSpot directly, but creation requires syncing/importing the deal into Sanka first.
+5. If the user explicitly asked to create and preview has no blockers, call `start_workflow` with the same source record and a stable idempotency key based on the workflow type and source deal reference.
+6. If preview returns blockers, explain them and do not call `start_workflow` until the user resolves or explicitly changes the request.
 7. If `start_workflow` returns a run id, summarize the created invoice, approval status, created records, and the run id. Call `get_workflow_run` only when the start result is incomplete or the user asks for status.
 8. If a Sanka MCP response includes `refresh_required`, `refresh_recommended`, or `suggested_user_facing_reply`, pause the workflow and show the refresh prompt before making further write calls.
 
@@ -47,3 +47,5 @@ Guardrails:
 - Do not invent commercial terms, line items, or approval outcomes that are not returned by Sanka MCP.
 - freee sync is intentionally out of scope for this phase. Do not attempt to sync created invoices to freee.
 - If duplicate invoices exist for the deal, warn the user clearly. Only create another invoice when the user explicitly requests it or when `allow_multiple_invoices` is set in options.
+- Customer resolution should come from HubSpot Bill to, Billing customer, Customer, or similar association labels when available. If no custom customer association exists, Sanka may fall back to associated company/contact.
+- Preserve platform mapping expectations in summaries: HubSpot Deal ID maps to the Sanka invoice platform id, HubSpot Company/Contact IDs map to Sanka customer records when created or reused, and HubSpot line item/product IDs should remain visible in returned line item details when available.
