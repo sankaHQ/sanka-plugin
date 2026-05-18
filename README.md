@@ -34,7 +34,7 @@ Examples:
 ```text
 $sanka:sanka Create an estimate from this HubSpot deal URL.
 $sanka:deal-to-estimate https://app.hubspot.com/contacts/.../record/0-3/... Preview the estimate and do not create it yet.
-$sanka:deal-to-estimate https://app.hubspot.com/contacts/.../record/0-3/... Create the estimate if the deal is synced in Sanka.
+$sanka:deal-to-estimate https://app.hubspot.com/contacts/.../record/0-3/... Create the estimate from this HubSpot deal.
 $sanka:list-deals Show recent deals.
 $sanka:create-expense Create an expense from this receipt.
 $sanka:refresh
