@@ -1,0 +1,15 @@
+interface:
+  display_name: "Export Records"
+  short_description: "Create a public export job in live Sanka."
+  default_prompt: "Use $sanka:export-records to create a public export job in live Sanka."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "sanka_plugin"
+      description: "Hosted Sanka MCP server for live Sanka workflows"
+      transport: "streamable_http"
+      url: "https://mcp.sanka.com/mcp"
+
+policy:
+  allow_implicit_invocation: false

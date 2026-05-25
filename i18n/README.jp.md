@@ -12,7 +12,7 @@ Codexはrepo-local marketplaceを使い、Claude CodeはGitHub marketplace comma
 sankaHQ/sanka-pluginをcloneする
 cloneしたrepoをCodexで開く
 Codexをrestartする
-Sanka Local PluginsからSankaをinstallする
+Sanka marketplaceからSankaをinstallする
 Sanka chipまたは$sanka:... mentionから開始する
 ```
 

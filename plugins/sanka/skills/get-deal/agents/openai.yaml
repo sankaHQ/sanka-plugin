@@ -1,0 +1,15 @@
+interface:
+  display_name: "Get Deal"
+  short_description: "Load one deal from live Sanka."
+  default_prompt: "Use $sanka:get-deal to load one deal from live Sanka."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "sanka_plugin"
+      description: "Hosted Sanka MCP server for live Sanka workflows"
+      transport: "streamable_http"
+      url: "https://mcp.sanka.com/mcp"
+
+policy:
+  allow_implicit_invocation: false

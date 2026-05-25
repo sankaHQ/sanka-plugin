@@ -18,5 +18,9 @@ if [ -f "scripts/sync-codex-skill-metadata.mjs" ]; then
   node scripts/sync-codex-skill-metadata.mjs --check
 fi
 
+if [ -f "scripts/sync-codex-package.mjs" ]; then
+  node scripts/sync-codex-package.mjs --check
+fi
+
 echo "Sanka Plugin refresh complete: ${before_sha} -> ${after_sha}"
 echo "Reload or reinstall Sanka Plugin in Codex, then start a fresh thread from the Sanka Plugin chip or a plain \$sanka:... mention."
