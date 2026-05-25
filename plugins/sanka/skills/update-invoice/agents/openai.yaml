@@ -1,0 +1,15 @@
+interface:
+  display_name: "Update Invoice"
+  short_description: "Update invoice in live Sanka."
+  default_prompt: "Use $sanka:update-invoice to update invoice in live Sanka."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "sanka_plugin"
+      description: "Hosted Sanka MCP server for live Sanka workflows"
+      transport: "streamable_http"
+      url: "https://mcp.sanka.com/mcp"
+
+policy:
+  allow_implicit_invocation: false

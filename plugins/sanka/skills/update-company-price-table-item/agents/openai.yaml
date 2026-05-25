@@ -1,0 +1,15 @@
+interface:
+  display_name: "Update Company Price Table Item Override"
+  short_description: "Update a company-specific item price override in live Sanka."
+  default_prompt: "Use $sanka:update-company-price-table-item to update a company-specific item price override in live Sanka."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "sanka_plugin"
+      description: "Hosted Sanka MCP server for live Sanka workflows"
+      transport: "streamable_http"
+      url: "https://mcp.sanka.com/mcp"
+
+policy:
+  allow_implicit_invocation: false

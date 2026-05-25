@@ -184,6 +184,18 @@ function requiredScopesForSkill(skillDirName) {
       values: ['deals:read', 'estimates:write', 'workflows:write'],
     };
   }
+  if (skillDirName === 'deal-to-invoice') {
+    return {
+      mode: 'static',
+      values: ['deals:read', 'invoices:write', 'workflows:write'],
+    };
+  }
+  if (skillDirName === 'deal-to-order-handoff') {
+    return {
+      mode: 'static',
+      values: ['deals:read', 'orders:write', 'tasks:write', 'items:read', 'inventories:read', 'workflows:write'],
+    };
+  }
   if (skillDirName === 'quote-readiness') {
     return {
       mode: 'static',

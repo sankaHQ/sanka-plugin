@@ -12,7 +12,7 @@ Codex uses a repo-local marketplace, while Claude Code supports a GitHub marketp
 Clone sankaHQ/sanka-plugin
 Open the cloned repo in Codex
 Restart Codex
-Install Sanka from Sanka Local Plugins
+Install Sanka from the Sanka marketplace
 Start with the Sanka chip or a plain $sanka:... mention
 ```
 
@@ -65,6 +65,17 @@ Codex can then run:
 ```
 
 After refresh, reload or reinstall Sanka in Codex and start a fresh thread from the Sanka chip or `$sanka:...`. Existing threads may keep an old MCP tool list.
+
+## Packaging
+
+Codex loads this repository through `.agents/plugins/marketplace.json`, which points at `plugins/sanka` so the plugin source path is a real subdirectory. Claude Code continues to use the root `.claude-plugin` files with `source: "./"`.
+
+When changing root Codex files such as `.codex-plugin/`, `skills/`, `assets/`, or `codex.mcp.json`, run:
+
+```bash
+node scripts/sync-codex-package.mjs
+node scripts/sync-codex-package.mjs --check
+```
 
 ## Notes
 

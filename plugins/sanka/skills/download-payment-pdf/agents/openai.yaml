@@ -1,0 +1,15 @@
+interface:
+  display_name: "Download Payment PDF"
+  short_description: "Download payment PDF from live Sanka."
+  default_prompt: "Use $sanka:download-payment-pdf to download payment PDF from live Sanka."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "sanka_plugin"
+      description: "Hosted Sanka MCP server for live Sanka workflows"
+      transport: "streamable_http"
+      url: "https://mcp.sanka.com/mcp"
+
+policy:
+  allow_implicit_invocation: false

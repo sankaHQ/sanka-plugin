@@ -1,0 +1,15 @@
+interface:
+  display_name: "Import Records"
+  short_description: "Create a public import job in live Sanka."
+  default_prompt: "Use $sanka:import-records to create a public import job in live Sanka."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "sanka_plugin"
+      description: "Hosted Sanka MCP server for live Sanka workflows"
+      transport: "streamable_http"
+      url: "https://mcp.sanka.com/mcp"
+
+policy:
+  allow_implicit_invocation: false

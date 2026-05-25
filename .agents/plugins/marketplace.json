@@ -1,14 +1,14 @@
 {
-  "name": "sanka-local",
+  "name": "sanka",
   "interface": {
-    "displayName": "Sanka Local Plugins"
+    "displayName": "Sanka"
   },
   "plugins": [
     {
       "name": "sanka",
       "source": {
         "source": "local",
-        "path": "./"
+        "path": "./plugins/sanka"
       },
       "policy": {
         "installation": "AVAILABLE",
