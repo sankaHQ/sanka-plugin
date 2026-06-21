@@ -14,6 +14,7 @@ const entries = [
   ['.codex-plugin', '.codex-plugin'],
   ['skills', 'skills'],
   ['assets', 'assets'],
+  ['vendor', 'vendor'],
   ['codex.mcp.json', 'codex.mcp.json'],
 ];
 
