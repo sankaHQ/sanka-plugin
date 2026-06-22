@@ -68694,10 +68694,17 @@ async function parseCommandLineArgs(args, usage) {
   };
 }
 function setupSignalHandlers(cleanup) {
-  process.on("SIGINT", async () => {
-    log("\nShutting down...");
+  const shutdown = async (signal) => {
+    log(`
+Shutting down on ${signal}...`);
     await cleanup();
     process.exit(0);
+  };
+  process.on("SIGINT", () => {
+    void shutdown("SIGINT");
+  });
+  process.on("SIGTERM", () => {
+    void shutdown("SIGTERM");
   });
   process.stdin.resume();
   process.stdin.on("end", async () => {
@@ -69160,6 +69167,11 @@ async function coordinateAuth(serverUrlHash, callbackPort, events, authTimeoutMs
   process.once("SIGINT", async () => {
     debugLog("Received SIGINT signal, cleaning up");
     await cleanupHandler();
+  });
+  process.once("SIGTERM", async () => {
+    debugLog("Received SIGTERM signal, cleaning up");
+    await cleanupHandler();
+    process.exit(0);
   });
   debugLog("Auth coordination complete, returning primary instance handlers");
   return {
