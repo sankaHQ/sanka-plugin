@@ -14,14 +14,24 @@ const entries = [
   ['.codex-plugin', '.codex-plugin'],
   ['skills', 'skills'],
   ['assets', 'assets'],
+  [
+    'vendor/mcp-remote',
+    'vendor/mcp-remote',
+    { exclude: ['bundled-proxy.cjs', 'bundled-proxy.mjs'] },
+  ],
   ['codex.mcp.json', 'codex.mcp.json'],
 ];
+
+function shouldIgnoreRelativePath(relativePath, options = {}) {
+  const normalized = relativePath.split(path.sep).join('/');
+  return normalized === '.DS_Store' || options.exclude?.includes(normalized);
+}
 
 function removeIgnoredNames(names) {
   return names.filter((name) => name !== '.DS_Store').sort((left, right) => left.localeCompare(right));
 }
 
-function listFiles(root) {
+function listFiles(root, options = {}) {
   if (!fs.existsSync(root)) {
     return [];
   }
@@ -30,6 +40,10 @@ function listFiles(root) {
   const walk = (dir) => {
     for (const name of removeIgnoredNames(fs.readdirSync(dir))) {
       const fullPath = path.join(dir, name);
+      const relativePath = path.relative(root, fullPath);
+      if (shouldIgnoreRelativePath(relativePath, options)) {
+        continue;
+      }
       const stat = fs.statSync(fullPath);
       if (stat.isDirectory()) {
         walk(fullPath);
@@ -48,7 +62,7 @@ function listFiles(root) {
   return results.sort((left, right) => left.localeCompare(right));
 }
 
-function compareEntry(source, target) {
+function compareEntry(source, target, options = {}) {
   const sourcePath = path.join(repoRoot, source);
   const targetPath = path.join(packageRoot, target);
 
@@ -73,8 +87,8 @@ function compareEntry(source, target) {
     return problems;
   }
 
-  const sourceFiles = listFiles(sourcePath);
-  const targetFiles = listFiles(targetPath);
+  const sourceFiles = listFiles(sourcePath, options);
+  const targetFiles = listFiles(targetPath, options);
   const allFiles = new Set([...sourceFiles, ...targetFiles]);
   for (const relativeFile of [...allFiles].sort((left, right) => left.localeCompare(right))) {
     if (!sourceFiles.includes(relativeFile)) {
@@ -96,7 +110,7 @@ function compareEntry(source, target) {
   return problems;
 }
 
-function syncEntry(source, target) {
+function syncEntry(source, target, options = {}) {
   const sourcePath = path.join(repoRoot, source);
   const targetPath = path.join(packageRoot, target);
 
@@ -104,12 +118,15 @@ function syncEntry(source, target) {
   fs.mkdirSync(path.dirname(targetPath), { recursive: true });
   fs.cpSync(sourcePath, targetPath, {
     recursive: true,
-    filter: (candidate) => path.basename(candidate) !== '.DS_Store',
+    filter: (candidate) => {
+      const relativePath = path.relative(sourcePath, candidate);
+      return !shouldIgnoreRelativePath(relativePath, options);
+    },
   });
 }
 
 if (checkMode) {
-  const problems = entries.flatMap(([source, target]) => compareEntry(source, target));
+  const problems = entries.flatMap(([source, target, options]) => compareEntry(source, target, options));
   if (problems.length > 0) {
     console.error('Codex package is out of sync:');
     for (const problem of problems) {
@@ -121,8 +138,8 @@ if (checkMode) {
   console.log('Codex package is in sync.');
 } else {
   fs.mkdirSync(packageRoot, { recursive: true });
-  for (const [source, target] of entries) {
-    syncEntry(source, target);
+  for (const [source, target, options] of entries) {
+    syncEntry(source, target, options);
   }
   console.log('Synced Codex package to plugins/sanka.');
 }

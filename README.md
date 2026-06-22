@@ -1,10 +1,10 @@
 # sanka-plugin
 
-Sanka attaches Sanka's hosted MCP server to Codex and Claude Code. Use it for live Sanka CRM, estimates, approvals, billing, private inbox, expenses, and workflow intents. Start with the general Sanka router when you do not want to choose a specific skill.
+Sanka connects local AI clients to Sanka's hosted MCP server through the packaged local proxy. Use it for live Sanka CRM, estimates, approvals, billing, private inbox, expenses, and workflow intents. Start with the general Sanka router when you do not want to choose a specific skill.
 
 ## Install
 
-Codex uses a repo-local marketplace, while Claude Code supports a GitHub marketplace command. The install paths differ, but both attach the same hosted Sanka MCP server and the same `$sanka:...` skills.
+Codex uses a repo-local marketplace, while Claude Code supports a GitHub marketplace command. The install paths differ, but both run the same local proxy against the hosted Sanka MCP server and expose the same `$sanka:...` skills.
 
 ### Codex
 
@@ -26,6 +26,18 @@ Start with /sanka:sanka for natural-language routing, or a specific /sanka:... s
 ```
 
 Enable auto-update from `/plugin` if you want Claude Code to pull future updates from GitHub.
+
+### Cursor And Other Local MCP Clients
+
+Use `mcp.json` from this repository as the local MCP server config. It runs:
+
+```text
+node ./vendor/mcp-remote/proxy.mjs https://mcp.sanka.com/mcp
+```
+
+Keep the repository files available on disk so the local proxy can run and read exact user-provided receipt paths for expense attachment upload.
+
+For clients that cannot run local commands, use `mcp.remote.json` or connect directly to `https://mcp.sanka.com/mcp`. That mode supports normal Sanka MCP tools but cannot read `local_file_path`; file uploads must provide `content_base64`.
 
 ## Use
 
@@ -80,8 +92,10 @@ node scripts/sync-codex-package.mjs --check
 ## Notes
 
 - Hosted MCP endpoint: `https://mcp.sanka.com/mcp`
+- Local MCP proxy: `node ./vendor/mcp-remote/proxy.mjs https://mcp.sanka.com/mcp`
 - Codex MCP server name: `sanka_plugin`
-- Live Sanka work must use attached hosted MCP tools. Do not substitute local Django shell, Postgres, repo files, or HubSpot MCP for Sanka actions.
+- Local plugin clients should use the packaged proxy so expense attachment tools can accept exact `local_file_path` values. Remote-only MCP clients can use `mcp.remote.json` or connect to the hosted endpoint directly, but they cannot read local file paths.
+- Live Sanka work must use attached Sanka MCP tools. Do not substitute local Django shell, Postgres, repo files, or HubSpot MCP for Sanka actions.
 - If only `search_docs` / `execute` appear, refresh the plugin attachment or start a fresh plugin-attached thread.
 
 ## Translations

@@ -1,10 +1,10 @@
 # sanka-plugin
 
-Sankaは、Sankaのhosted MCP serverをCodexとClaude Codeに接続するためのpluginです。SankaのCRM、見積、承認、請求、private inbox、経費、workflow intentをlive dataで操作できます。具体的なskillを選ばせたくない場合は、Sanka routerから開始できます。
+Sankaは、local AI clientをpackaged local proxy経由でSankaのhosted MCP serverに接続するためのpluginです。SankaのCRM、見積、承認、請求、private inbox、経費、workflow intentをlive dataで操作できます。具体的なskillを選ばせたくない場合は、Sanka routerから開始できます。
 
 ## インストール
 
-Codexはrepo-local marketplaceを使い、Claude CodeはGitHub marketplace commandを使います。インストール方法は違いますが、どちらも同じhosted Sanka MCP serverと同じ `$sanka:...` skillを接続します。
+Codexはrepo-local marketplaceを使い、Claude CodeはGitHub marketplace commandを使います。インストール方法は違いますが、どちらも同じlocal proxyでhosted Sanka MCP serverに接続し、同じ `$sanka:...` skillを使います。
 
 ### Codex
 
@@ -26,6 +26,18 @@ Sanka chipまたは$sanka:... mentionから開始する
 ```
 
 Claude CodeでGitHubからfuture updateをpullしたい場合は、`/plugin` からauto-updateを有効化してください。
+
+### Cursor とその他のlocal MCP client
+
+このrepoの `mcp.json` をlocal MCP server configとして使ってください。以下を実行します。
+
+```text
+node ./vendor/mcp-remote/proxy.mjs https://mcp.sanka.com/mcp
+```
+
+local proxyが起動でき、経費添付アップロード時にユーザーが指定した正確なreceipt pathを読めるよう、このrepoのファイルをローカルに置いたままにしてください。
+
+local commandを実行できないclientでは、`mcp.remote.json` を使うか `https://mcp.sanka.com/mcp` に直接接続してください。そのmodeでも通常のSanka MCP toolは使えますが、`local_file_path` は読めないため、file uploadでは `content_base64` を渡す必要があります。
 
 ## 使い方
 
@@ -69,8 +81,10 @@ Sankaを更新しますか？
 ## 補足
 
 - Hosted MCP endpoint: `https://mcp.sanka.com/mcp`
+- Local MCP proxy: `node ./vendor/mcp-remote/proxy.mjs https://mcp.sanka.com/mcp`
 - Codex MCP server name: `sanka_plugin`
-- live Sanka workにはattached hosted MCP toolsを使ってください。local Django shell、Postgres、repo files、HubSpot MCPをSanka actionの代替にしないでください。
+- local plugin clientではpackaged proxyを使ってください。これにより経費添付ツールで正確な `local_file_path` を使えます。remote-only MCP clientは `mcp.remote.json` を使うかhosted endpointへ直接接続できますが、local file pathは読めません。
+- live Sanka workにはattached Sanka MCP toolsを使ってください。local Django shell、Postgres、repo files、HubSpot MCPをSanka actionの代替にしないでください。
 - `search_docs` / `execute` しか表示されない場合は、plugin attachmentをrefreshするか、新しいplugin-attached threadを開始してください。
 
 ## 翻訳
