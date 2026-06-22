@@ -4,7 +4,7 @@
       "cwd": ".",
       "command": "node",
       "args": [
-        "./vendor/mcp-remote/bundled-proxy.cjs",
+        "./vendor/mcp-remote/proxy.mjs",
         "https://mcp.sanka.com/mcp"
       ],
       "note": "Hosted Sanka MCP server via the packaged local Codex proxy. The proxy keeps OAuth native and lets expense attachment tools read exact user-provided local receipt paths before forwarding original bytes to hosted Sanka MCP."

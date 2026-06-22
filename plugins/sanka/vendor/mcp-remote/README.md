@@ -4,8 +4,8 @@ Files:
 
 - `chunk-65X3S4HB.js`: copied from upstream package without local edits
 - `sanka-local-file-bridge.mjs`: Sanka-specific Codex bridge for exact user-provided local expense attachment paths
-- `proxy.mjs`: based on upstream `dist/proxy.js`, patched to eagerly start the OAuth callback listener for Codex and to apply the local expense attachment bridge
-- `bundled-proxy.cjs`: self-contained runtime artifact used by `codex.mcp.json`
+- `proxy.mjs`: based on upstream `dist/proxy.js`, patched to eagerly start the OAuth callback listener for Codex and to apply the local expense attachment bridge. This is the runtime used by `codex.mcp.json`.
+- `bundled-proxy.cjs`: optional self-contained runtime artifact kept for compatibility experiments
 
 Patch rationale:
 
