@@ -32,7 +32,7 @@ Enable auto-update from `/plugin` if you want Claude Code to pull future updates
 Use `mcp.json` from this repository as the local MCP server config. It runs:
 
 ```text
-node ./vendor/mcp-remote/proxy.mjs https://mcp.sanka.com/mcp
+node ./vendor/mcp-remote/bundled-proxy.min.cjs https://mcp.sanka.com/mcp
 ```
 
 Keep the repository files available on disk so the local proxy can run and read exact user-provided receipt paths for expense attachment upload.
@@ -92,7 +92,7 @@ node scripts/sync-codex-package.mjs --check
 ## Notes
 
 - Hosted MCP endpoint: `https://mcp.sanka.com/mcp`
-- Local MCP proxy: `node ./vendor/mcp-remote/proxy.mjs https://mcp.sanka.com/mcp`
+- Local MCP proxy: `node ./vendor/mcp-remote/bundled-proxy.min.cjs https://mcp.sanka.com/mcp`
 - Codex MCP server name: `sanka_plugin`
 - Local plugin clients should use the packaged proxy so expense attachment tools can accept exact `local_file_path` values. Remote-only MCP clients can use `mcp.remote.json` or connect to the hosted endpoint directly, but they cannot read local file paths.
 - Live Sanka work must use attached Sanka MCP tools. Do not substitute local Django shell, Postgres, repo files, or HubSpot MCP for Sanka actions.

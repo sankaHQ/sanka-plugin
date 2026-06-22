@@ -32,7 +32,7 @@ Claude CodeでGitHubからfuture updateをpullしたい場合は、`/plugin` か
 このrepoの `mcp.json` をlocal MCP server configとして使ってください。以下を実行します。
 
 ```text
-node ./vendor/mcp-remote/proxy.mjs https://mcp.sanka.com/mcp
+node ./vendor/mcp-remote/bundled-proxy.min.cjs https://mcp.sanka.com/mcp
 ```
 
 local proxyが起動でき、経費添付アップロード時にユーザーが指定した正確なreceipt pathを読めるよう、このrepoのファイルをローカルに置いたままにしてください。
@@ -81,7 +81,7 @@ Sankaを更新しますか？
 ## 補足
 
 - Hosted MCP endpoint: `https://mcp.sanka.com/mcp`
-- Local MCP proxy: `node ./vendor/mcp-remote/proxy.mjs https://mcp.sanka.com/mcp`
+- Local MCP proxy: `node ./vendor/mcp-remote/bundled-proxy.min.cjs https://mcp.sanka.com/mcp`
 - Codex MCP server name: `sanka_plugin`
 - local plugin clientではpackaged proxyを使ってください。これにより経費添付ツールで正確な `local_file_path` を使えます。remote-only MCP clientは `mcp.remote.json` を使うかhosted endpointへ直接接続できますが、local file pathは読めません。
 - live Sanka workにはattached Sanka MCP toolsを使ってください。local Django shell、Postgres、repo files、HubSpot MCPをSanka actionの代替にしないでください。
