@@ -10,7 +10,7 @@
   "plugins": [
     {
       "name": "sanka",
-      "description": "Sanka plugin that attaches the hosted MCP server for live Sanka workflows, including CRM, estimates, billing, private inbox, expenses, and workflow intents.",
+      "description": "Sanka plugin that connects local AI clients to hosted Sanka MCP through a packaged proxy for live CRM, billing, private inbox, expenses, and workflow intents.",
       "version": "0.4.32",
       "author": {
         "name": "Sanka"

@@ -1,7 +1,7 @@
 {
   "name": "sanka",
   "version": "0.4.32",
-  "description": "Sanka plugin that attaches the hosted MCP server for live Sanka workflows, including CRM, estimates, quote readiness, billing, private inbox, expenses, and workflow intents.",
+  "description": "Sanka plugin that connects local AI clients to hosted Sanka MCP through a packaged proxy for live CRM, billing, private inbox, expenses, and workflow intents.",
   "author": {
     "name": "Sanka",
     "url": "https://sanka.com"
@@ -28,7 +28,7 @@
   "interface": {
     "displayName": "Sanka",
     "shortDescription": "Work with live Sanka data and private inbox via native OAuth",
-    "longDescription": "Use Sanka's hosted MCP endpoint for live Sanka workflows from Codex through native OAuth. Start from the installed Sanka chip, the $sanka:sanka router, or a specific $sanka:... skill so Sanka owns CRM, estimates, approvals, quote readiness, billing, private inbox, expenses, and workflow intents such as deal-to-estimate and Salesforce Opportunity quote readiness. If a Sanka MCP response says the plugin is outdated, ask whether to refresh it; when the user says yes, refresh the local sanka-plugin repo, reload or reinstall Sanka, and start a fresh thread. Live Sanka operations must come from attached hosted MCP tools, not local repo files, Django shell, Postgres, Salesforce MCP, or HubSpot MCP fallbacks.",
+    "longDescription": "Use Sanka's packaged local MCP proxy for live Sanka workflows from Codex through native OAuth. The proxy connects to hosted Sanka MCP and can upload exact user-provided local receipt paths as original expense attachment bytes. Start from the installed Sanka chip, the $sanka:sanka router, or a specific $sanka:... skill so Sanka owns CRM, estimates, approvals, quote readiness, billing, private inbox, expenses, and workflow intents such as deal-to-estimate and Salesforce Opportunity quote readiness. If a Sanka MCP response says the plugin is outdated, ask whether to refresh it; when the user says yes, refresh the local sanka-plugin repo, reload or reinstall Sanka, and start a fresh thread. Live Sanka operations must come from attached Sanka MCP tools, not local repo files, Django shell, Postgres, Salesforce MCP, or HubSpot MCP fallbacks.",
     "developerName": "Sanka",
     "category": "Productivity",
     "capabilities": [
