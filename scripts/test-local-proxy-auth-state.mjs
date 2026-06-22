@@ -129,11 +129,26 @@ try {
   });
   assert.equal(auth.error, undefined, `auth_status failed: ${JSON.stringify(auth.error)}`);
 
+  const currentWorkspace = await request(4, "tools/call", {
+    name: "current_workspace",
+    arguments: {}
+  });
+  assert.equal(
+    currentWorkspace.error,
+    undefined,
+    `current_workspace should return a Sanka tool result instead of triggering native OAuth: ${JSON.stringify(currentWorkspace.error)}`
+  );
+
   const authFiles = listAuthFiles();
   assert.equal(
-    authFiles.some((file) => file.endsWith("_lock.json") || file.endsWith("_code_verifier.txt")),
+    authFiles.some(
+      (file) =>
+        file.endsWith("_client_info.json") ||
+        file.endsWith("_lock.json") ||
+        file.endsWith("_code_verifier.txt")
+    ),
     false,
-    `proxy should not create native OAuth lock or code verifier during unauthenticated attach; saw ${authFiles.join(", ")}`
+    `proxy should not create native OAuth client info, lock, or code verifier during unauthenticated attach; saw ${authFiles.join(", ")}`
   );
 
   console.log("Local proxy auth-state checks passed.");
