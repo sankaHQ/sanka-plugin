@@ -22,6 +22,7 @@ const mcpManifestPath = path.join(pluginRoot, manifestName);
 const mcpManifest = JSON.parse(fs.readFileSync(mcpManifestPath, "utf8"));
 const serverConfig = mcpManifest.mcpServers?.sanka;
 assert.ok(serverConfig, `${mcpManifestPath} must define the sanka MCP server`);
+const clientProtocolVersion = process.env.SANKA_CLIENT_PROTOCOL_VERSION || "2025-06-18";
 
 function resolvePluginCommand(command) {
   return command.startsWith(".") ? path.resolve(pluginRoot, command) : command;
@@ -117,14 +118,20 @@ function listAuthFiles() {
 
 try {
   const init = await request(1, "initialize", {
-    protocolVersion: "2024-11-05",
-    capabilities: {},
+    protocolVersion: clientProtocolVersion,
+    capabilities: { elicitation: {} },
     clientInfo: {
-      name: "sanka-plugin-auth-state-smoke",
-      version: "0.0.0"
+      name: "codex-mcp-client",
+      title: "Codex",
+      version: "0.142.0-alpha.6"
     }
   });
   assert.equal(init.error, undefined, `initialize failed: ${JSON.stringify(init.error)}`);
+  assert.equal(
+    init.result?.protocolVersion,
+    clientProtocolVersion,
+    `initialize should preserve the client protocol version; got ${JSON.stringify(init.result?.protocolVersion)}`
+  );
   notify("notifications/initialized");
 
   const tools = await request(2, "tools/list");

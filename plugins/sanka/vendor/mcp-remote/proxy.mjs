@@ -25,6 +25,8 @@ import {
 import { suppressNativeOAuthChallenge } from "./sanka-local-auth-bridge.mjs";
 import process2 from "node:process";
 
+const REMOTE_INITIALIZE_PROTOCOL_VERSION = "2024-11-05";
+
 class ReadBuffer {
   append(chunk) {
     this._buffer = this._buffer ? Buffer.concat([this._buffer, chunk]) : chunk;
@@ -159,15 +161,38 @@ function sankaMcpProxy({
           params: message.params ? JSON.stringify(message.params).substring(0, 500) : void 0
         });
 
+        let initializeClientProtocolVersion;
         if (message.method === "initialize") {
           const { clientInfo } = message.params;
-          if (clientInfo) clientInfo.name = `${clientInfo.name} (via Sanka Plugin local proxy)`;
+          initializeClientProtocolVersion = message.params?.protocolVersion;
+          message = {
+            ...message,
+            params: {
+              ...message.params,
+              protocolVersion: REMOTE_INITIALIZE_PROTOCOL_VERSION,
+              clientInfo: clientInfo
+                ? {
+                    ...clientInfo,
+                    name: "sanka-plugin-local-proxy",
+                    title: "Sanka Plugin local proxy"
+                  }
+                : clientInfo
+            }
+          };
           log(JSON.stringify(message, null, 2));
-          debugLog("Initialize message with modified client info", { clientInfo });
+          debugLog("Initialize message with proxied client info", {
+            originalClientInfo: clientInfo,
+            proxiedClientInfo: message.params.clientInfo,
+            clientProtocolVersion: initializeClientProtocolVersion,
+            remoteProtocolVersion: REMOTE_INITIALIZE_PROTOCOL_VERSION
+          });
         }
 
         if (message.id !== void 0 && message.method) {
-          pendingRequests.set(message.id, { method: message.method });
+          pendingRequests.set(message.id, {
+            method: message.method,
+            initializeClientProtocolVersion
+          });
         }
 
         await transportToServer.send(message);
@@ -191,6 +216,18 @@ function sankaMcpProxy({
                   tools: augmentToolsListForLocalFileUploads(
                     message.result.tools.filter((tool) => shouldIncludeTool(ignoredTools, tool.name))
                   )
+                }
+              };
+            } else if (
+              request.method === "initialize" &&
+              request.initializeClientProtocolVersion &&
+              message.result?.protocolVersion
+            ) {
+              message = {
+                ...message,
+                result: {
+                  ...message.result,
+                  protocolVersion: request.initializeClientProtocolVersion
                 }
               };
             }
