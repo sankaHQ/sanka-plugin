@@ -1,10 +1,10 @@
 #!/usr/bin/env node
-// Vendored from mcp-remote@0.1.38 and patched for the Codex plugin.
+// Vendored from mcp-remote@0.1.38 and patched for local Sanka plugin clients.
 //
 // Why this exists:
 // Upstream mcp-remote opens the browser during a later tools/call 401 flow, but
-// it does not start the localhost OAuth callback server first in that path. Codex
-// then launches the authorization URL with a redirect_uri on 127.0.0.1 while
+// it does not start the localhost OAuth callback server first in that path. Some clients
+// then launch the authorization URL with a redirect_uri on 127.0.0.1 while
 // nothing is listening, so the OAuth round-trip never completes.
 //
 // This wrapper eagerly initializes the auth coordinator before the first remote

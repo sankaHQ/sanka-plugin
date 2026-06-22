@@ -114,7 +114,7 @@ function augmentToolForLocalFileUpload(tool) {
     inputSchema.properties.content_base64 = {
       ...inputSchema.properties.content_base64,
       description:
-        "Base64 file content. In Codex Sanka Plugin, prefer local_file_path for user-provided local receipts instead of manually producing this value."
+        "Base64 file content. In local Sanka Plugin clients, prefer local_file_path for user-provided local receipts instead of manually producing this value."
     };
   }
 
@@ -297,13 +297,13 @@ function removeLocalBridgeFilledRequiredFields(toolName, required) {
 
 function localBridgeDescriptionForTool(toolName) {
   if (toolName === DIRECT_UPLOAD_TOOL) {
-    return "Codex Sanka Plugin also accepts local_file_path for an exact user-provided local receipt or invoice path; the local proxy reads the file and forwards original bytes as content_base64.";
+    return "Local Sanka Plugin clients also accept local_file_path for an exact user-provided local receipt or invoice path; the local proxy reads the file and forwards original bytes as content_base64.";
   }
   if (toolName === CHUNK_START_TOOL) {
-    return "Codex Sanka Plugin also accepts local_file_path; the local proxy fills filename, mime_type, byte_length, and content_base64_length from the file.";
+    return "Local Sanka Plugin clients also accept local_file_path; the local proxy fills filename, mime_type, byte_length, and content_base64_length from the file.";
   }
   if (toolName === CHUNK_APPEND_TOOL) {
-    return "Codex Sanka Plugin also accepts local_file_path plus offset; the local proxy reads the requested base64 chunk and forwards content_base64.";
+    return "Local Sanka Plugin clients also accept local_file_path plus offset; the local proxy reads the requested base64 chunk and forwards content_base64.";
   }
   return "";
 }

@@ -11,7 +11,7 @@ Workflow:
 
 1. Gather the required creation details from the request. If key required fields are missing, ask a concise follow-up.
 2. Attachments are optional when the user did not provide or require one. If the request includes a receipt, invoice, PDF, screenshot, or other attachment, upload the original file first and keep the returned `file_id`.
-   - In Codex Sanka Plugin, when the user provides a local receipt or invoice path, call `upload_expense_attachment` with `local_file_path` set to that exact absolute path. The packaged local proxy reads the original file bytes and forwards `content_base64` to hosted Sanka MCP.
+   - In local Sanka Plugin clients, when the user provides a local receipt or invoice path, call `upload_expense_attachment` with `local_file_path` set to that exact absolute path. The packaged local proxy reads the original file bytes and forwards `content_base64` to hosted Sanka MCP.
    - For a small, already available `content_base64` payload, call `upload_expense_attachment`.
    - For an oversized client-local PDF/path or when direct upload reports a size limit, call `start_expense_attachment_upload` with the same `local_file_path`, append every chunk with `append_expense_attachment_upload_chunk` using `local_file_path`, the returned `next_offset`, and `local_chunk_size` at or below the returned `chunk_size`, then call `finish_expense_attachment_upload`.
    - Multiple append calls are expected. Do not abandon a user-provided or required attachment or create the expense without its `file_id` only because the upload needs many chunks.

@@ -10,7 +10,7 @@ Use only the attached Sanka MCP tools in this thread.
 Workflow:
 
 1. Gather the required upload details from the request. If key required fields are missing, ask a concise follow-up.
-2. In Codex Sanka Plugin, when the user provides a local receipt or invoice path, call `upload_expense_attachment` with `local_file_path` set to that exact absolute path. The packaged local proxy reads the original file bytes and forwards `content_base64` to hosted Sanka MCP.
+2. In local Sanka Plugin clients, when the user provides a local receipt or invoice path, call `upload_expense_attachment` with `local_file_path` set to that exact absolute path. The packaged local proxy reads the original file bytes and forwards `content_base64` to hosted Sanka MCP.
 3. For a small, already available `content_base64` payload, call `upload_expense_attachment` directly.
 4. For oversized client-local PDFs or when direct upload reports a size limit, use `start_expense_attachment_upload` with the same `local_file_path`, then `append_expense_attachment_upload_chunk` with `local_file_path`, the returned `next_offset`, and `local_chunk_size` at or below the returned `chunk_size`, then `finish_expense_attachment_upload`.
 5. Once `start_expense_attachment_upload` succeeds, finish the upload sequence. Multiple append calls are expected; do not abandon the attachment only because the upload needs many chunks.

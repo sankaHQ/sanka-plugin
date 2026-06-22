@@ -116,7 +116,7 @@ try {
   assert.deepEqual(appendTool.inputSchema.required, ["upload_token", "offset"]);
   assert.equal(untouchedTool.inputSchema.properties?.local_file_path, undefined);
 
-  console.log("Codex local file bridge checks passed.");
+  console.log("Local MCP file bridge checks passed.");
 } finally {
   fs.rmSync(tempDir, { recursive: true, force: true });
 }
