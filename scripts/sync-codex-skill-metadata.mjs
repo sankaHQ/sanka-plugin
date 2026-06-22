@@ -76,7 +76,7 @@ function buildOpenAiYaml(skillName, title, description) {
     'dependencies:',
     '  tools:',
     '    - type: "mcp"',
-    '      value: "sanka_plugin"',
+    '      value: "sanka"',
     '      description: "Hosted Sanka MCP server for live Sanka workflows"',
     '      transport: "streamable_http"',
     '      url: "https://mcp.sanka.com/mcp"',

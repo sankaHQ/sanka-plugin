@@ -1,6 +1,6 @@
 {
   "mcpServers": {
-    "sanka_plugin": {
+    "sanka": {
       "cwd": ".",
       "command": "node",
       "args": [
