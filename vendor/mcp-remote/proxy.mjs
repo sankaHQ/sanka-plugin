@@ -2,13 +2,11 @@
 // Vendored from mcp-remote@0.1.38 and patched for local Sanka plugin clients.
 //
 // Why this exists:
-// Upstream mcp-remote opens the browser during a later tools/call 401 flow, but
-// it does not start the localhost OAuth callback server first in that path. Some clients
-// then launch the authorization URL with a redirect_uri on 127.0.0.1 while
-// nothing is listening, so the OAuth round-trip never completes.
-//
-// This wrapper eagerly initializes the auth coordinator before the first remote
-// call so the callback listener is already running when the browser is opened.
+// Local plugin clients must keep the hosted Sanka tool list attached before a
+// user signs in, and Sanka's expense upload flow needs to read exact local file
+// paths from the user's machine. Authentication should be initiated only when
+// the hosted MCP returns an explicit Sanka connect URL, not by preemptively
+// starting mcp-remote's native localhost OAuth coordinator during proxy boot.
 
 import {
   JSONRPCMessageSchema,
@@ -339,9 +337,7 @@ async function runProxy(
   };
 
   try {
-    log("Preparing local OAuth callback listener...");
-    await authInitializer();
-
+    debugLog("Deferring local OAuth callback listener until the remote transport explicitly requires native OAuth");
     const remoteTransport = await connectToRemoteServer(
       null,
       serverUrl,

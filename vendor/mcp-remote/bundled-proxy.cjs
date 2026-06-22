@@ -69745,8 +69745,7 @@ async function runProxy(serverUrl, callbackPort, headers, transportStrategy = "h
     };
   };
   try {
-    log("Preparing local OAuth callback listener...");
-    await authInitializer();
+    debugLog("Deferring local OAuth callback listener until the remote transport explicitly requires native OAuth");
     const remoteTransport = await connectToRemoteServer(
       null,
       serverUrl,
