@@ -43,8 +43,16 @@ npx esbuild "$TMP_DIR/src/proxy.mjs" \
   --outfile="$VENDOR_DIR/bundled-proxy.cjs" \
   >/dev/null
 
-perl -0pi -e 's/var import_meta = \\{\\};/var import_meta = { url: import_node_url.pathToFileURL(__filename).href };/g' "$VENDOR_DIR/bundled-proxy.cjs"
+perl -0pi -e 's/var import_meta = \{\};/var import_meta = { url: import_node_url.pathToFileURL(__filename).href };/g' "$VENDOR_DIR/bundled-proxy.cjs"
+
+npx esbuild "$VENDOR_DIR/bundled-proxy.cjs" \
+  --minify \
+  --platform=node \
+  --format=cjs \
+  --outfile="$VENDOR_DIR/bundled-proxy.min.cjs" \
+  >/dev/null
 
 echo "Updated:"
 echo "  $VENDOR_DIR/chunk-65X3S4HB.js"
 echo "  $VENDOR_DIR/bundled-proxy.cjs"
+echo "  $VENDOR_DIR/bundled-proxy.min.cjs"
