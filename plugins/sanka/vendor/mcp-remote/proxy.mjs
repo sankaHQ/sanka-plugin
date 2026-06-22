@@ -10,9 +10,7 @@
 
 import {
   JSONRPCMessageSchema,
-  NodeOAuthClientProvider,
   connectToRemoteServer,
-  createLazyAuthCoordinator,
   debugLog,
   discoverOAuthServerInfo,
   log,
@@ -25,7 +23,6 @@ import {
   prepareLocalFileUploadToolCall
 } from "./sanka-local-file-bridge.mjs";
 import { suppressNativeOAuthChallenge } from "./sanka-local-auth-bridge.mjs";
-import { EventEmitter } from "events";
 import process2 from "node:process";
 
 class ReadBuffer {
@@ -290,9 +287,6 @@ async function runProxy(
   authTimeoutMs,
   serverUrlHash
 ) {
-  const events = new EventEmitter();
-  const authCoordinator = createLazyAuthCoordinator(serverUrlHash, callbackPort, events, authTimeoutMs);
-
   log("Discovering OAuth server configuration...");
   const discoveryResult = await discoverOAuthServerInfo(serverUrl, headers);
   if (discoveryResult.protectedResourceMetadata) {
@@ -306,38 +300,18 @@ async function runProxy(
     debugLog("No Protected Resource Metadata found, using server URL as authorization server");
   }
 
-  const authProvider = new NodeOAuthClientProvider({
-    serverUrl: discoveryResult.authorizationServerUrl,
-    callbackPort,
-    host,
-    clientName: "MCP CLI Proxy",
-    staticOAuthClientMetadata,
-    staticOAuthClientInfo,
-    authorizeResource,
-    serverUrlHash,
-    authorizationServerMetadata: discoveryResult.authorizationServerMetadata,
-    protectedResourceMetadata: discoveryResult.protectedResourceMetadata,
-    wwwAuthenticateScope: discoveryResult.wwwAuthenticateScope
-  });
+  const authProvider = null;
 
   const localTransport = new StdioServerTransport();
-  let server = null;
 
   const authInitializer = async () => {
-    const authState = await authCoordinator.initializeAuth();
-    server = authState.server;
-    if (authState.skipBrowserAuth) {
-      log("Authentication was completed by another instance - will use tokens from disk");
-      await new Promise((res) => setTimeout(res, 1000));
-    }
-    return {
-      waitForAuthCode: authState.waitForAuthCode,
-      skipBrowserAuth: authState.skipBrowserAuth
-    };
+    throw new Error(
+      "Sanka Plugin disables mcp-remote native OAuth. Use the hosted Sanka MCP connect_url returned by Sanka tools."
+    );
   };
 
   try {
-    debugLog("Deferring local OAuth callback listener until the remote transport explicitly requires native OAuth");
+    debugLog("Native mcp-remote OAuth is disabled for the Sanka local proxy");
     const remoteTransport = await connectToRemoteServer(
       null,
       serverUrl,
@@ -361,9 +335,6 @@ async function runProxy(
     const cleanup = async () => {
       await remoteTransport.close();
       await localTransport.close();
-      if (server) {
-        server.close();
-      }
     };
 
     setupSignalHandlers(cleanup);
