@@ -11,8 +11,7 @@
         "path": "./plugins/sanka"
       },
       "policy": {
-        "installation": "AVAILABLE",
-        "authentication": "ON_USE"
+        "installation": "AVAILABLE"
       },
       "category": "Productivity"
     }

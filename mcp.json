@@ -7,7 +7,7 @@
         "./vendor/mcp-remote/bundled-proxy.min.cjs",
         "https://mcp.sanka.com/mcp"
       ],
-      "note": "Hosted Sanka MCP server via the packaged local proxy. The proxy keeps OAuth native and lets expense attachment tools read exact user-provided local receipt paths before forwarding original bytes to hosted Sanka MCP."
+      "note": "Hosted Sanka MCP server via the packaged local proxy. The proxy keeps tools attached during Sanka sign-in and lets expense attachment tools read exact user-provided local receipt paths before forwarding original bytes to hosted Sanka MCP."
     }
   }
 }

@@ -9,6 +9,7 @@ import {
   augmentToolsListForLocalFileUploads,
   prepareLocalFileUploadToolCall
 } from "../vendor/mcp-remote/sanka-local-file-bridge.mjs";
+import { suppressNativeOAuthChallenge } from "../vendor/mcp-remote/sanka-local-auth-bridge.mjs";
 
 const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "sanka-plugin-upload-"));
 
@@ -115,6 +116,26 @@ try {
   assert.equal(appendTool.inputSchema.properties.local_chunk_size.type, "integer");
   assert.deepEqual(appendTool.inputSchema.required, ["upload_token", "offset"]);
   assert.equal(untouchedTool.inputSchema.properties?.local_file_path, undefined);
+
+  const authChallenge = suppressNativeOAuthChallenge({
+    jsonrpc: "2.0",
+    id: 5,
+    result: {
+      _meta: {
+        "mcp/www_authenticate": ['Bearer resource_metadata="https://mcp.sanka.com/.well-known/oauth-protected-resource"'],
+        retained: "value"
+      },
+      structuredContent: {
+        connect_url: "https://app.sanka.com/oauth/authorize?client_id=test",
+        required_user_facing_reply: "Connect Sanka."
+      },
+      isError: true
+    }
+  });
+  assert.equal(authChallenge.result._meta["mcp/www_authenticate"], undefined);
+  assert.equal(authChallenge.result._meta.retained, "value");
+  assert.equal(authChallenge.result._meta["sanka/native_oauth_suppressed"], true);
+  assert.equal(authChallenge.result.structuredContent.connect_url.includes("app.sanka.com"), true);
 
   console.log("Local MCP file bridge checks passed.");
 } finally {

@@ -69461,6 +69461,28 @@ function cloneSchema(schema) {
   return JSON.parse(JSON.stringify(schema));
 }
 
+// src/sanka-local-auth-bridge.mjs
+var MCP_WWW_AUTHENTICATE_META_KEY = "mcp/www_authenticate";
+var SANKA_NATIVE_OAUTH_SUPPRESSED_META_KEY = "sanka/native_oauth_suppressed";
+function suppressNativeOAuthChallenge(message) {
+  const result = message?.result;
+  const meta = result?._meta;
+  if (!meta || !Object.prototype.hasOwnProperty.call(meta, MCP_WWW_AUTHENTICATE_META_KEY)) {
+    return message;
+  }
+  const { [MCP_WWW_AUTHENTICATE_META_KEY]: _challenge, ...remainingMeta } = meta;
+  return {
+    ...message,
+    result: {
+      ...result,
+      _meta: {
+        ...remainingMeta,
+        [SANKA_NATIVE_OAUTH_SUPPRESSED_META_KEY]: true
+      }
+    }
+  };
+}
+
 // src/proxy.mjs
 var import_events = require("events");
 var import_node_process7 = __toESM(require("node:process"), 1);
@@ -69610,6 +69632,7 @@ function sankaMcpProxy({
           }
         }
       }
+      message = suppressNativeOAuthChallenge(message);
       log("[Remote\u2192Local]", message.method || message.id);
       debugLog("Remote \u2192 Local message", {
         method: message.method,

@@ -26,6 +26,7 @@ import {
   augmentToolsListForLocalFileUploads,
   prepareLocalFileUploadToolCall
 } from "./sanka-local-file-bridge.mjs";
+import { suppressNativeOAuthChallenge } from "./sanka-local-auth-bridge.mjs";
 import { EventEmitter } from "events";
 import process2 from "node:process";
 
@@ -200,6 +201,7 @@ function sankaMcpProxy({
             }
           }
         }
+        message = suppressNativeOAuthChallenge(message);
 
         log("[Remote→Local]", message.method || message.id);
         debugLog("Remote → Local message", {
