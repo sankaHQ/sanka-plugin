@@ -14,13 +14,21 @@ const pluginRoot = process.env.SANKA_PLUGIN_ROOT
   ? path.resolve(process.env.SANKA_PLUGIN_ROOT)
   : repoRoot;
 const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "sanka-plugin-auth-state-"));
-const proxyPath = path.join(pluginRoot, "vendor", "mcp-remote", "bundled-proxy.min.cjs");
+const childCwd = fs.mkdtempSync(path.join(os.tmpdir(), "sanka-plugin-foreign-cwd-"));
+const mcpManifestPath = path.join(pluginRoot, ".mcp.json");
+const mcpManifest = JSON.parse(fs.readFileSync(mcpManifestPath, "utf8"));
+const serverConfig = mcpManifest.mcpServers?.sanka;
+assert.ok(serverConfig, `${mcpManifestPath} must define the sanka MCP server`);
+
+function resolvePluginCommand(command) {
+  return command.startsWith(".") ? path.resolve(pluginRoot, command) : command;
+}
 
 const child = spawn(
-  process.execPath,
-  [proxyPath, "https://mcp.sanka.com/mcp"],
+  resolvePluginCommand(serverConfig.command),
+  serverConfig.args ?? [],
   {
-    cwd: pluginRoot,
+    cwd: childCwd,
     env: {
       ...process.env,
       MCP_REMOTE_CONFIG_DIR: tempDir
@@ -156,4 +164,5 @@ try {
   child.kill("SIGTERM");
   await new Promise((resolve) => child.once("exit", resolve));
   fs.rmSync(tempDir, { recursive: true, force: true });
+  fs.rmSync(childCwd, { recursive: true, force: true });
 }
