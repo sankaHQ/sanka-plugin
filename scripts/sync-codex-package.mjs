@@ -19,6 +19,7 @@ const entries = [
     'vendor/mcp-remote',
     { exclude: ['bundled-proxy.cjs', 'bundled-proxy.mjs'] },
   ],
+  ['.mcp.json', '.mcp.json'],
   ['codex.mcp.json', 'codex.mcp.json'],
 ];
 

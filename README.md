@@ -82,7 +82,7 @@ After refresh, reload or reinstall Sanka in Codex and start a fresh thread from 
 
 Codex loads this repository through `.agents/plugins/marketplace.json`, which points at `plugins/sanka` so the plugin source path is a real subdirectory. Claude Code continues to use the root `.claude-plugin` files with `source: "./"`.
 
-When changing root Codex files such as `.codex-plugin/`, `skills/`, `assets/`, or `codex.mcp.json`, run:
+When changing root Codex files such as `.codex-plugin/`, `skills/`, `assets/`, `.mcp.json`, or `codex.mcp.json`, run:
 
 ```bash
 node scripts/sync-codex-package.mjs
@@ -93,7 +93,7 @@ node scripts/sync-codex-package.mjs --check
 
 - Hosted MCP endpoint: `https://mcp.sanka.com/mcp`
 - Local MCP proxy: `node ./vendor/mcp-remote/bundled-proxy.min.cjs https://mcp.sanka.com/mcp`
-- Codex MCP server name: `sanka_plugin`
+- Codex MCP server name: `sanka`
 - Local plugin clients should use the packaged proxy so expense attachment tools can accept exact `local_file_path` values. Remote-only MCP clients can use `mcp.remote.json` or connect to the hosted endpoint directly, but they cannot read local file paths.
 - Live Sanka work must use attached Sanka MCP tools. Do not substitute local Django shell, Postgres, repo files, or HubSpot MCP for Sanka actions.
 - If only `search_docs` / `execute` appear, refresh the plugin attachment or start a fresh plugin-attached thread.

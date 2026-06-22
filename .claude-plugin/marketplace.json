@@ -5,13 +5,13 @@
   },
   "metadata": {
     "description": "Official Sanka plugins for Claude Code.",
-    "version": "0.4.32"
+    "version": "0.4.34"
   },
   "plugins": [
     {
       "name": "sanka",
       "description": "Sanka plugin that connects local AI clients to hosted Sanka MCP through a packaged proxy for live CRM, billing, private inbox, expenses, and workflow intents.",
-      "version": "0.4.33",
+      "version": "0.4.34",
       "author": {
         "name": "Sanka"
       },
