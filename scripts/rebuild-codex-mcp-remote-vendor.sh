@@ -59,6 +59,13 @@ cp "$VENDOR_DIR/chunk-65X3S4HB.js" "$TMP_DIR/src/chunk-65X3S4HB.js"
 npx esbuild "$TMP_DIR/src/proxy.mjs" \
   --bundle \
   --platform=node \
+  --format=esm \
+  --outfile="$VENDOR_DIR/bundled-proxy.mjs" \
+  >/dev/null
+
+npx esbuild "$TMP_DIR/src/proxy.mjs" \
+  --bundle \
+  --platform=node \
   --format=cjs \
   --outfile="$VENDOR_DIR/bundled-proxy.cjs" \
   >/dev/null
@@ -74,5 +81,6 @@ npx esbuild "$VENDOR_DIR/bundled-proxy.cjs" \
 
 echo "Updated:"
 echo "  $VENDOR_DIR/chunk-65X3S4HB.js"
+echo "  $VENDOR_DIR/bundled-proxy.mjs"
 echo "  $VENDOR_DIR/bundled-proxy.cjs"
 echo "  $VENDOR_DIR/bundled-proxy.min.cjs"
