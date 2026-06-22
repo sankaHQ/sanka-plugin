@@ -28,6 +28,17 @@ function assertPluginManifest(relativePath) {
   assert.equal(manifest.mcpServers, "./.mcp.json", `${relativePath} must load the shared .mcp.json manifest`);
 }
 
+function assertCodexMarketplaceManifest(relativePath) {
+  const manifest = readJSON(relativePath);
+  const sankaPlugin = manifest.plugins?.find((plugin) => plugin?.name === "sanka");
+  assert.ok(sankaPlugin, `${relativePath} must include the sanka plugin entry`);
+  assert.equal(
+    sankaPlugin.policy?.authentication,
+    "ON_USE",
+    `${relativePath} must authenticate Sanka only when it is used`,
+  );
+}
+
 function listOpenAiYamlFiles(root) {
   const results = [];
   const walk = (dir) => {
@@ -48,6 +59,8 @@ function listOpenAiYamlFiles(root) {
 for (const manifestPath of [".codex-plugin/plugin.json", "plugins/sanka/.codex-plugin/plugin.json"]) {
   assertPluginManifest(manifestPath);
 }
+
+assertCodexMarketplaceManifest(".agents/plugins/marketplace.json");
 
 for (const manifestPath of [".mcp.json", "codex.mcp.json", "mcp.json", "plugins/sanka/.mcp.json", "plugins/sanka/codex.mcp.json"]) {
   assertLocalMcpManifest(manifestPath);
