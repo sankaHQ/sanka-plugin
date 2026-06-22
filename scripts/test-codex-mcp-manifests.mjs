@@ -19,13 +19,52 @@ function assertLocalMcpManifest(relativePath) {
   const serverNames = Object.keys(manifest.mcpServers ?? {});
   assert.deepEqual(serverNames, [expectedServerName], `${relativePath} must define only the ${expectedServerName} MCP server`);
 
-  const args = manifest.mcpServers[expectedServerName].args ?? [];
+  const server = manifest.mcpServers[expectedServerName];
+  const args = server.args ?? [];
   assert.equal(args.includes("--host"), false, `${relativePath} must not override the default OAuth callback host`);
+}
+
+function assertCodexMcpManifest(relativePath) {
+  const manifest = readJSON(relativePath);
+  assertLocalMcpManifest(relativePath);
+  const server = manifest.mcpServers[expectedServerName];
+  const args = server.args ?? [];
+  assert.equal(
+    server.command,
+    "./vendor/mcp-remote/sanka-proxy-launcher.cjs",
+    `${relativePath} must launch through the plugin-relative proxy launcher`,
+  );
+  assert.equal(args[0], "https://mcp.sanka.com/mcp", `${relativePath} must pass the hosted Sanka MCP URL as the first argument`);
+  assert.equal(
+    args.some((arg) => typeof arg === "string" && arg.startsWith("./vendor/")),
+    false,
+    `${relativePath} must not pass cwd-relative vendor paths as node arguments`,
+  );
+}
+
+function assertDirectClientMcpManifest(relativePath) {
+  const manifest = readJSON(relativePath);
+  assertLocalMcpManifest(relativePath);
+  const server = manifest.mcpServers[expectedServerName];
+  const args = server.args ?? [];
+  assert.equal(server.command, "node", `${relativePath} must launch through node for Windows and shell-less MCP clients`);
+  assert.equal(
+    args[0],
+    "./vendor/mcp-remote/sanka-proxy-launcher.cjs",
+    `${relativePath} must execute the local proxy launcher through node`,
+  );
+  assert.equal(args[1], "https://mcp.sanka.com/mcp", `${relativePath} must pass the hosted Sanka MCP URL after the launcher`);
 }
 
 function assertPluginManifest(relativePath) {
   const manifest = readJSON(relativePath);
   assert.equal(manifest.mcpServers, "./.mcp.json", `${relativePath} must load the shared .mcp.json manifest`);
+  assert.ok((manifest.interface?.defaultPrompt?.length ?? 0) <= 3, `${relativePath} must keep at most 3 Codex default prompts`);
+}
+
+function assertDirectClientPluginManifest(relativePath) {
+  const manifest = readJSON(relativePath);
+  assert.equal(manifest.mcpServers, "./mcp.json", `${relativePath} must use the direct-client MCP manifest`);
 }
 
 function assertCodexMarketplaceManifest(relativePath) {
@@ -61,9 +100,15 @@ for (const manifestPath of [".codex-plugin/plugin.json", "plugins/sanka/.codex-p
 }
 
 assertCodexMarketplaceManifest(".agents/plugins/marketplace.json");
+assertDirectClientPluginManifest(".claude-plugin/plugin.json");
+assertDirectClientPluginManifest(".plugin/plugin.json");
 
-for (const manifestPath of [".mcp.json", "codex.mcp.json", "mcp.json", "plugins/sanka/.mcp.json", "plugins/sanka/codex.mcp.json"]) {
-  assertLocalMcpManifest(manifestPath);
+for (const manifestPath of [".mcp.json", "codex.mcp.json", "plugins/sanka/.mcp.json", "plugins/sanka/codex.mcp.json"]) {
+  assertCodexMcpManifest(manifestPath);
+}
+
+for (const manifestPath of ["mcp.json", "plugins/sanka/mcp.json"]) {
+  assertDirectClientMcpManifest(manifestPath);
 }
 
 const remoteManifest = readJSON("mcp.remote.json");

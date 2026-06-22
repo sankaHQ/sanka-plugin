@@ -21,6 +21,7 @@ const entries = [
   ],
   ['.mcp.json', '.mcp.json'],
   ['codex.mcp.json', 'codex.mcp.json'],
+  ['mcp.json', 'mcp.json'],
 ];
 
 function shouldIgnoreRelativePath(relativePath, options = {}) {
