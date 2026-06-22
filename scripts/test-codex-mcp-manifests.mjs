@@ -33,9 +33,9 @@ function assertCodexMarketplaceManifest(relativePath) {
   const sankaPlugin = manifest.plugins?.find((plugin) => plugin?.name === "sanka");
   assert.ok(sankaPlugin, `${relativePath} must include the sanka plugin entry`);
   assert.equal(
-    sankaPlugin.policy?.authentication,
-    "ON_USE",
-    `${relativePath} must authenticate Sanka only when it is used`,
+    Object.prototype.hasOwnProperty.call(sankaPlugin.policy ?? {}, "authentication"),
+    false,
+    `${relativePath} must not use Codex plugin-level OAuth gating`,
   );
 }
 
