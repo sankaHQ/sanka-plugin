@@ -10,9 +10,11 @@ process.env.SANKA_MCP_SESSION_STORE_DIR = tempDir;
 
 const {
   applyPersistedMcpSessionHeader,
+  clearPersistedMcpSessionId,
   hasMcpSessionHeader,
   persistAndApplyMcpSessionHeader,
   readPersistedMcpSessionId,
+  removeMcpSessionHeader,
   writePersistedMcpSessionId
 } = await import("../vendor/mcp-remote/sanka-local-session-store.mjs");
 
@@ -33,6 +35,9 @@ try {
   assert.equal(persistAndApplyMcpSessionHeader(serverUrl, headers, "session-two"), true);
   assert.equal(headers["mcp-session-id"], "session-two");
   assert.equal(readPersistedMcpSessionId(serverUrl), "session-two");
+  removeMcpSessionHeader(headers);
+  assert.equal(hasMcpSessionHeader(headers), false);
+  assert.equal(readPersistedMcpSessionId(serverUrl), "session-two");
 
   const files = fs.readdirSync(tempDir);
   assert.equal(files.length, 1);
@@ -41,6 +46,8 @@ try {
 
   assert.equal(writePersistedMcpSessionId(serverUrl, "../bad"), false);
   assert.equal(readPersistedMcpSessionId(serverUrl), "session-two");
+  assert.equal(clearPersistedMcpSessionId(serverUrl), true);
+  assert.equal(readPersistedMcpSessionId(serverUrl), undefined);
 
   console.log("Local MCP session-store checks passed.");
 } finally {

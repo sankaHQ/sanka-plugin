@@ -72,8 +72,25 @@ export const writePersistedMcpSessionId = (serverUrl, mcpSessionId) => {
   return true;
 };
 
+export const clearPersistedMcpSessionId = (serverUrl) => {
+  try {
+    fs.rmSync(storePath(serverUrl), { force: true });
+    return true;
+  } catch {
+    return false;
+  }
+};
+
 export const hasMcpSessionHeader = (headers = {}) =>
   Object.keys(headers).some((key) => key.toLowerCase() === "mcp-session-id");
+
+export const removeMcpSessionHeader = (headers = {}) => {
+  for (const key of Object.keys(headers)) {
+    if (key.toLowerCase() === "mcp-session-id") {
+      delete headers[key];
+    }
+  }
+};
 
 export const applyPersistedMcpSessionHeader = (serverUrl, headers = {}) => {
   if (hasMcpSessionHeader(headers)) {

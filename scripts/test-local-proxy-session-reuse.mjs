@@ -15,6 +15,7 @@ const pluginRoot = process.env.SANKA_PLUGIN_ROOT
   : repoRoot;
 const manifestName = process.env.SANKA_MCP_MANIFEST || ".mcp.json";
 const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "sanka-plugin-session-reuse-"));
+process.env.SANKA_MCP_SESSION_STORE_DIR = tempDir;
 const foreignCwd = fs.mkdtempSync(path.join(os.tmpdir(), "sanka-plugin-session-reuse-cwd-"));
 const mcpManifestPath = path.join(pluginRoot, manifestName);
 const mcpManifest = JSON.parse(fs.readFileSync(mcpManifestPath, "utf8"));
