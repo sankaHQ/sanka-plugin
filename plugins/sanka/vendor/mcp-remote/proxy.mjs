@@ -23,6 +23,12 @@ import {
   prepareLocalFileUploadToolCall
 } from "./sanka-local-file-bridge.mjs";
 import { suppressNativeOAuthChallenge } from "./sanka-local-auth-bridge.mjs";
+import {
+  applyPersistedMcpSessionHeader,
+  clearPersistedMcpSessionId,
+  removeMcpSessionHeader,
+  persistAndApplyMcpSessionHeader
+} from "./sanka-local-session-store.mjs";
 import process2 from "node:process";
 
 const REMOTE_INITIALIZE_PROTOCOL_VERSION = "2024-11-05";
@@ -127,7 +133,9 @@ class StdioServerTransport {
 function sankaMcpProxy({
   transportToClient,
   transportToServer,
-  ignoredTools = []
+  ignoredTools = [],
+  onServerSessionId,
+  onStaleServerSession
 }) {
   let transportToClientClosed = false;
   let transportToServerClosed = false;
@@ -195,7 +203,22 @@ function sankaMcpProxy({
           });
         }
 
-        await transportToServer.send(message);
+        try {
+          await transportToServer.send(message);
+        } catch (error) {
+          if (isStaleMcpSessionError(error) && onStaleServerSession) {
+            onStaleServerSession(error);
+            await sendJsonRpcError(
+              transportToClient,
+              message.id,
+              -32603,
+              "Stored Sanka MCP session expired and was cleared. Retry the Sanka tool call to start a fresh session."
+            );
+            return;
+          }
+          throw error;
+        }
+        onServerSessionId?.(transportToServer.sessionId);
       })
       .catch(onServerError);
   };
@@ -291,6 +314,18 @@ async function sendJsonRpcError(transport, id, code, message) {
   });
 }
 
+function isStaleMcpSessionError(error) {
+  const code = Number(error?.code ?? error?.status ?? error?.statusCode ?? 0);
+  const message = String(error?.message ?? error ?? "").toLowerCase();
+  if (message.includes("mcp-session-id")) {
+    return true;
+  }
+  if (message.includes("session") && /(invalid|unknown|expired|not found|missing)/.test(message)) {
+    return true;
+  }
+  return code === 400 || code === 404;
+}
+
 function patternToRegex(pattern) {
   const parts = pattern.split("*");
   const escapedParts = parts.map((part) => part.replace(/\W/g, "\\$&"));
@@ -324,8 +359,14 @@ async function runProxy(
   authTimeoutMs,
   serverUrlHash
 ) {
+  const remoteHeaders = { ...(headers ?? {}) };
+  const restoredSessionId = applyPersistedMcpSessionHeader(serverUrl, remoteHeaders);
+  if (restoredSessionId) {
+    debugLog("Restored persisted Sanka MCP session id for local proxy");
+  }
+
   log("Discovering OAuth server configuration...");
-  const discoveryResult = await discoverOAuthServerInfo(serverUrl, headers);
+  const discoveryResult = await discoverOAuthServerInfo(serverUrl, remoteHeaders);
   if (discoveryResult.protectedResourceMetadata) {
     log(`Discovered authorization server: ${discoveryResult.authorizationServerUrl}`);
     if (discoveryResult.protectedResourceMetadata.scopes_supported) {
@@ -347,21 +388,55 @@ async function runProxy(
     );
   };
 
+  const clearRestoredSession = (error) => {
+    clearPersistedMcpSessionId(serverUrl);
+    removeMcpSessionHeader(remoteHeaders);
+    log("Stored Sanka MCP session id was rejected; cleared it and will use a fresh session.");
+    debugLog("Cleared stale persisted Sanka MCP session id", {
+      errorMessage: error instanceof Error ? error.message : String(error)
+    });
+  };
+
+  const connectRemoteTransport = async () => {
+    try {
+      return await connectToRemoteServer(
+        null,
+        serverUrl,
+        authProvider,
+        remoteHeaders,
+        authInitializer,
+        transportStrategy
+      );
+    } catch (error) {
+      if (!restoredSessionId || !isStaleMcpSessionError(error)) {
+        throw error;
+      }
+      clearRestoredSession(error);
+      return await connectToRemoteServer(
+        null,
+        serverUrl,
+        authProvider,
+        remoteHeaders,
+        authInitializer,
+        transportStrategy
+      );
+    }
+  };
+
   try {
     debugLog("Native mcp-remote OAuth is disabled for the Sanka local proxy");
-    const remoteTransport = await connectToRemoteServer(
-      null,
-      serverUrl,
-      authProvider,
-      headers,
-      authInitializer,
-      transportStrategy
-    );
+    const remoteTransport = await connectRemoteTransport();
 
     sankaMcpProxy({
       transportToClient: localTransport,
       transportToServer: remoteTransport,
-      ignoredTools
+      ignoredTools,
+      onStaleServerSession: clearRestoredSession,
+      onServerSessionId: (sessionId) => {
+        if (persistAndApplyMcpSessionHeader(serverUrl, remoteHeaders, sessionId)) {
+          debugLog("Persisted Sanka MCP session id for local proxy reuse");
+        }
+      }
     });
 
     await localTransport.start();

@@ -54,6 +54,7 @@ mkdir -p "$TMP_DIR/src"
 cp "$VENDOR_DIR/proxy.mjs" "$TMP_DIR/src/proxy.mjs"
 cp "$VENDOR_DIR/sanka-local-file-bridge.mjs" "$TMP_DIR/src/sanka-local-file-bridge.mjs"
 cp "$VENDOR_DIR/sanka-local-auth-bridge.mjs" "$TMP_DIR/src/sanka-local-auth-bridge.mjs"
+cp "$VENDOR_DIR/sanka-local-session-store.mjs" "$TMP_DIR/src/sanka-local-session-store.mjs"
 cp "$VENDOR_DIR/chunk-65X3S4HB.js" "$TMP_DIR/src/chunk-65X3S4HB.js"
 
 npx esbuild "$TMP_DIR/src/proxy.mjs" \
