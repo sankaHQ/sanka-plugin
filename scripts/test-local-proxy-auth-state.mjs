@@ -35,7 +35,8 @@ const child = spawn(
     cwd: childCwd,
     env: {
       ...process.env,
-      MCP_REMOTE_CONFIG_DIR: tempDir
+      MCP_REMOTE_CONFIG_DIR: tempDir,
+      SANKA_MCP_SESSION_STORE_DIR: tempDir
     },
     stdio: ["pipe", "pipe", "pipe"]
   }
@@ -158,6 +159,11 @@ try {
   );
 
   const authFiles = listAuthFiles();
+  assert.equal(
+    authFiles.some((file) => path.basename(file).startsWith("mcp-session-")),
+    true,
+    `proxy should persist the remote MCP session id for reuse across local proxy restarts; saw ${authFiles.join(", ")}`
+  );
   assert.equal(
     authFiles.some(
       (file) =>

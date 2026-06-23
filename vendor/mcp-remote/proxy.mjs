@@ -23,6 +23,10 @@ import {
   prepareLocalFileUploadToolCall
 } from "./sanka-local-file-bridge.mjs";
 import { suppressNativeOAuthChallenge } from "./sanka-local-auth-bridge.mjs";
+import {
+  applyPersistedMcpSessionHeader,
+  persistAndApplyMcpSessionHeader
+} from "./sanka-local-session-store.mjs";
 import process2 from "node:process";
 
 const REMOTE_INITIALIZE_PROTOCOL_VERSION = "2024-11-05";
@@ -127,7 +131,8 @@ class StdioServerTransport {
 function sankaMcpProxy({
   transportToClient,
   transportToServer,
-  ignoredTools = []
+  ignoredTools = [],
+  onServerSessionId
 }) {
   let transportToClientClosed = false;
   let transportToServerClosed = false;
@@ -196,6 +201,7 @@ function sankaMcpProxy({
         }
 
         await transportToServer.send(message);
+        onServerSessionId?.(transportToServer.sessionId);
       })
       .catch(onServerError);
   };
@@ -324,8 +330,14 @@ async function runProxy(
   authTimeoutMs,
   serverUrlHash
 ) {
+  const remoteHeaders = { ...(headers ?? {}) };
+  const restoredSessionId = applyPersistedMcpSessionHeader(serverUrl, remoteHeaders);
+  if (restoredSessionId) {
+    debugLog("Restored persisted Sanka MCP session id for local proxy");
+  }
+
   log("Discovering OAuth server configuration...");
-  const discoveryResult = await discoverOAuthServerInfo(serverUrl, headers);
+  const discoveryResult = await discoverOAuthServerInfo(serverUrl, remoteHeaders);
   if (discoveryResult.protectedResourceMetadata) {
     log(`Discovered authorization server: ${discoveryResult.authorizationServerUrl}`);
     if (discoveryResult.protectedResourceMetadata.scopes_supported) {
@@ -353,7 +365,7 @@ async function runProxy(
       null,
       serverUrl,
       authProvider,
-      headers,
+      remoteHeaders,
       authInitializer,
       transportStrategy
     );
@@ -361,7 +373,12 @@ async function runProxy(
     sankaMcpProxy({
       transportToClient: localTransport,
       transportToServer: remoteTransport,
-      ignoredTools
+      ignoredTools,
+      onServerSessionId: (sessionId) => {
+        if (persistAndApplyMcpSessionHeader(serverUrl, remoteHeaders, sessionId)) {
+          debugLog("Persisted Sanka MCP session id for local proxy reuse");
+        }
+      }
     });
 
     await localTransport.start();
