@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 
 const DIRECT_UPLOAD_TOOL = "upload_expense_attachment";
@@ -8,6 +9,7 @@ const CHUNK_APPEND_TOOL = "append_expense_attachment_upload_chunk";
 const LOCAL_FILE_PATH_FIELD = "local_file_path";
 const LOCAL_FILE_MIME_TYPE_FIELD = "local_file_mime_type";
 const LOCAL_CHUNK_SIZE_FIELD = "local_chunk_size";
+const LOCAL_UPLOAD_ROOTS_ENV = "SANKA_LOCAL_FILE_UPLOAD_DIRS";
 
 const HOSTED_UPLOAD_MAX_BASE64_LENGTH = 12 * 1024 * 1024;
 const HOSTED_UPLOAD_MAX_BYTES = Math.floor(HOSTED_UPLOAD_MAX_BASE64_LENGTH / 4) * 3;
@@ -20,8 +22,7 @@ const MIME_BY_EXTENSION = new Map([
   [".jpeg", "image/jpeg"],
   [".webp", "image/webp"],
   [".gif", "image/gif"],
-  [".csv", "text/csv"],
-  [".txt", "text/plain"]
+  [".csv", "text/csv"]
 ]);
 
 export class LocalFileUploadError extends Error {
@@ -144,8 +145,8 @@ function prepareChunkStartCall(message, args) {
   const stat = statLocalUploadFile(filePath, HOSTED_UPLOAD_MAX_BYTES);
   const nextArgs = {
     ...stripLocalOnlyArguments(args),
-    filename: getFilename(args, filePath),
-    mime_type: getMimeType(args, filePath),
+    filename: getFilename(args, stat.path),
+    mime_type: getMimeType(args, stat.path),
     byte_length: stat.size,
     content_base64_length: base64LengthForByteLength(stat.size)
   };
@@ -176,10 +177,10 @@ function prepareChunkAppendCall(message, args) {
 
 function readLocalFileForUpload(localFilePath, maxBytes) {
   const filePath = normalizeLocalFilePath(localFilePath);
-  statLocalUploadFile(filePath, maxBytes);
-  const content = fs.readFileSync(filePath);
+  const stat = statLocalUploadFile(filePath, maxBytes);
+  const content = fs.readFileSync(stat.path);
   return {
-    path: filePath,
+    path: stat.path,
     contentBase64: content.toString("base64")
   };
 }
@@ -189,13 +190,15 @@ function normalizeLocalFilePath(localFilePath) {
   if (!path.isAbsolute(filePath)) {
     throw new LocalFileUploadError(`${LOCAL_FILE_PATH_FIELD} must be an absolute path.`);
   }
-  return filePath;
+  return path.resolve(filePath);
 }
 
 function statLocalUploadFile(filePath, maxBytes) {
   let stat;
+  let realPath;
   try {
-    stat = fs.statSync(filePath);
+    realPath = fs.realpathSync.native(filePath);
+    stat = fs.statSync(realPath);
   } catch (error) {
     throw new LocalFileUploadError(
       `Cannot read local attachment file: ${error instanceof Error ? error.message : String(error)}`
@@ -213,7 +216,11 @@ function statLocalUploadFile(filePath, maxBytes) {
       `Local attachment file is ${stat.size} bytes, which exceeds the ${maxBytes} byte local upload limit.`
     );
   }
-  return stat;
+  assertAllowedLocalUploadPath(realPath);
+  return {
+    path: realPath,
+    size: stat.size
+  };
 }
 
 function assertLocalFileToolArguments(args) {
@@ -271,6 +278,65 @@ function getPositiveInteger(value, fieldName) {
 
 function base64LengthForByteLength(byteLength) {
   return Math.ceil(byteLength / 3) * 4;
+}
+
+function assertAllowedLocalUploadPath(filePath) {
+  const ext = path.extname(filePath).toLowerCase();
+  if (!MIME_BY_EXTENSION.has(ext)) {
+    throw new LocalFileUploadError(
+      `${LOCAL_FILE_PATH_FIELD} must point to a supported attachment type: ${[...MIME_BY_EXTENSION.keys()].join(", ")}.`
+    );
+  }
+
+  if (hasHiddenPathSegment(filePath)) {
+    throw new LocalFileUploadError(`${LOCAL_FILE_PATH_FIELD} must not include hidden files or directories.`);
+  }
+
+  const roots = allowedLocalUploadRoots();
+  if (!roots.some((root) => pathIsInsideRoot(filePath, root))) {
+    throw new LocalFileUploadError(
+      `${LOCAL_FILE_PATH_FIELD} must be inside an allowed upload directory. Set ${LOCAL_UPLOAD_ROOTS_ENV} to a ${path.delimiter}-separated allowlist when needed.`
+    );
+  }
+}
+
+function allowedLocalUploadRoots() {
+  const configured = (process.env[LOCAL_UPLOAD_ROOTS_ENV] ?? "")
+    .split(path.delimiter)
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+  const roots = configured.length > 0 ? configured : defaultLocalUploadRoots();
+  return roots
+    .map((root) => {
+      try {
+        return fs.realpathSync.native(path.resolve(root));
+      } catch {
+        return null;
+      }
+    })
+    .filter(Boolean);
+}
+
+function defaultLocalUploadRoots() {
+  const home = os.homedir();
+  return [
+    path.join(home, "Desktop"),
+    path.join(home, "Documents"),
+    path.join(home, "Downloads"),
+    path.join(home, "Pictures"),
+    os.tmpdir()
+  ];
+}
+
+function pathIsInsideRoot(filePath, root) {
+  const relative = path.relative(root, filePath);
+  return relative === "" || (!relative.startsWith("..") && !path.isAbsolute(relative));
+}
+
+function hasHiddenPathSegment(filePath) {
+  const parsed = path.parse(filePath);
+  const relative = filePath.slice(parsed.root.length);
+  return relative.split(path.sep).some((segment) => segment.startsWith("."));
 }
 
 function isExpenseLocalFileUploadTool(toolName) {
