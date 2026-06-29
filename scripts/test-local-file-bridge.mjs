@@ -66,6 +66,40 @@ try {
   assert.equal("local_file_path" in append.params.arguments, false);
   assert.equal("local_chunk_size" in append.params.arguments, false);
 
+  const unsupportedPath = path.join(tempDir, "secret.key");
+  fs.writeFileSync(unsupportedPath, "not an attachment");
+  assert.throws(
+    () =>
+      prepareLocalFileUploadToolCall({
+        jsonrpc: "2.0",
+        id: 31,
+        method: "tools/call",
+        params: {
+          name: "upload_expense_attachment",
+          arguments: { local_file_path: unsupportedPath }
+        }
+      }),
+    /supported attachment type/
+  );
+
+  const hiddenDir = path.join(tempDir, ".hidden");
+  fs.mkdirSync(hiddenDir);
+  const hiddenPath = path.join(hiddenDir, "receipt.pdf");
+  fs.writeFileSync(hiddenPath, bytes);
+  assert.throws(
+    () =>
+      prepareLocalFileUploadToolCall({
+        jsonrpc: "2.0",
+        id: 32,
+        method: "tools/call",
+        params: {
+          name: "upload_expense_attachment",
+          arguments: { local_file_path: hiddenPath }
+        }
+      }),
+    /hidden files or directories/
+  );
+
   const alreadyEncoded = prepareLocalFileUploadToolCall({
     jsonrpc: "2.0",
     id: 4,

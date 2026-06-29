@@ -4293,7 +4293,7 @@ var require_dbcs_data = __commonJS({
       // == Japanese/ShiftJIS ====================================================
       // All japanese encodings are based on JIS X set of standards:
       // JIS X 0201 - Single-byte encoding of ASCII + ¥ + Kana chars at 0xA1-0xDF.
-      // JIS X 0208 - Main set of 6879 characters, placed in 94x94 plane, to be encoded by 2 bytes. 
+      // JIS X 0208 - Main set of 6879 characters, placed in 94x94 plane, to be encoded by 2 bytes.
       //              Has several variations in 1978, 1983, 1990 and 1997.
       // JIS X 0212 - Supplementary plane of 6067 chars in 94x94 plane. 1990. Effectively dead.
       // JIS X 0213 - Extension and modern replacement of 0208 and 0212. Total chars: 11233.
@@ -4310,7 +4310,7 @@ var require_dbcs_data = __commonJS({
       //               0x8F, (0xA1-0xFE)x2 - 0212 plane (94x94).
       //  * JIS X 208: 7-bit, direct encoding of 0208. Byte ranges: 0x21-0x7E (94 values). Uncommon.
       //               Used as-is in ISO2022 family.
-      //  * ISO2022-JP: Stateful encoding, with escape sequences to switch between ASCII, 
+      //  * ISO2022-JP: Stateful encoding, with escape sequences to switch between ASCII,
       //                0201-1976 Roman, 0208-1978, 0208-1983.
       //  * ISO2022-JP-1: Adds esc seq for 0212-1990.
       //  * ISO2022-JP-2: Adds esc seq for GB2313-1980, KSX1001-1992, ISO8859-1, ISO8859-7.
@@ -4421,7 +4421,7 @@ var require_dbcs_data = __commonJS({
       //  * Windows CP 951: Microsoft variant of Big5-HKSCS-2001. Seems to be never public. http://me.abelcheung.org/articles/research/what-is-cp951/
       //  * Big5-2003 (Taiwan standard) almost superset of cp950.
       //  * Unicode-at-on (UAO) / Mozilla 1.8. Falling out of use on the Web. Not supported by other browsers.
-      //  * Big5-HKSCS (-2001, -2004, -2008). Hong Kong standard. 
+      //  * Big5-HKSCS (-2001, -2004, -2008). Hong Kong standard.
       //    many unicode code points moved from PUA to Supplementary plane (U+2XXXX) over the years.
       //    Plus, it has 4 combining sequences.
       //    Seems that Mozilla refused to support it for 10 yrs. https://bugzilla.mozilla.org/show_bug.cgi?id=162431 https://bugzilla.mozilla.org/show_bug.cgi?id=310299
@@ -4432,7 +4432,7 @@ var require_dbcs_data = __commonJS({
       //    In the encoder, it might make sense to support encoding old PUA mappings to Big5 bytes seq-s.
       //    Official spec: http://www.ogcio.gov.hk/en/business/tech_promotion/ccli/terms/doc/2003cmp_2008.txt
       //                   http://www.ogcio.gov.hk/tc/business/tech_promotion/ccli/terms/doc/hkscs-2008-big5-iso.txt
-      // 
+      //
       // Current understanding of how to deal with Big5(-HKSCS) is in the Encoding Standard, http://encoding.spec.whatwg.org/#big5-encoder
       // Unicode mapping (http://www.unicode.org/Public/MAPPINGS/OBSOLETE/EASTASIA/OTHER/BIG5.TXT) is said to be wrong.
       "windows950": "cp950",
@@ -16128,6 +16128,7 @@ var require_utils = __commonJS({
     "use strict";
     var formats = require_formats();
     var getSideChannel = require_side_channel();
+    var defineProperty = require_es_define_property();
     var has = Object.prototype.hasOwnProperty;
     var isArray = Array.isArray;
     var overflowChannel = getSideChannel();
@@ -16175,6 +16176,18 @@ var require_utils = __commonJS({
       }
       return obj;
     };
+    var setProperty = function setProperty2(obj, key, value) {
+      if (key === "__proto__" && defineProperty) {
+        defineProperty(obj, key, {
+          configurable: true,
+          enumerable: true,
+          value,
+          writable: true
+        });
+      } else {
+        obj[key] = value;
+      }
+    };
     var merge2 = function merge3(target, source, options) {
       if (!source) {
         return target;
@@ -16182,7 +16195,10 @@ var require_utils = __commonJS({
       if (typeof source !== "object" && typeof source !== "function") {
         if (isArray(target)) {
           var nextIndex = target.length;
-          if (options && typeof options.arrayLimit === "number" && nextIndex > options.arrayLimit) {
+          if (options && typeof options.arrayLimit === "number" && nextIndex >= options.arrayLimit) {
+            if (options.throwOnLimitExceeded) {
+              throw new RangeError("Array limit exceeded. Only " + options.arrayLimit + " element" + (options.arrayLimit === 1 ? "" : "s") + " allowed in an array.");
+            }
             return markOverflow(arrayToObject(target.concat(source), options), nextIndex);
           }
           target[nextIndex] = source;
@@ -16213,6 +16229,9 @@ var require_utils = __commonJS({
         }
         var combined = [target].concat(source);
         if (options && typeof options.arrayLimit === "number" && combined.length > options.arrayLimit) {
+          if (options.throwOnLimitExceeded) {
+            throw new RangeError("Array limit exceeded. Only " + options.arrayLimit + " element" + (options.arrayLimit === 1 ? "" : "s") + " allowed in an array.");
+          }
           return markOverflow(arrayToObject(combined, options), combined.length - 1);
         }
         return combined;
@@ -16234,14 +16253,20 @@ var require_utils = __commonJS({
             target[i] = item;
           }
         });
+        if (options && typeof options.arrayLimit === "number" && target.length > options.arrayLimit) {
+          if (options.throwOnLimitExceeded) {
+            throw new RangeError("Array limit exceeded. Only " + options.arrayLimit + " element" + (options.arrayLimit === 1 ? "" : "s") + " allowed in an array.");
+          }
+          return markOverflow(arrayToObject(target, options), target.length - 1);
+        }
         return target;
       }
       return Object.keys(source).reduce(function(acc, key) {
         var value = source[key];
         if (has.call(acc, key)) {
-          acc[key] = merge3(acc[key], value, options);
+          setProperty(acc, key, merge3(acc[key], value, options));
         } else {
-          acc[key] = value;
+          setProperty(acc, key, value);
         }
         if (isOverflow(source) && !isOverflow(acc)) {
           markOverflow(acc, getMaxIndex(source));
@@ -16257,7 +16282,7 @@ var require_utils = __commonJS({
     };
     var assign = function assignSingleSource(target, source) {
       return Object.keys(source).reduce(function(acc, key) {
-        acc[key] = source[key];
+        setProperty(acc, key, source[key]);
         return acc;
       }, target);
     };
@@ -16291,6 +16316,13 @@ var require_utils = __commonJS({
       var out = "";
       for (var j = 0; j < string4.length; j += limit) {
         var segment = string4.length >= limit ? string4.slice(j, j + limit) : string4;
+        if (j + limit < string4.length) {
+          var last = segment.charCodeAt(segment.length - 1);
+          if (last >= 55296 && last <= 56319) {
+            segment = segment.slice(0, -1);
+            j -= 1;
+          }
+        }
         var arr = [];
         for (var i = 0; i < segment.length; ++i) {
           var c = segment.charCodeAt(i);
@@ -16320,7 +16352,7 @@ var require_utils = __commonJS({
     };
     var compact = function compact2(value) {
       var queue = [{ obj: { o: value }, prop: "o" }];
-      var refs = [];
+      var refs = getSideChannel();
       for (var i = 0; i < queue.length; ++i) {
         var item = queue[i];
         var obj = item.obj[item.prop];
@@ -16328,9 +16360,9 @@ var require_utils = __commonJS({
         for (var j = 0; j < keys.length; ++j) {
           var key = keys[j];
           var val = obj[key];
-          if (typeof val === "object" && val !== null && refs.indexOf(val) === -1) {
+          if (typeof val === "object" && val !== null && !refs.has(val)) {
             queue[queue.length] = { obj, prop: key };
-            refs[refs.length] = val;
+            refs.set(val, true);
           }
         }
       }
@@ -16346,8 +16378,11 @@ var require_utils = __commonJS({
       }
       return !!(obj.constructor && obj.constructor.isBuffer && obj.constructor.isBuffer(obj));
     };
-    var combine = function combine2(a, b, arrayLimit, plainObjects) {
+    var combine = function combine2(a, b, arrayLimit, plainObjects, throwOnLimitExceeded) {
       if (isOverflow(a)) {
+        if (throwOnLimitExceeded) {
+          throw new RangeError("Array limit exceeded. Only " + arrayLimit + " element" + (arrayLimit === 1 ? "" : "s") + " allowed in an array.");
+        }
         var newIndex = getMaxIndex(a) + 1;
         a[newIndex] = b;
         setMaxIndex(a, newIndex);
@@ -16355,6 +16390,9 @@ var require_utils = __commonJS({
       }
       var result = [].concat(a, b);
       if (result.length > arrayLimit) {
+        if (throwOnLimitExceeded) {
+          throw new RangeError("Array limit exceeded. Only " + arrayLimit + " element" + (arrayLimit === 1 ? "" : "s") + " allowed in an array.");
+        }
         return markOverflow(arrayToObject(result, { plainObjects }), result.length - 1);
       }
       return result;
@@ -16710,8 +16748,19 @@ var require_parse = __commonJS({
         return String.fromCharCode(parseInt(numberStr, 10));
       });
     };
-    var parseArrayValue = function(val, options, currentArrayLength) {
+    var parseArrayValue = function(val, options, currentArrayLength, isFlatArrayValue) {
       if (val && typeof val === "string" && options.comma && val.indexOf(",") > -1) {
+        if (isFlatArrayValue && options.throwOnLimitExceeded) {
+          var commaCount = 0;
+          var commaIndex = val.indexOf(",");
+          while (commaIndex > -1) {
+            commaCount += 1;
+            if (commaCount >= options.arrayLimit) {
+              throw new RangeError("Array limit exceeded. Only " + options.arrayLimit + " element" + (options.arrayLimit === 1 ? "" : "s") + " allowed in an array.");
+            }
+            commaIndex = val.indexOf(",", commaIndex + 1);
+          }
+        }
         return val.split(",");
       }
       if (options.throwOnLimitExceeded && currentArrayLength >= options.arrayLimit) {
@@ -16768,7 +16817,8 @@ var require_parse = __commonJS({
               parseArrayValue(
                 part.slice(pos + 1),
                 options,
-                isArray(obj[key]) ? obj[key].length : 0
+                isArray(obj[key]) ? obj[key].length : 0,
+                part.indexOf("[]=") === -1
               ),
               function(encodedVal) {
                 return options.decoder(encodedVal, defaults.decoder, charset, "value");
@@ -16783,10 +16833,7 @@ var require_parse = __commonJS({
           val = isArray(val) ? [val] : val;
         }
         if (options.comma && isArray(val) && val.length > options.arrayLimit) {
-          if (options.throwOnLimitExceeded) {
-            throw new RangeError("Array limit exceeded. Only " + options.arrayLimit + " element" + (options.arrayLimit === 1 ? "" : "s") + " allowed in an array.");
-          }
-          val = utils.combine([], val, options.arrayLimit, options.plainObjects);
+          val = utils.combine([], val, options.arrayLimit, options.plainObjects, options.throwOnLimitExceeded);
         }
         if (key !== null) {
           var existing = has.call(obj, key);
@@ -16795,7 +16842,8 @@ var require_parse = __commonJS({
               obj[key],
               val,
               options.arrayLimit,
-              options.plainObjects
+              options.plainObjects,
+              options.throwOnLimitExceeded
             );
           } else if (!existing || options.duplicates === "last") {
             obj[key] = val;
@@ -16822,7 +16870,8 @@ var require_parse = __commonJS({
               [],
               leaf,
               options.arrayLimit,
-              options.plainObjects
+              options.plainObjects,
+              options.throwOnLimitExceeded
             );
           }
         } else {
@@ -56350,8 +56399,8 @@ var $ZodObjectJIT = /* @__PURE__ */ $constructor("$ZodObjectJIT", (inst, def) =>
             path: iss.path ? [${k}, ...iss.path] : [${k}]
           })));
         }
-        
-        
+
+
         if (${id}.value === undefined) {
           if (${k} in input) {
             newResult[${k}] = undefined;
@@ -56359,7 +56408,7 @@ var $ZodObjectJIT = /* @__PURE__ */ $constructor("$ZodObjectJIT", (inst, def) =>
         } else {
           newResult[${k}] = ${id}.value;
         }
-        
+
       `);
     }
     doc.write(`payload.value = newResult;`);
@@ -68036,6 +68085,7 @@ function getServerUrlHash(serverUrl, authorizeResource, headers) {
 
 // src/sanka-local-file-bridge.mjs
 var import_node_fs = __toESM(require("node:fs"), 1);
+var import_node_os = __toESM(require("node:os"), 1);
 var import_node_path = __toESM(require("node:path"), 1);
 var DIRECT_UPLOAD_TOOL = "upload_expense_attachment";
 var CHUNK_START_TOOL = "start_expense_attachment_upload";
@@ -68043,6 +68093,7 @@ var CHUNK_APPEND_TOOL = "append_expense_attachment_upload_chunk";
 var LOCAL_FILE_PATH_FIELD = "local_file_path";
 var LOCAL_FILE_MIME_TYPE_FIELD = "local_file_mime_type";
 var LOCAL_CHUNK_SIZE_FIELD = "local_chunk_size";
+var LOCAL_UPLOAD_ROOTS_ENV = "SANKA_LOCAL_FILE_UPLOAD_DIRS";
 var HOSTED_UPLOAD_MAX_BASE64_LENGTH = 12 * 1024 * 1024;
 var HOSTED_UPLOAD_MAX_BYTES = Math.floor(HOSTED_UPLOAD_MAX_BASE64_LENGTH / 4) * 3;
 var DEFAULT_LOCAL_CHUNK_SIZE = 16e4;
@@ -68053,8 +68104,7 @@ var MIME_BY_EXTENSION = /* @__PURE__ */ new Map([
   [".jpeg", "image/jpeg"],
   [".webp", "image/webp"],
   [".gif", "image/gif"],
-  [".csv", "text/csv"],
-  [".txt", "text/plain"]
+  [".csv", "text/csv"]
 ]);
 var LocalFileUploadError = class extends Error {
   constructor(message) {
@@ -68156,8 +68206,8 @@ function prepareChunkStartCall(message, args) {
   const stat = statLocalUploadFile(filePath, HOSTED_UPLOAD_MAX_BYTES);
   const nextArgs = {
     ...stripLocalOnlyArguments(args),
-    filename: getFilename(args, filePath),
-    mime_type: getMimeType(args, filePath),
+    filename: getFilename(args, stat.path),
+    mime_type: getMimeType(args, stat.path),
     byte_length: stat.size,
     content_base64_length: base64LengthForByteLength(stat.size)
   };
@@ -68184,10 +68234,10 @@ function prepareChunkAppendCall(message, args) {
 }
 function readLocalFileForUpload(localFilePath, maxBytes) {
   const filePath = normalizeLocalFilePath(localFilePath);
-  statLocalUploadFile(filePath, maxBytes);
-  const content = import_node_fs.default.readFileSync(filePath);
+  const stat = statLocalUploadFile(filePath, maxBytes);
+  const content = import_node_fs.default.readFileSync(stat.path);
   return {
-    path: filePath,
+    path: stat.path,
     contentBase64: content.toString("base64")
   };
 }
@@ -68196,12 +68246,14 @@ function normalizeLocalFilePath(localFilePath) {
   if (!import_node_path.default.isAbsolute(filePath)) {
     throw new LocalFileUploadError(`${LOCAL_FILE_PATH_FIELD} must be an absolute path.`);
   }
-  return filePath;
+  return import_node_path.default.resolve(filePath);
 }
 function statLocalUploadFile(filePath, maxBytes) {
   let stat;
+  let realPath;
   try {
-    stat = import_node_fs.default.statSync(filePath);
+    realPath = import_node_fs.default.realpathSync.native(filePath);
+    stat = import_node_fs.default.statSync(realPath);
   } catch (error2) {
     throw new LocalFileUploadError(
       `Cannot read local attachment file: ${error2 instanceof Error ? error2.message : String(error2)}`
@@ -68218,7 +68270,11 @@ function statLocalUploadFile(filePath, maxBytes) {
       `Local attachment file is ${stat.size} bytes, which exceeds the ${maxBytes} byte local upload limit.`
     );
   }
-  return stat;
+  assertAllowedLocalUploadPath(realPath);
+  return {
+    path: realPath,
+    size: stat.size
+  };
 }
 function assertLocalFileToolArguments(args) {
   if (!args || typeof args !== "object" || Array.isArray(args)) {
@@ -68268,6 +68324,53 @@ function getPositiveInteger(value, fieldName) {
 }
 function base64LengthForByteLength(byteLength) {
   return Math.ceil(byteLength / 3) * 4;
+}
+function assertAllowedLocalUploadPath(filePath) {
+  const ext = import_node_path.default.extname(filePath).toLowerCase();
+  if (!MIME_BY_EXTENSION.has(ext)) {
+    throw new LocalFileUploadError(
+      `${LOCAL_FILE_PATH_FIELD} must point to a supported attachment type: ${[...MIME_BY_EXTENSION.keys()].join(", ")}.`
+    );
+  }
+  if (hasHiddenPathSegment(filePath)) {
+    throw new LocalFileUploadError(`${LOCAL_FILE_PATH_FIELD} must not include hidden files or directories.`);
+  }
+  const roots = allowedLocalUploadRoots();
+  if (!roots.some((root) => pathIsInsideRoot(filePath, root))) {
+    throw new LocalFileUploadError(
+      `${LOCAL_FILE_PATH_FIELD} must be inside an allowed upload directory. Set ${LOCAL_UPLOAD_ROOTS_ENV} to a ${import_node_path.default.delimiter}-separated allowlist when needed.`
+    );
+  }
+}
+function allowedLocalUploadRoots() {
+  const configured = (process.env[LOCAL_UPLOAD_ROOTS_ENV] ?? "").split(import_node_path.default.delimiter).map((entry) => entry.trim()).filter(Boolean);
+  const roots = configured.length > 0 ? configured : defaultLocalUploadRoots();
+  return roots.map((root) => {
+    try {
+      return import_node_fs.default.realpathSync.native(import_node_path.default.resolve(root));
+    } catch {
+      return null;
+    }
+  }).filter(Boolean);
+}
+function defaultLocalUploadRoots() {
+  const home = import_node_os.default.homedir();
+  return [
+    import_node_path.default.join(home, "Desktop"),
+    import_node_path.default.join(home, "Documents"),
+    import_node_path.default.join(home, "Downloads"),
+    import_node_path.default.join(home, "Pictures"),
+    import_node_os.default.tmpdir()
+  ];
+}
+function pathIsInsideRoot(filePath, root) {
+  const relative = import_node_path.default.relative(root, filePath);
+  return relative === "" || !relative.startsWith("..") && !import_node_path.default.isAbsolute(relative);
+}
+function hasHiddenPathSegment(filePath) {
+  const parsed = import_node_path.default.parse(filePath);
+  const relative = filePath.slice(parsed.root.length);
+  return relative.split(import_node_path.default.sep).some((segment) => segment.startsWith("."));
 }
 function isExpenseLocalFileUploadTool(toolName) {
   return toolName === DIRECT_UPLOAD_TOOL || toolName === CHUNK_START_TOOL || toolName === CHUNK_APPEND_TOOL;
@@ -68339,14 +68442,14 @@ function suppressNativeOAuthChallenge(message) {
 // src/sanka-local-session-store.mjs
 var import_node_crypto = require("node:crypto");
 var import_node_fs2 = __toESM(require("node:fs"), 1);
-var import_node_os = __toESM(require("node:os"), 1);
+var import_node_os2 = __toESM(require("node:os"), 1);
 var import_node_path2 = __toESM(require("node:path"), 1);
 var STORE_DIR_ENV = "SANKA_MCP_SESSION_STORE_DIR";
 var STORE_VERSION = 1;
 var isUsableSessionId = (value) => typeof value === "string" && /^[A-Za-z0-9._~:-]{8,256}$/.test(value);
 var storeDir = () => {
   const configured = process.env[STORE_DIR_ENV]?.trim();
-  const dir = configured || import_node_path2.default.join(import_node_os.default.homedir(), ".sanka-mcp");
+  const dir = configured || import_node_path2.default.join(import_node_os2.default.homedir(), ".sanka-mcp");
   import_node_fs2.default.mkdirSync(dir, { recursive: true, mode: 448 });
   try {
     import_node_fs2.default.chmodSync(dir, 448);
