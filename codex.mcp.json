@@ -4,7 +4,9 @@
       "cwd": ".",
       "command": "./vendor/mcp-remote/sanka-proxy-launcher.cjs",
       "args": [
-        "https://mcp.sanka.com/mcp"
+        "https://mcp.sanka.com/mcp",
+        "--header",
+        "X-Mcp-Reconnect-Server-Name: sakura"
       ],
       "note": "Hosted Sakura MCP server via the packaged local proxy. The proxy keeps tools attached during Sanka sign-in and lets expense attachment tools read exact user-provided local receipt paths before forwarding original bytes to hosted Sanka MCP."
     }
