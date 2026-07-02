@@ -5,10 +5,10 @@
   },
   "plugins": [
     {
-      "name": "sanka",
+      "name": "sakura",
       "source": {
         "source": "local",
-        "path": "./plugins/sanka"
+        "path": "./plugins/sakura"
       },
       "policy": {
         "installation": "AVAILABLE"

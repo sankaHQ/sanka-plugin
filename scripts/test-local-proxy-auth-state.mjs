@@ -20,8 +20,8 @@ const foreignCwd = usePluginCwd ? null : fs.mkdtempSync(path.join(os.tmpdir(), "
 const childCwd = usePluginCwd ? pluginRoot : foreignCwd;
 const mcpManifestPath = path.join(pluginRoot, manifestName);
 const mcpManifest = JSON.parse(fs.readFileSync(mcpManifestPath, "utf8"));
-const serverConfig = mcpManifest.mcpServers?.sanka;
-assert.ok(serverConfig, `${mcpManifestPath} must define the sanka MCP server`);
+const serverConfig = mcpManifest.mcpServers?.sakura;
+assert.ok(serverConfig, `${mcpManifestPath} must define the sakura MCP server`);
 const clientProtocolVersion = process.env.SANKA_CLIENT_PROTOCOL_VERSION || "2025-06-18";
 
 function resolvePluginCommand(command) {

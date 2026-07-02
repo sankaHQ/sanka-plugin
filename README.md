@@ -4,7 +4,7 @@ Sanka connects local AI clients to Sanka's hosted MCP server through the package
 
 ## Install
 
-Codex uses a repo-local marketplace, while Claude Code supports a GitHub marketplace command. The install paths differ, but both run the same local proxy against the hosted Sanka MCP server and expose the same `$sanka:...` skills.
+Codex uses a repo-local marketplace, while Claude Code supports a GitHub marketplace command. The install paths differ, but both run the same local proxy against the hosted Sakura MCP server and expose the same `$sakura:...` skills.
 
 ### Codex
 
@@ -13,7 +13,7 @@ Clone sankaHQ/sanka-plugin
 Open the cloned repo in Codex
 Restart Codex
 Install Sanka from the Sanka marketplace
-Start with the Sanka chip or a plain $sanka:... mention
+Start with the Sakura chip or a plain $sakura:... mention
 ```
 
 ### Claude Code
@@ -22,7 +22,7 @@ Start with the Sanka chip or a plain $sanka:... mention
 /plugin marketplace add sankaHQ/sanka-plugin
 /plugin install sanka@sanka
 /reload-plugins
-Start with /sanka:sanka for natural-language routing, or a specific /sanka:... skill
+Start with /sakura:sakura for natural-language routing, or a specific /sakura:... skill
 ```
 
 Enable auto-update from `/plugin` if you want Claude Code to pull future updates from GitHub.
@@ -37,22 +37,22 @@ node ./vendor/mcp-remote/bundled-proxy.min.cjs https://mcp.sanka.com/mcp
 
 Keep the repository files available on disk so the local proxy can run and read exact user-provided receipt paths for expense attachment upload.
 
-For clients that cannot run local commands, use `mcp.remote.json` or connect directly to `https://mcp.sanka.com/mcp`. That mode supports normal Sanka MCP tools but cannot read `local_file_path`; file uploads must provide `content_base64`.
+For clients that cannot run local commands, use `mcp.remote.json` or connect directly to `https://mcp.sanka.com/mcp`. That mode supports normal Sakura MCP tools but cannot read `local_file_path`; file uploads must provide `content_base64`.
 
 ## Use
 
 Examples:
 
 ```text
-$sanka:sanka Create an estimate from this HubSpot deal URL.
-$sanka:deal-to-estimate https://app.hubspot.com/contacts/.../record/0-3/... Preview the estimate and do not create it yet.
-$sanka:deal-to-estimate https://app.hubspot.com/contacts/.../record/0-3/... Create the estimate from this HubSpot deal.
-$sanka:list-deals Show recent deals.
-$sanka:create-expense Create an expense from this receipt.
-$sanka:refresh
+$sakura:sakura Create an estimate from this HubSpot deal URL.
+$sakura:deal-to-estimate https://app.hubspot.com/contacts/.../record/0-3/... Preview the estimate and do not create it yet.
+$sakura:deal-to-estimate https://app.hubspot.com/contacts/.../record/0-3/... Create the estimate from this HubSpot deal.
+$sakura:list-deals Show recent deals.
+$sakura:create-expense Create an expense from this receipt.
+$sakura:refresh
 ```
 
-For Claude Code, use `/sanka:sanka` as the general Sanka entrypoint when the user wants to say the request naturally. Use narrower skills like `/sanka:deal-to-estimate` when the workflow is already obvious.
+For Claude Code, use `/sakura:sakura` as the general Sanka entrypoint when the user wants to say the request naturally. Use narrower skills like `/sakura:deal-to-estimate` when the workflow is already obvious.
 
 For HubSpot deal URLs, use the Sanka router or workflow skills when the outcome is a Sanka estimate, approval request, workflow run, or audit trail. HubSpot is only the source record; Sanka owns the business action.
 
@@ -76,7 +76,7 @@ Codex can then run:
 ./scripts/refresh-codex-plugin.sh
 ```
 
-After refresh, reload or reinstall Sanka in Codex and start a fresh thread from the Sanka chip or `$sanka:...`. Existing threads may keep an old MCP tool list.
+After refresh, reload or reinstall Sanka in Codex and start a fresh thread from the Sakura chip or `$sakura:...`. Existing threads may keep an old MCP tool list.
 
 ## Packaging
 
@@ -95,7 +95,7 @@ node scripts/sync-codex-package.mjs --check
 - Local MCP proxy: `node ./vendor/mcp-remote/bundled-proxy.min.cjs https://mcp.sanka.com/mcp`
 - Codex MCP server name: `sanka`
 - Local plugin clients should use the packaged proxy so expense attachment tools can accept exact `local_file_path` values. Remote-only MCP clients can use `mcp.remote.json` or connect to the hosted endpoint directly, but they cannot read local file paths.
-- Live Sanka work must use attached Sanka MCP tools. Do not substitute local Django shell, Postgres, repo files, or HubSpot MCP for Sanka actions.
+- Live Sanka work must use attached Sakura MCP tools. Do not substitute local Django shell, Postgres, repo files, or HubSpot MCP for Sanka actions.
 - If only `search_docs` / `execute` appear, refresh the plugin attachment or start a fresh plugin-attached thread.
 
 ## Translations
