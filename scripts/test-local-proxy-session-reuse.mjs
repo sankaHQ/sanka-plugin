@@ -19,8 +19,8 @@ process.env.SANKA_MCP_SESSION_STORE_DIR = tempDir;
 const foreignCwd = fs.mkdtempSync(path.join(os.tmpdir(), "sanka-plugin-session-reuse-cwd-"));
 const mcpManifestPath = path.join(pluginRoot, manifestName);
 const mcpManifest = JSON.parse(fs.readFileSync(mcpManifestPath, "utf8"));
-const serverConfig = mcpManifest.mcpServers?.sanka;
-assert.ok(serverConfig, `${mcpManifestPath} must define the sanka MCP server`);
+const serverConfig = mcpManifest.mcpServers?.sakura;
+assert.ok(serverConfig, `${mcpManifestPath} must define the sakura MCP server`);
 
 function resolvePluginCommand(command) {
   return command.startsWith(".") ? path.resolve(pluginRoot, command) : command;

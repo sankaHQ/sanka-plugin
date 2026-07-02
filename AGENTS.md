@@ -7,13 +7,13 @@ rules and the repo map live in the sanka-project workspace repo (`../AGENTS.md`)
 
 The distributable Sanka plugin for AI clients (Claude Code, Codex, Cursor, and more).
 It attaches Sanka's hosted MCP server (`https://mcp.sanka.com/mcp`) and ships the
-`$sanka:...` / `/sanka:...` skills. Claude Code installs from the GitHub marketplace
+`$sakura:...` / `/sakura:...` skills. Claude Code installs from the GitHub marketplace
 (`/plugin marketplace add sankaHQ/sanka-plugin`); Codex uses the repo-local marketplace.
 
 ## Layout
 
 - `skills/` — per-tool skill definitions (one directory per Sanka capability).
-- `plugins/sanka/` — the packaged Claude plugin (marketplace layout).
+- `plugins/sakura/` — the packaged Claude plugin (marketplace layout).
 - `.mcp.json` / `mcp.json` / `codex.mcp.json` — MCP server attachment manifests per client.
 - `guardrails/`, `i18n/`, `vendor/`, `assets/` — supporting material.
 - `scripts/` — sync tooling: `sync-codex-package.mjs`, `sync-codex-skill-metadata.mjs`,

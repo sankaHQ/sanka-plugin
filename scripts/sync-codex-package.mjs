@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const repoRoot = path.resolve(__dirname, '..');
-const packageRoot = path.join(repoRoot, 'plugins', 'sanka');
+const packageRoot = path.join(repoRoot, 'plugins', 'sakura');
 const checkMode = process.argv.includes('--check');
 
 const entries = [
@@ -134,7 +134,7 @@ if (checkMode) {
     for (const problem of problems) {
       console.error(`- ${problem}`);
     }
-    console.error('Run `node scripts/sync-codex-package.mjs` and commit the updated plugins/sanka package.');
+    console.error('Run `node scripts/sync-codex-package.mjs` and commit the updated plugins/sakura package.');
     process.exit(1);
   }
   console.log('Codex package is in sync.');
@@ -143,5 +143,5 @@ if (checkMode) {
   for (const [source, target, options] of entries) {
     syncEntry(source, target, options);
   }
-  console.log('Synced Codex package to plugins/sanka.');
+  console.log('Synced Codex package to plugins/sakura.');
 }

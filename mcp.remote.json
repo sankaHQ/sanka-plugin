@@ -1,8 +1,11 @@
 {
   "mcpServers": {
-    "sanka": {
+    "sakura": {
       "type": "http",
       "url": "https://mcp.sanka.com/mcp",
+      "headers": {
+        "X-Mcp-Reconnect-Server-Name": "sakura"
+      },
       "note": "Direct hosted Sanka MCP connection for remote-only clients that cannot run local commands. This mode cannot read local_file_path values; provide content_base64 for file uploads."
     }
   }
