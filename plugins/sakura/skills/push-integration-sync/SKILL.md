@@ -13,9 +13,11 @@ Workflow:
 2. Require either `record_ids` or `workspace_scope`, but never both.
 3. Call `push_integration_sync` directly.
 4. If the direct tool call returns `Auth required` or the client surfaces an authentication challenge, call `auth_status` exactly once. If it returns an explicit reconnect URL such as `connect_url` or `authorization_url`, show that URL verbatim. If it only returns OAuth metadata and not a reconnect URL, tell the user to launch the MCP client's native Sanka OAuth flow or reconnect action for this server, then retry the same Sanka request.
-5. Summarize the queued sync result, including requested and emitted counts.
+5. Summarize the queued sync result, including requested and emitted counts. Queued means asynchronous delivery; do not poll for a completed status.
 
 Guardrails:
+- If the tool call fails with error code `INTEGRATION_EXPORT_NOT_SUPPORTED` (HTTP 400), tell the user that provider and object type pair has no native outbound delivery yet (HubSpot supports contact, company, deal, and ticket) and do not retry the same pair.
+- If the tool call fails with error code `JOB_QUEUE_UNAVAILABLE` (HTTP 503), tell the user the dispatch queue is temporarily unavailable and to retry shortly.
 - Do not call `auth_status` or `connect_sanka` as a preflight for this command.
 - Do not call `list_mcp_resources`, `list_mcp_resource_templates`, or `tool_search` as a preflight for this command.
 - Call the named Sanka MCP tool directly instead of probing attachment state through discovery tools.
