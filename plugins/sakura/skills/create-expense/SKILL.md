@@ -15,7 +15,7 @@ Workflow:
    - For a small, already available `content_base64` payload, call `upload_expense_attachment`.
    - For an oversized client-local PDF/path or when direct upload reports a size limit, call `start_expense_attachment_upload` with the same `local_file_path`, append every chunk with `append_expense_attachment_upload_chunk` using `local_file_path`, the returned `next_offset`, and `local_chunk_size` at or below the returned `chunk_size`, then call `finish_expense_attachment_upload`.
    - Multiple append calls are expected. Do not abandon a user-provided or required attachment or create the expense without its `file_id` only because the upload needs many chunks.
-3. Call `create_expense` with the expense fields and any uploaded attachment ids in `attachment_file_ids`.
+3. Call `create_expense` with the expense fields and any uploaded attachment ids in `attachment_file_ids`. Preserve the source `amount` and `currency`. If the user, receipt, payment record, or another authoritative source supplies the workspace-base amount, pass that exact value as `base_currency`; otherwise omit it and let Sanka calculate the conversion.
 4. If an upload or create tool returns `Auth required`, `missing_scope`, or `insufficient_scope`, call `auth_status` exactly once with `{ required_scopes: ["expenses:write"] }`. If it returns an explicit reconnect URL such as `connect_url` or `authorization_url`, show that URL verbatim. If it only returns OAuth metadata and not a reconnect URL, tell the user to launch the MCP client's native OAuth flow or reconnect action for this server, then retry the same Sanka request.
 5. Read the created expense back with `get_expense` when attachment confirmation, base currency, or final status matters. Summarize the created expense and surface any returned ids or important fields.
 
@@ -33,6 +33,7 @@ Guardrails:
 - Do not use local repo files, terminal commands, Django shell, Postgres, or any repo-local fallback for live Sanka data.
 - Do not call `search_docs` or `execute` when `create_expense` covers the request.
 - Do not invent required business values that the user did not provide or clearly imply.
+- Do not infer `base_currency` from an ad hoc exchange rate or hide the actual payment amount only in the description. An explicit `base_currency` overrides Sanka's automatic conversion, so use it only for an authoritative documented base amount and read the expense back when the exact value matters.
 - If the client only exposes a user-provided local attachment path, pass only that exact path as `local_file_path` to the expense attachment upload tools. Do not manually print, summarize, or shuttle base64 through the chat.
 - Preserve the original receipt or invoice bytes. Do not compress, rasterize, summarize, or replace a PDF with extracted text unless the original upload actually fails and the user explicitly approves a substitute.
 - Do not skip an attachment that the user provided or required unless the upload failed and the user explicitly approves creating the expense without it.
