@@ -1,0 +1,15 @@
+interface:
+  display_name: "Delete Sandbox"
+  short_description: "Permanently delete a live Sanka sandbox workspace."
+  default_prompt: "Use $sanka:delete-sandbox to permanently delete a live Sanka sandbox workspace."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "sakura"
+      description: "Hosted Sakura MCP server for live Sanka workflows"
+      transport: "streamable_http"
+      url: "https://mcp.sanka.com/mcp"
+
+policy:
+  allow_implicit_invocation: false

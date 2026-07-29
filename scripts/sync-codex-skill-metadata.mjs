@@ -91,7 +91,7 @@ function operationForSkill(skillDirName) {
   if (skillDirName === 'deal-to-estimate') {
     return 'write';
   }
-  return /^(create|update|delete|upload|reply|archive|cancel|reschedule|import|export|generate|push|sync|apply)-/.test(
+  return /^(create|update|delete|upload|reply|archive|cancel|reschedule|import|export|generate|push|sync|apply|refresh)-/.test(
     skillDirName,
   )
     ? 'write'
@@ -102,8 +102,17 @@ function scopeKeyForSkill(skillDirName) {
   if (skillDirName === 'connect') {
     return undefined;
   }
+  if (skillDirName === 'reply-private-message-thread') {
+    return 'account_messages';
+  }
+  if (skillDirName === 'reply-workspace-message-thread') {
+    return 'workspace_messages';
+  }
   if (skillDirName.includes('private-message')) {
     return 'messages';
+  }
+  if (skillDirName.includes('sandbox')) {
+    return 'sandboxes';
   }
   if (skillDirName === 'apply-company-price-table-items' || skillDirName.includes('company-price-table')) {
     return 'companies';

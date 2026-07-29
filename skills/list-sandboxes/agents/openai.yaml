@@ -1,0 +1,15 @@
+interface:
+  display_name: "List Sandboxes"
+  short_description: "List the sandbox linked to the current workspace in live Sanka."
+  default_prompt: "Use $sanka:list-sandboxes to list the sandbox linked to the current workspace in live Sanka."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "sakura"
+      description: "Hosted Sakura MCP server for live Sanka workflows"
+      transport: "streamable_http"
+      url: "https://mcp.sanka.com/mcp"
+
+policy:
+  allow_implicit_invocation: false
