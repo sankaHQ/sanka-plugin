@@ -1,6 +1,6 @@
 {
   "name": "sakura",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Sakura plugin by Sanka that connects local AI clients to the hosted Sakura MCP server through a packaged proxy for live CRM, billing, private inbox, expenses, and workflow intents.",
   "author": {
     "name": "Sanka",
