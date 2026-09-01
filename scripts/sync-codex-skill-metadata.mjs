@@ -230,27 +230,27 @@ function requiredScopesForSkill(skillDirName) {
 function authReconnectInstructionForSkill(skillDirName) {
   const requiredScopes = requiredScopesForSkill(skillDirName);
   if (requiredScopes.mode === 'static') {
-    return `1. If the direct tool call returns \`Auth required\`, \`missing_scope\`, or \`insufficient_scope\`, call \`auth_status\` exactly once with \`{ required_scopes: ${JSON.stringify(requiredScopes.values)} }\`. If it returns an explicit reconnect URL such as \`connect_url\` or \`authorization_url\`, show that URL verbatim. If it only returns OAuth metadata and not a reconnect URL, tell the user to launch the MCP client's native Sanka OAuth flow or reconnect action for this server, then retry the same Sanka request.`;
+    return `1. If the direct tool call returns \`Auth required\`, \`missing_scope\`, or \`insufficient_scope\`, call \`auth_status\` exactly once with \`{ required_scopes: ${JSON.stringify(requiredScopes.values)} }\`. Include \`required_user_facing_reply\` verbatim when present; otherwise show \`connect_url\` verbatim. If neither is present, report that Connect Sanka could not be started and stop without attempting client-native OAuth. After the user connects, retry the same Sanka request.`;
   }
 
   if (requiredScopes.mode === 'dynamic') {
-    return '1. If the direct tool call returns `Auth required`, `missing_scope`, or `insufficient_scope`, call `auth_status` exactly once with `required_scopes` derived from `object_name` and the property operation. Normalize object names such as `purchase-orders -> purchase_orders`, `inventory-transactions -> inventory_transactions`, and `cases -> cases`, then use the matching `:read` or `:write` scope. If `auth_status` returns an explicit reconnect URL such as `connect_url` or `authorization_url`, show that URL verbatim. If it only returns OAuth metadata and not a reconnect URL, tell the user to launch the MCP client\'s native Sanka OAuth flow or reconnect action for this server, then retry the same Sanka request.';
+    return '1. If the direct tool call returns `Auth required`, `missing_scope`, or `insufficient_scope`, call `auth_status` exactly once with `required_scopes` derived from `object_name` and the property operation. Normalize object names such as `purchase-orders -> purchase_orders`, `inventory-transactions -> inventory_transactions`, and `cases -> cases`, then use the matching `:read` or `:write` scope. Include `required_user_facing_reply` verbatim when present; otherwise show `connect_url` verbatim. If neither is present, report that Connect Sanka could not be started and stop without attempting client-native OAuth. After the user connects, retry the same Sanka request.';
   }
 
-  return "1. If the direct tool call returns `Auth required` or the client surfaces an authentication challenge, call `auth_status` exactly once. If it returns an explicit reconnect URL such as `connect_url` or `authorization_url`, show that URL verbatim. If it only returns OAuth metadata and not a reconnect URL, tell the user to launch the MCP client's native Sanka OAuth flow or reconnect action for this server, then retry the same Sanka request.";
+  return "1. If the direct tool call returns `Auth required`, call `auth_status` exactly once. Include `required_user_facing_reply` verbatim when present; otherwise show `connect_url` verbatim. If neither is present, report that Connect Sanka could not be started and stop without attempting client-native OAuth. After the user connects, retry the same Sanka request.";
 }
 
 function authGuardrailLineForSkill(skillDirName) {
   const requiredScopes = requiredScopesForSkill(skillDirName);
   if (requiredScopes.mode === 'static') {
-    return `- If the direct tool call returns \`Auth required\`, \`missing_scope\`, or \`insufficient_scope\`, call \`auth_status\` exactly once with \`{ required_scopes: ${JSON.stringify(requiredScopes.values)} }\` to surface reconnect metadata. If it only returns metadata, tell the user to start the client-native Sanka OAuth flow.`;
+    return `- If the direct tool call returns \`Auth required\`, \`missing_scope\`, or \`insufficient_scope\`, call \`auth_status\` exactly once with \`{ required_scopes: ${JSON.stringify(requiredScopes.values)} }\` to surface Connect Sanka metadata.`;
   }
 
   if (requiredScopes.mode === 'dynamic') {
-    return '- If the direct tool call returns `Auth required`, `missing_scope`, or `insufficient_scope`, call `auth_status` exactly once with `required_scopes` derived from `object_name` and the property operation so reconnect requests the correct object-specific scope. If it only returns metadata, tell the user to start the client-native Sanka OAuth flow.';
+    return '- If the direct tool call returns `Auth required`, `missing_scope`, or `insufficient_scope`, call `auth_status` exactly once with `required_scopes` derived from `object_name` and the property operation so Connect Sanka requests the correct object-specific scope.';
   }
 
-  return '- If the direct tool call returns `Auth required`, call `auth_status` exactly once to surface reconnect metadata. If it only returns metadata, tell the user to start the client-native Sanka OAuth flow.';
+  return '- If the direct tool call returns `Auth required`, call `auth_status` exactly once to surface Connect Sanka metadata.';
 }
 
 function renumberWorkflowSection(body) {
@@ -292,12 +292,12 @@ function updateAuthWorkflow(body, skillDirName) {
   if (skillDirName === 'connect') {
     return body.replace(
       /^\d+\.\s+(?:If the tool returns an authentication challenge, tell the user to complete the native Sanka sign-in flow shown by the client, then retry the original request\.|If `auth_status` returns `connected: false`.+)$/m,
-      "1. If `auth_status` returns `connected: false`, surface any explicit reconnect URL such as `connect_url` or `authorization_url` verbatim. If it only returns OAuth metadata and not a reconnect URL, tell the user to launch the MCP client's native Sanka OAuth flow or reconnect action for this server, then retry the original request.",
+      "1. If `auth_status` returns `connected: false`, include `required_user_facing_reply` verbatim when present; otherwise show `connect_url` verbatim. If neither is present, report that Connect Sanka could not be started and stop without attempting client-native OAuth. After the user connects, retry the original request.",
     );
   }
 
   return body.replace(
-    /^\d+\.\s+(?:If the client surfaces an authentication prompt or challenge, tell the user to complete Sanka sign-in and then retry\.|If the direct tool call returns `Auth required`.+)$/m,
+    /^\d+\.\s+(?:If the client surfaces an authentication prompt or challenge, tell the user to complete Sanka sign-in and then retry\.|If (?:the direct tool call|an upload or (?:create|update) tool|any upload tool) returns `Auth required`.+)$/m,
     authReconnectInstructionForSkill(skillDirName),
   );
 }
@@ -323,18 +323,18 @@ function injectGuardrails(body, skillDirName) {
       : '- Call the named Sanka MCP tool directly instead of probing attachment state through discovery tools.';
   const authRequiredLine =
     skillDirName === 'connect'
-      ? '- If `auth_status` returns `connected: false`, surface any explicit reconnect URL it returns. If it only returns metadata, tell the user to start the client-native Sanka OAuth flow.'
+      ? '- If `auth_status` returns `connected: false`, surface its Connect Sanka reply or URL.'
       : authGuardrailLineForSkill(skillDirName);
   const attachmentFailureLine =
     skillDirName === 'connect'
       ? '- Do not report a plugin attachment failure unless a direct `auth_status` call returns a tool-not-found or unavailable error from the client.'
       : '- Do not report a plugin attachment failure unless a direct call to the named Sanka MCP tool returns a tool-not-found or unavailable error from the client.';
   const reconnectUrlLine =
-    '- If `auth_status` returns an explicit reconnect URL such as `connect_url` or `authorization_url`, repeat it verbatim.';
+    '- If `auth_status` returns `required_user_facing_reply`, include it verbatim; otherwise repeat `connect_url` verbatim.';
   const noFabricationLine =
-    '- Do not fabricate a manual connect, OAuth, or login URL. Only repeat reconnect URLs returned by `auth_status`.';
-  const nativeOauthLine =
-    "- If `auth_status` only returns OAuth metadata such as `authorization_server_url`, `resource_metadata_url`, `resource_url`, `reconnect_rpc_method`, or `reconnect_server_name`, tell the user to trigger the MCP client's native Sanka OAuth flow or reconnect action and then retry.";
+    '- Do not fabricate a connect, OAuth, or login URL. Only repeat the Connect Sanka URL returned by `auth_status`.';
+  const noNativeOauthLine =
+    '- Do not start or recommend client-native OAuth. Hosted Sanka MCP authentication uses only the Connect Sanka session exchange.';
 
   const header = body.slice(0, guardrailsStart + guardrailsMarker.length);
   const guardrailSection = body.slice(guardrailsStart + guardrailsMarker.length);
@@ -349,20 +349,21 @@ function injectGuardrails(body, skillDirName) {
     }
     if (
       line.startsWith('- If `auth_status` returns `authorization_url` or `sign_in_url`') ||
-      line.startsWith('- If `auth_status` returns an explicit reconnect URL such as `authorization_url`')
+      line.startsWith('- If `auth_status` returns an explicit reconnect URL')
     ) {
       return reconnectUrlLine;
     }
     if (
       line.startsWith('- Do not fabricate a manual OAuth URL.') ||
-      line.startsWith('- Do not fabricate a manual OAuth URL or fall back to `https://app.sanka.com/login`.')
+      line.startsWith('- Do not fabricate a manual OAuth URL or fall back to `https://app.sanka.com/login`.') ||
+      line.startsWith('- Do not fabricate a manual connect, OAuth, or login URL.')
     ) {
       return noFabricationLine;
     }
     if (line.startsWith('- If `auth_status` only returns OAuth metadata')) {
-      return nativeOauthLine;
+      return noNativeOauthLine;
     }
-    if (line.startsWith('- If `auth_status` returns `connected: false`, surface the returned reconnect URLs')) {
+    if (line.startsWith('- If `auth_status` returns `connected: false`')) {
       return authRequiredLine;
     }
     return line;
@@ -386,7 +387,7 @@ function injectGuardrails(body, skillDirName) {
       attachmentFailureLine,
       reconnectUrlLine,
       noFabricationLine,
-      nativeOauthLine,
+      noNativeOauthLine,
     );
   } else {
     const preflightIndex = guardrailLines.indexOf(preflightLine);
@@ -396,7 +397,7 @@ function injectGuardrails(body, skillDirName) {
       attachmentFailureLine,
       reconnectUrlLine,
       noFabricationLine,
-      nativeOauthLine,
+      noNativeOauthLine,
     ];
     let offset = 1;
     for (const line of insertedLines) {

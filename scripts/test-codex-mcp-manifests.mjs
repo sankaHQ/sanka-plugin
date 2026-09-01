@@ -95,6 +95,15 @@ function listOpenAiYamlFiles(root) {
   return results.sort((left, right) => left.localeCompare(right));
 }
 
+function listSkillFiles(root) {
+  return fs
+    .readdirSync(path.join(repoRoot, root), { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => path.join(repoRoot, root, entry.name, "SKILL.md"))
+    .filter((filePath) => fs.existsSync(filePath))
+    .sort((left, right) => left.localeCompare(right));
+}
+
 for (const manifestPath of [".codex-plugin/plugin.json", "plugins/sakura/.codex-plugin/plugin.json"]) {
   assertPluginManifest(manifestPath);
 }
@@ -122,6 +131,27 @@ for (const root of ["skills", "plugins/sakura/skills"]) {
     assert.ok(contents.includes(`      value: "${expectedServerName}"`), `${relativePath} must reference ${expectedServerName}`);
     assert.equal(contents.includes("sanka_plugin"), false, `${relativePath} must not reference stale sanka_plugin`);
     checkedSkillCount += 1;
+  }
+
+  for (const filePath of listSkillFiles(root)) {
+    const relativePath = path.relative(repoRoot, filePath);
+    const contents = fs.readFileSync(filePath, "utf8");
+    for (const unsupportedNativeOauthInstruction of [
+      "authorization_url",
+      "authorization_server_url",
+      "resource_metadata_url",
+      "reconnect_rpc_method",
+      "reconnect_server_name",
+      "launch the MCP client's native",
+      "start the client-native Sanka OAuth",
+      "authentication challenge",
+    ]) {
+      assert.equal(
+        contents.includes(unsupportedNativeOauthInstruction),
+        false,
+        `${relativePath} must route authentication through Connect Sanka instead of ${unsupportedNativeOauthInstruction}`,
+      );
+    }
   }
 }
 
