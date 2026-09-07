@@ -9,7 +9,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const repoRoot = path.resolve(__dirname, "..");
 
-const expectedServerName = "sakura";
+const expectedServerName = "sanka";
 function readJSON(relativePath) {
   return JSON.parse(fs.readFileSync(path.join(repoRoot, relativePath), "utf8"));
 }
@@ -69,8 +69,8 @@ function assertDirectClientPluginManifest(relativePath) {
 
 function assertCodexMarketplaceManifest(relativePath) {
   const manifest = readJSON(relativePath);
-  const sankaPlugin = manifest.plugins?.find((plugin) => plugin?.name === "sakura");
-  assert.ok(sankaPlugin, `${relativePath} must include the sakura plugin entry`);
+  const sankaPlugin = manifest.plugins?.find((plugin) => plugin?.name === "sanka");
+  assert.ok(sankaPlugin, `${relativePath} must include the sanka plugin entry`);
   assert.equal(
     Object.prototype.hasOwnProperty.call(sankaPlugin.policy ?? {}, "authentication"),
     false,
@@ -104,7 +104,7 @@ function listSkillFiles(root) {
     .sort((left, right) => left.localeCompare(right));
 }
 
-for (const manifestPath of [".codex-plugin/plugin.json", "plugins/sakura/.codex-plugin/plugin.json"]) {
+for (const manifestPath of [".codex-plugin/plugin.json", "plugins/sanka/.codex-plugin/plugin.json"]) {
   assertPluginManifest(manifestPath);
 }
 
@@ -112,11 +112,11 @@ assertCodexMarketplaceManifest(".agents/plugins/marketplace.json");
 assertDirectClientPluginManifest(".claude-plugin/plugin.json");
 assertDirectClientPluginManifest(".plugin/plugin.json");
 
-for (const manifestPath of [".mcp.json", "codex.mcp.json", "plugins/sakura/.mcp.json", "plugins/sakura/codex.mcp.json"]) {
+for (const manifestPath of [".mcp.json", "codex.mcp.json", "plugins/sanka/.mcp.json", "plugins/sanka/codex.mcp.json"]) {
   assertCodexMcpManifest(manifestPath);
 }
 
-for (const manifestPath of ["mcp.json", "plugins/sakura/mcp.json"]) {
+for (const manifestPath of ["mcp.json", "plugins/sanka/mcp.json"]) {
   assertDirectClientMcpManifest(manifestPath);
 }
 
@@ -124,7 +124,7 @@ const remoteManifest = readJSON("mcp.remote.json");
 assert.equal(remoteManifest.mcpServers?.[expectedServerName]?.type, "http", "mcp.remote.json must keep the hosted HTTP transport");
 
 let checkedSkillCount = 0;
-for (const root of ["skills", "plugins/sakura/skills"]) {
+for (const root of ["skills", "plugins/sanka/skills"]) {
   for (const filePath of listOpenAiYamlFiles(root)) {
     const relativePath = path.relative(repoRoot, filePath);
     const contents = fs.readFileSync(filePath, "utf8");
