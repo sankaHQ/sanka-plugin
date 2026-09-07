@@ -1,7 +1,7 @@
 {
-  "name": "sakura",
+  "name": "sanka",
   "displayName": "Sanka",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Sanka plugin by Sanka that connects local AI clients to the hosted Sanka MCP server through a packaged proxy for live CRM, billing, private inbox, expenses, and workflow intents.",
   "author": {
     "name": "Sanka",
@@ -12,7 +12,6 @@
   "license": "MIT",
   "logo": "assets/logo.svg",
   "keywords": [
-    "sakura",
     "sanka",
     "email",
     "inbox",
