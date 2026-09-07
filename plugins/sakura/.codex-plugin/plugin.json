@@ -1,7 +1,7 @@
 {
   "name": "sakura",
   "version": "0.6.0",
-  "description": "Sakura plugin by Sanka that connects local AI clients to the hosted Sakura MCP server through a packaged proxy for live CRM, billing, private inbox, expenses, and workflow intents.",
+  "description": "Sanka plugin by Sanka that connects local AI clients to the hosted Sanka MCP server through a packaged proxy for live CRM, billing, private inbox, expenses, and workflow intents.",
   "author": {
     "name": "Sanka",
     "url": "https://sanka.com"
@@ -27,9 +27,9 @@
   "skills": "./skills/",
   "mcpServers": "./.mcp.json",
   "interface": {
-    "displayName": "Sakura",
-    "shortDescription": "Sakura, the Sanka AI employee — live Sanka data and private inbox",
-    "longDescription": "Use Sanka's packaged local MCP proxy for live Sanka workflows from Codex. The proxy connects to hosted Sakura MCP, keeps Sanka tools attached before sign-in completes, and can upload exact user-provided local receipt paths as original expense attachment bytes. Start from the installed Sakura chip, the $sakura:sakura router, or a specific $sakura:... skill so Sanka owns CRM, estimates, approvals, quote readiness, billing, private inbox, expenses, and workflow intents such as deal-to-estimate and Salesforce Opportunity quote readiness. If a Sakura MCP response says the plugin is outdated, ask whether to refresh it; when the user says yes, refresh the local sanka-plugin repo, reload or reinstall Sakura, and start a fresh thread. Live Sanka operations must come from attached Sakura MCP tools, not local repo files, Django shell, Postgres, Salesforce MCP, or HubSpot MCP fallbacks.",
+    "displayName": "Sanka",
+    "shortDescription": "Sanka, the Sanka AI employee — live Sanka data and private inbox",
+    "longDescription": "Use Sanka's packaged local MCP proxy for live Sanka workflows from Codex. The proxy connects to hosted Sanka MCP, keeps Sanka tools attached before sign-in completes, and can upload exact user-provided local receipt paths as original expense attachment bytes. Start from the installed Sanka chip, the $sakura:sakura router, or a specific $sakura:... skill so Sanka owns CRM, estimates, approvals, quote readiness, billing, private inbox, expenses, and workflow intents such as deal-to-estimate and Salesforce Opportunity quote readiness. If a Sanka MCP response says the plugin is outdated, ask whether to refresh it; when the user says yes, refresh the local sanka-plugin repo, reload or reinstall Sanka, and start a fresh thread. Live Sanka operations must come from attached Sanka MCP tools, not local repo files, Django shell, Postgres, Salesforce MCP, or HubSpot MCP fallbacks.",
     "developerName": "Sanka",
     "category": "Productivity",
     "capabilities": [

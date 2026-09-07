@@ -6,7 +6,7 @@ argument-hint: "[HubSpot deal URL, Sanka deal id, or request details]"
 
 # Deal To Invoice
 
-Use only the attached Sakura MCP tools in this thread. This is a Sanka lead-to-cash workflow that creates invoice drafts from HubSpot deals, even when the source is a HubSpot deal URL.
+Use only the attached Sanka MCP tools in this thread. This is a Sanka lead-to-cash workflow that creates invoice drafts from HubSpot deals, even when the source is a HubSpot deal URL.
 
 Workflow:
 
@@ -18,15 +18,15 @@ Workflow:
 6. If preview returns blockers, explain them and do not call `start_workflow` until the user resolves or explicitly changes the request.
 7. If `start_workflow` returns a run id, summarize the created invoice, approval status, created records, and the run id. Call `get_workflow_run` only when the start result is incomplete or the user asks for status.
 8. If the user also asked to sync the created invoices to freee, treat that as a separate workflow step. First call `preview_workflow` with `workflow_type: "invoice_export"`, `source_record: { "source_system": "sanka", "object_type": "invoice" }`, `options.target_system: "freee"`, `options.sync_scope: "created_in_workflow_run"`, and `options.workflow_run_id` set to the deal-to-invoice run id. Only call `start_workflow` for `invoice_export` after the user explicitly approved the freee sync preview.
-9. If a Sakura MCP response includes `refresh_required`, `refresh_recommended`, or `suggested_user_facing_reply`, pause the workflow and show the refresh prompt before making further write calls.
+9. If a Sanka MCP response includes `refresh_required`, `refresh_recommended`, or `suggested_user_facing_reply`, pause the workflow and show the refresh prompt before making further write calls.
 
 Refresh prompt:
 
 ```text
-Sakura plugin may be outdated.
+Sanka plugin may be outdated.
 This action needs a newer Sanka workflow skill.
 
-Update Sakura plugin?
+Update Sanka plugin?
 Reply "yes" and Codex will run the refresh flow:
 
 Refresh sanka-plugin. Reinstall it if needed, then make the new Sanka skills available.
@@ -39,15 +39,13 @@ Guardrails:
 - Call the named Sanka MCP tool directly instead of probing attachment state through discovery tools.
 - Do not report a plugin attachment failure unless a direct call to the named Sanka MCP tool returns a tool-not-found or unavailable error from the client.
 - If the direct tool call returns `Auth required`, `missing_scope`, or `insufficient_scope`, call `auth_status` exactly once with `{ required_scopes: ["deals:read","invoices:write","workflows:write"] }` to surface Connect Sanka metadata.
-- Do not report a plugin attachment failure unless a direct call to the named Sakura MCP tool returns a tool-not-found or unavailable error from the client.
 - If `preview_workflow`, `start_workflow`, or `get_workflow_run` is unavailable, show the refresh prompt and stop instead of falling back to HubSpot MCP, local repo files, terminal commands, Django shell, or Postgres.
 - If `auth_status` returns `required_user_facing_reply`, include it verbatim; otherwise repeat `connect_url` verbatim.
 - Do not fabricate a connect, OAuth, or login URL. Only repeat the Connect Sanka URL returned by `auth_status`.
 - Do not start or recommend client-native OAuth. Hosted Sanka MCP authentication uses only the Connect Sanka session exchange.
-- Call the named Sakura MCP tool directly instead of probing attachment state through discovery tools.
 - Do not use local repo files, terminal commands, Django shell, Postgres, or any repo-local fallback for live Sanka data.
 - Do not call `search_docs` or `execute` when `preview_workflow` or `start_workflow` covers the request.
-- Do not invent commercial terms, line items, or approval outcomes that are not returned by Sakura MCP.
+- Do not invent commercial terms, line items, or approval outcomes that are not returned by Sanka MCP.
 - freee sync is optional and separate from deal-to-invoice. Do not combine HubSpot invoice creation and freee sync into one invented tool, endpoint, or workflow type.
 - Never sync all Sanka invoices to freee by default. If the user says "sync Sanka invoices to freee invoice drafts" without a scope, use `preview_workflow` for `invoice_export` to return `needs_confirmation` or ask the user to choose a scope.
 - Supported freee sync scopes are invoices created in a workflow run, selected invoice IDs, selected record IDs, filtered unsynced invoice drafts, and all eligible unsynced invoices only with explicit `confirm_all`.
