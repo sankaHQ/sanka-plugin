@@ -5,13 +5,13 @@ argument-hint: "[details to create the record]"
 ---
 # Create Expense
 
-Use only the attached Sakura MCP tools in this thread.
+Use only the attached Sanka MCP tools in this thread.
 
 Workflow:
 
 1. Gather the required creation details from the request. If key required fields are missing, ask a concise follow-up.
 2. Attachments are optional when the user did not provide or require one. If the request includes a receipt, invoice, PDF, screenshot, or other attachment, upload the original file first and keep the returned `file_id`.
-   - In local Sakura plugin clients, when the user provides a local receipt or invoice path, call `upload_expense_attachment` with `local_file_path` set to that exact absolute path. The packaged local proxy reads the original file bytes and forwards `content_base64` to hosted Sakura MCP.
+   - In local Sanka plugin clients, when the user provides a local receipt or invoice path, call `upload_expense_attachment` with `local_file_path` set to that exact absolute path. The packaged local proxy reads the original file bytes and forwards `content_base64` to hosted Sanka MCP.
    - For a small, already available `content_base64` payload, call `upload_expense_attachment`.
    - For an oversized client-local PDF/path or when direct upload reports a size limit, call `start_expense_attachment_upload` with the same `local_file_path`, append every chunk with `append_expense_attachment_upload_chunk` using `local_file_path`, the returned `next_offset`, and `local_chunk_size` at or below the returned `chunk_size`, then call `finish_expense_attachment_upload`.
    - Multiple append calls are expected. Do not abandon a user-provided or required attachment or create the expense without its `file_id` only because the upload needs many chunks.
@@ -25,11 +25,9 @@ Guardrails:
 - Call the named Sanka MCP tool directly instead of probing attachment state through discovery tools.
 - Do not report a plugin attachment failure unless a direct call to the named Sanka MCP tool returns a tool-not-found or unavailable error from the client.
 - If the direct tool call returns `Auth required`, `missing_scope`, or `insufficient_scope`, call `auth_status` exactly once with `{ required_scopes: ["expenses:write"] }` to surface Connect Sanka metadata.
-- Do not report a plugin attachment failure unless a direct call to the named Sakura MCP tool returns a tool-not-found or unavailable error from the client.
 - If `auth_status` returns `required_user_facing_reply`, include it verbatim; otherwise repeat `connect_url` verbatim.
 - Do not fabricate a connect, OAuth, or login URL. Only repeat the Connect Sanka URL returned by `auth_status`.
 - Do not start or recommend client-native OAuth. Hosted Sanka MCP authentication uses only the Connect Sanka session exchange.
-- Call the named Sakura MCP tool directly instead of probing attachment state through discovery tools.
 - Do not use local repo files, terminal commands, Django shell, Postgres, or any repo-local fallback for live Sanka data.
 - Do not call `search_docs` or `execute` when `create_expense` covers the request.
 - Do not invent required business values that the user did not provide or clearly imply.

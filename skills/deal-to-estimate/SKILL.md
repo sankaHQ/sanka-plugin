@@ -6,7 +6,7 @@ argument-hint: "[HubSpot deal URL, Sanka deal id, or request details]"
 
 # Deal To Estimate
 
-Use only the attached Sakura MCP tools in this thread. This is a Sanka lead-to-cash workflow, even when the source is a HubSpot deal URL.
+Use only the attached Sanka MCP tools in this thread. This is a Sanka lead-to-cash workflow, even when the source is a HubSpot deal URL.
 
 Workflow:
 
@@ -17,15 +17,15 @@ Workflow:
 5. If the user explicitly asked to create and the preview has no blockers, call `start_workflow` with the same source record and a stable idempotency key based on the workflow type and source deal reference. HubSpot `external_only` previews are startable; `start_workflow` materializes the source deal in Sanka before creating the estimate draft.
 6. If `start_workflow` returns a source-materialization or validation error, summarize the blocker and source record instead of retrying with lower-level object writes.
 7. If `start_workflow` returns a run id, summarize the created estimate, approval status, created records, and the run id. Call `get_workflow_run` only when the start result is incomplete or the user asks for status.
-8. If a Sakura MCP response includes `refresh_required`, `refresh_recommended`, or `suggested_user_facing_reply`, pause the workflow and show the refresh prompt before making further write calls.
+8. If a Sanka MCP response includes `refresh_required`, `refresh_recommended`, or `suggested_user_facing_reply`, pause the workflow and show the refresh prompt before making further write calls.
 
 Refresh prompt:
 
 ```text
-Sakura plugin may be outdated.
+Sanka plugin may be outdated.
 This action needs a newer Sanka workflow skill.
 
-Update Sakura plugin?
+Update Sanka plugin?
 Reply "yes" and Codex will run the refresh flow:
 
 Refresh sanka-plugin. Reinstall it if needed, then make the new Sanka skills available.
@@ -38,12 +38,10 @@ Guardrails:
 - Call the named Sanka MCP tool directly instead of probing attachment state through discovery tools.
 - Do not report a plugin attachment failure unless a direct call to the named Sanka MCP tool returns a tool-not-found or unavailable error from the client.
 - If the direct tool call returns `Auth required`, `missing_scope`, or `insufficient_scope`, call `auth_status` exactly once with `{ required_scopes: ["deals:read","estimates:write","workflows:write"] }` to surface Connect Sanka metadata.
-- Do not report a plugin attachment failure unless a direct call to the named Sakura MCP tool returns a tool-not-found or unavailable error from the client.
 - If `preview_workflow`, `start_workflow`, or `get_workflow_run` is unavailable, show the refresh prompt and stop instead of falling back to HubSpot MCP, local repo files, terminal commands, Django shell, or Postgres.
 - If `auth_status` returns `required_user_facing_reply`, include it verbatim; otherwise repeat `connect_url` verbatim.
 - Do not fabricate a connect, OAuth, or login URL. Only repeat the Connect Sanka URL returned by `auth_status`.
 - Do not start or recommend client-native OAuth. Hosted Sanka MCP authentication uses only the Connect Sanka session exchange.
-- Call the named Sakura MCP tool directly instead of probing attachment state through discovery tools.
 - Do not use local repo files, terminal commands, Django shell, Postgres, or any repo-local fallback for live Sanka data.
 - Do not call `search_docs` or `execute` when `preview_workflow` or `start_workflow` covers the request.
-- Do not invent commercial terms, line items, or approval outcomes that are not returned by Sakura MCP.
+- Do not invent commercial terms, line items, or approval outcomes that are not returned by Sanka MCP.

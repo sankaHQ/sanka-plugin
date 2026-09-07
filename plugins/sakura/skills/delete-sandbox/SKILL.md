@@ -5,7 +5,7 @@ argument-hint: "<sandbox link id>"
 ---
 # Delete Sandbox
 
-Use only the attached Sakura MCP tools in this thread.
+Use only the attached Sanka MCP tools in this thread.
 
 Workflow:
 

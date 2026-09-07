@@ -5,7 +5,7 @@ argument-hint: "<thread id and reply body>"
 ---
 # Reply Workspace Message Thread
 
-Use only the attached Sakura MCP tools in this thread.
+Use only the attached Sanka MCP tools in this thread.
 
 Workflow:
 

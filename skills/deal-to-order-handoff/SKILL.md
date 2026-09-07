@@ -6,7 +6,7 @@ argument-hint: "[HubSpot deal URL, HubSpot deal id, or fulfillment handoff detai
 
 # Deal To Order Handoff
 
-Use only the attached Sakura MCP tools in this thread. This workflow converts a closed-won HubSpot Deal into a Sanka order draft and fulfillment handoff through generic workflow tools.
+Use only the attached Sanka MCP tools in this thread. This workflow converts a closed-won HubSpot Deal into a Sanka order draft and fulfillment handoff through generic workflow tools.
 
 Workflow:
 
@@ -19,16 +19,16 @@ Workflow:
 7. If the user explicitly asked to create and the preview has no hard blockers, call `start_workflow` with the same source record and a stable idempotency key based on `deal_to_order_handoff` and the HubSpot Deal reference.
 8. Pass `allow_duplicate_order` only when the user explicitly approved creating another order for a deal that already has an order or handoff.
 9. If `start_workflow` returns a run id, summarize created order references, handoff task/reference, inventory summary, delivery summary, HubSpot writeback result, warnings, blockers, and run id. Call `get_workflow_run` only when the start result is incomplete or the user asks for status.
-10. If a Sakura MCP response includes `refresh_required`, `refresh_recommended`, or `suggested_user_facing_reply`, pause the workflow and show the refresh prompt before making further write calls.
+10. If a Sanka MCP response includes `refresh_required`, `refresh_recommended`, or `suggested_user_facing_reply`, pause the workflow and show the refresh prompt before making further write calls.
 
 Refresh prompt:
 
 ```text
-Sakura plugin may be outdated.
+Sanka plugin may be outdated.
 This action needs a newer Sanka workflow skill.
 
-Update Sakura plugin?
-Reply "yes" and Codex or Claude Code can refresh Sakura plugin, reload it, and make the new Sanka skills available.
+Update Sanka plugin?
+Reply "yes" and Codex or Claude Code can refresh Sanka plugin, reload it, and make the new Sanka skills available.
 ```
 
 Guardrails:
@@ -38,15 +38,13 @@ Guardrails:
 - Call the named Sanka MCP tool directly instead of probing attachment state through discovery tools.
 - Do not report a plugin attachment failure unless a direct call to the named Sanka MCP tool returns a tool-not-found or unavailable error from the client.
 - If the direct tool call returns `Auth required`, `missing_scope`, or `insufficient_scope`, call `auth_status` exactly once with `{ required_scopes: ["deals:read","orders:write","tasks:write","items:read","inventories:read","workflows:write"] }` to surface Connect Sanka metadata.
-- Do not report a plugin attachment failure unless a direct call to the named Sakura MCP tool returns a tool-not-found or unavailable error from the client.
 - If `preview_workflow`, `start_workflow`, or `get_workflow_run` is unavailable, show the refresh prompt and stop instead of falling back to HubSpot MCP, local repo files, terminal commands, Django shell, or Postgres.
 - If `auth_status` returns `required_user_facing_reply`, include it verbatim; otherwise repeat `connect_url` verbatim.
 - Do not fabricate a connect, OAuth, or login URL. Only repeat the Connect Sanka URL returned by `auth_status`.
 - Do not start or recommend client-native OAuth. Hosted Sanka MCP authentication uses only the Connect Sanka session exchange.
-- Call the named Sakura MCP tool directly instead of probing attachment state through discovery tools.
 - Do not use local repo files, terminal commands, Django shell, Postgres, or any repo-local fallback for live Sanka data.
 - Do not call `search_docs` or `execute` when `preview_workflow` or `start_workflow` covers the request.
-- Do not invent business values, inventory quantities, delivery dates, line items, owners, order numbers, task ids, writeback status, or URLs that are not supplied by the user or returned by Sakura MCP.
+- Do not invent business values, inventory quantities, delivery dates, line items, owners, order numbers, task ids, writeback status, or URLs that are not supplied by the user or returned by Sanka MCP.
 - Preview is read-only. Never call `start_workflow`, create orders, create tasks, create mappings, or update HubSpot for preview-only requests.
 - Order draft and handoff creation require explicit user confirmation through `start_workflow`.
 - HubSpot writeback is reported only after successful Sanka order or handoff creation. If writeback fails or is skipped, surface that result without hiding the created Sanka records.

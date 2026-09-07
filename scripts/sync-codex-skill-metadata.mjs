@@ -77,7 +77,7 @@ function buildOpenAiYaml(skillName, title, description) {
     '  tools:',
     '    - type: "mcp"',
     '      value: "sakura"',
-    '      description: "Hosted Sakura MCP server for live Sanka workflows"',
+    '      description: "Hosted Sanka MCP server for live Sanka workflows"',
     '      transport: "streamable_http"',
     '      url: "https://mcp.sanka.com/mcp"',
     '',
