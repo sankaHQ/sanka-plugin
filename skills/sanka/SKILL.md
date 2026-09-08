@@ -34,6 +34,7 @@ Workflow:
 22. For refresh, update, outdated plugin, or missing skill requests, stop live Sanka work and show the refresh prompt below.
 
 Intent routes:
+- Developer Cloud source execution, code Repair, independent certificates and repository Fleets: call `get_developer_cloud_availability`, then use the dedicated `*_developer_cloud_*` lifecycle tools. Pin the internal workspace UUID and exact source digest/revision. Paid create/retry uses an explicitly approved cap and stable idempotency key; existing authorization counts. Repair and certification are nested options on `create_developer_cloud_run`. Read saved status, scope and receipts before claiming completion; a partial Fleet remains partial. Local migration and client-evidence APIs remain separate. Missing tools require the refresh path, while disabled admission means the feature is not currently enabled. No tool authorizes a repository merge or deployment.
 - Deals, HubSpot deal URLs, Salesforce Opportunity quote readiness, estimates, quotes, approvals, order handoffs, fulfillment handoffs, workflow runs: `resolve_record`, `preview_workflow`, `start_workflow`, `get_workflow_run`
 - HubSpot revenue summaries, unbilled revenue, approval waits, unpaid invoices, blocked revenue: `preview_workflow` with `workflow_type: "revenue_control_summary"` only
 - Sales incentives, sales commissions, draft commission reports, unpaid commission exceptions, low-margin commission exceptions, refund/credit commission exceptions: `preview_workflow` with `workflow_type: "sales_incentive_commission"` only
