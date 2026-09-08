@@ -78,6 +78,84 @@ function assertCodexMarketplaceManifest(relativePath) {
   );
 }
 
+const legacyPluginIdentifiers = ["sakura", "sanka_plugin", "sanka_key"];
+
+function resolvePluginSourcePath(source) {
+  if (typeof source === "string") {
+    return source;
+  }
+  if (source && typeof source === "object" && source.source === "local" && typeof source.path === "string") {
+    return source.path;
+  }
+  return null;
+}
+
+function hostedMcpUrlsForPluginSource(relativeSourcePath) {
+  const sourceRoot = path.resolve(repoRoot, relativeSourcePath);
+  const urls = new Set();
+  for (const manifestName of [".mcp.json", "codex.mcp.json", "mcp.json", "mcp.remote.json"]) {
+    const manifestPath = path.join(sourceRoot, manifestName);
+    if (!fs.existsSync(manifestPath)) {
+      continue;
+    }
+    const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+    for (const server of Object.values(manifest.mcpServers ?? {})) {
+      if (typeof server?.url === "string") {
+        urls.add(server.url);
+      }
+      for (const arg of server?.args ?? []) {
+        if (typeof arg === "string" && /^https?:\/\//.test(arg)) {
+          urls.add(arg);
+        }
+      }
+    }
+  }
+  return urls;
+}
+
+// Guard against re-listing a renamed or duplicate plugin. Installing two marketplace entries that
+// attach the same hosted MCP server doubles every client's tool catalog; Codex code mode copies the
+// server instructions into each tool definition, so a duplicate once pushed the catalog past the
+// 64 MiB IPC frame limit and every shell command failed.
+function assertSingleHostedPluginCatalog(relativePath) {
+  const manifest = readJSON(relativePath);
+  const plugins = manifest.plugins ?? [];
+  assert.deepEqual(
+    plugins.map((plugin) => plugin?.name),
+    [expectedServerName],
+    `${relativePath} must list exactly the ${expectedServerName} plugin`,
+  );
+  const urlOwners = new Map();
+  for (const plugin of plugins) {
+    const haystack = JSON.stringify(plugin).toLowerCase();
+    for (const identifier of legacyPluginIdentifiers) {
+      assert.equal(
+        haystack.includes(identifier),
+        false,
+        `${relativePath} must not reference the legacy ${identifier} plugin identifier`,
+      );
+    }
+    const sourcePath = resolvePluginSourcePath(plugin.source);
+    assert.ok(sourcePath, `${relativePath} plugin ${plugin.name} must declare a local source path`);
+    const urls = hostedMcpUrlsForPluginSource(sourcePath);
+    assert.ok(urls.has("https://mcp.sanka.com/mcp"), `${relativePath} plugin ${plugin.name} must attach the hosted Sanka MCP URL`);
+    for (const url of urls) {
+      const owner = urlOwners.get(url);
+      assert.equal(owner, undefined, `${relativePath} lists ${plugin.name} and ${owner} for the same MCP server ${url}`);
+      urlOwners.set(url, plugin.name);
+    }
+  }
+}
+
+function assertSinglePackagedPluginDirectory() {
+  const packaged = fs
+    .readdirSync(path.join(repoRoot, "plugins"), { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .sort();
+  assert.deepEqual(packaged, [expectedServerName], `plugins/ must contain only the ${expectedServerName} package`);
+}
+
 function listOpenAiYamlFiles(root) {
   const results = [];
   const walk = (dir) => {
@@ -109,6 +187,9 @@ for (const manifestPath of [".codex-plugin/plugin.json", "plugins/sanka/.codex-p
 }
 
 assertCodexMarketplaceManifest(".agents/plugins/marketplace.json");
+assertSingleHostedPluginCatalog(".agents/plugins/marketplace.json");
+assertSingleHostedPluginCatalog(".claude-plugin/marketplace.json");
+assertSinglePackagedPluginDirectory();
 assertDirectClientPluginManifest(".claude-plugin/plugin.json");
 assertDirectClientPluginManifest(".plugin/plugin.json");
 
