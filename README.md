@@ -110,3 +110,10 @@ package path, MCP attachment key, reconnect header, and `$sanka:â€¦` / `/sanka:â
 skill routes remain stable for existing installations. These are compatibility
 identifiers, not a separate product. Existing installed copies need an update to
 show the new display name. No release or publishing is part of this source change.
+
+If a client still has the pre-rename `sakura` plugin installed next to `sanka`,
+remove it: both entries attach the same hosted MCP server, which doubles every
+tool catalog and can push Codex code mode past its IPC frame limit. Run
+`codex plugin remove sakura@sanka` in Codex or `/plugin uninstall sakura@sanka`
+in Claude Code. `scripts/test-codex-mcp-manifests.mjs` keeps the marketplaces
+down to the single `sanka` entry.

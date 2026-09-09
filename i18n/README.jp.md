@@ -86,6 +86,7 @@ Sankaを更新しますか？
 - local plugin clientではpackaged proxyを使ってください。これにより経費添付ツールで正確な `local_file_path` を使えます。remote-only MCP clientは `mcp.remote.json` を使うかhosted endpointへ直接接続できますが、local file pathは読めません。
 - live Sanka workにはattached Sanka MCP toolsを使ってください。local Django shell、Postgres、repo files、HubSpot MCPをSanka actionの代替にしないでください。
 - `search_docs` / `execute` しか表示されない場合は、plugin attachmentをrefreshするか、新しいplugin-attached threadを開始してください。
+- 旧名称の `sakura` プラグインが `sanka` と並んで残っている場合は削除してください。両方とも同じホスト型 MCP サーバーに接続するため、ツールカタログが二重になり、Codex のコードモードでは IPC フレーム上限を超えることがあります。Codex では `codex plugin remove sakura@sanka`、Claude Code では `/plugin uninstall sakura@sanka` を実行します。
 
 ## 翻訳
 
