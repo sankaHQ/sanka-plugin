@@ -29,7 +29,7 @@ Under `sanka-public/content/docs`:
 - `user-guides/ferry/migration-guides/migration-guide/`
 - `user-guides/ferry/migration-guides/salesforce-migration-guide/`
 
-Confirm navigation and public URL resolution in that repository before adding links. Keep English and Japanese structure, examples, and available assets equivalent. User guides should use natural-language tasks; tool names and exact response fields belong in the explicit AI/developer reference.
+Confirm navigation and public URL resolution in that repository before adding links. Start with English companion pages under the current documentation-owner policy; Japanese translation is a follow-up once requested. If translated, keep structure, examples, and available assets equivalent. User guides should use natural-language tasks; tool names and exact response fields belong in the explicit AI/developer reference.
 
 ## Delivery order
 
