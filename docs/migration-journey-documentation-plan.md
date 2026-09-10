@@ -8,7 +8,7 @@ Users and AI clients can identify the current migration stage, understand its st
 
 ## Additions to existing documentation
 
-Preserve existing guides. Add a short migration-with-an-agent guide and an agent reference, then link them from the current Codex connection and migration guides. The public documentation owner is `sanka-public`; use its maintained `content/docs` layout and validation commands, not retired documentation paths.
+Preserve existing guides and navigation. Add a short migration-with-an-agent guide and an agent reference as separate review drafts. Public articles are now database-backed: use the supported Public Docs authoring lane, not local MDX mirrors in `sanka-public`. If draft access is unavailable, provide review-only artifacts outside the public repository with proposed CMS metadata. Linking from existing guides is a later review decision.
 
 | Deliverable | Audience | Content and acceptance |
 | --- | --- | --- |
@@ -21,13 +21,12 @@ Preserve existing guides. Add a short migration-with-an-agent guide and an agent
 
 ## Existing entry points to complement
 
-Under `sanka-public/content/docs`:
+Published catalog slugs verified during this work:
 
-- `resources/agent-connections/chatgpt/codex-installation/`
-- `developer-guides/quick-start/chatgpt-codex/`
-- `developer-guides/agent-connections/mcp/`
-- `user-guides/ferry/migration-guides/migration-guide/`
-- `user-guides/ferry/migration-guides/salesforce-migration-guide/`
+- `codex`
+- `ferry/process/free-assessment`
+- `developers/mcp`
+- `salesforce-to-hubspot-migration`
 
 Confirm navigation and public URL resolution in that repository before adding links. Start with English companion pages under the current documentation-owner policy; Japanese translation is a follow-up once requested. If translated, keep structure, examples, and available assets equivalent. User guides should use natural-language tasks; tool names and exact response fields belong in the explicit AI/developer reference.
 
@@ -35,8 +34,8 @@ Confirm navigation and public URL resolution in that repository before adding li
 
 1. Finalize and test the API/MCP contract and plugin guidance.
 2. Draft additive user and agent pages against that exact behavior. Mark any unavailable assessment tool or report view explicitly; do not invent a command to complete it.
-3. Verify existing installation steps, output destinations, navigation, and localized parity. Use public-safe examples without customer identifiers or credentials.
-4. Run the documentation owner's build/link/search checks and submit a separate documentation PR. Keep publication tied to availability of the documented capability.
+3. Compare existing installation steps and assessment guidance with the companion implementation; record discrepancies for later team review without rewriting existing articles. Verify output destinations. Use public-safe examples without customer identifiers or credentials.
+4. Validate the new drafts and their links, then hand off the separate documentation artifacts for review. Do not publish automatically. Documentation publication is a CMS operation, not an article GitHub PR, and depends on availability of the documented capability.
 
 ## Review checklist
 
