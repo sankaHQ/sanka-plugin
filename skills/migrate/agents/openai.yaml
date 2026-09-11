@@ -1,0 +1,15 @@
+interface:
+  display_name: "Migrate Data"
+  short_description: "Resume or prepare a Sanka data migration using persisted journey state and reviewable results."
+  default_prompt: "Use $sanka:migrate to resume or prepare a Sanka data migration using persisted journey state and reviewable results."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "sanka"
+      description: "Hosted Sanka MCP server for live Sanka workflows"
+      transport: "streamable_http"
+      url: "https://mcp.sanka.com/mcp"
+
+policy:
+  allow_implicit_invocation: false
