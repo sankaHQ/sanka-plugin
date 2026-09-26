@@ -26,7 +26,7 @@ Guardrails:
 - If `auth_status` returns `required_user_facing_reply`, include it verbatim; otherwise repeat `connect_url` verbatim.
 - Do not fabricate a connect, OAuth, or login URL. Only repeat the Connect Sanka URL returned by `auth_status`.
 - Do not start or recommend client-native OAuth. Hosted Sanka MCP authentication uses only the Connect Sanka session exchange.
-- Do not use provider-specific tool names such as `delete_salesforce_company`; use `delete_company` with `target`, `provider`, `channel_id`, `operation`, and `dry_run` where needed.
+- Do not use provider-specific tool names such as `delete_salesforce_company`; use `delete_company` with `target`, `provider`, `channel_id`, and `dry_run` where needed.
 - Do not use local repo files, terminal commands, Django shell, Postgres, or any repo-local fallback for live Sanka data.
 - Do not call `search_docs` or `execute` when `delete_company` covers the request.
 - Do not delete records on vague or inferred intent.
