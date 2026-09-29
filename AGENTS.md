@@ -1,6 +1,6 @@
 # sanka-plugin Agent Guide
 
-Canonical agent instructions for this repo — `CLAUDE.md` symlinks here. Workspace-wide
+Canonical agent instructions for this repo; Claude Code and Codex read it directly. Workspace-wide
 rules and the repo map live in the sanka-project workspace repo (`../AGENTS.md`).
 
 ## What this is
