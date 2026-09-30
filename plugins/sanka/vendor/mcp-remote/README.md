@@ -6,7 +6,7 @@ Files:
 - `sanka-local-file-bridge.mjs`: Sanka-specific local-client bridge for exact user-provided local expense attachment paths
 - `proxy.mjs`: based on upstream `dist/proxy.js`, patched to keep tools attached before Sanka sign-in, disable `mcp-remote` native localhost OAuth, suppress native OAuth challenges in tool results, and apply the local expense attachment bridge.
 - `bundled-proxy.mjs` / `bundled-proxy.cjs`: self-contained unminified rebuild artifacts kept in the source repo and omitted from the packaged plugin copy.
-- `bundled-proxy.min.cjs`: self-contained runtime used by `codex.mcp.json`, `.mcp.json`, and `mcp.json`. This is packaged because local AI clients do not install `mcp-remote` npm dependencies inside plugin archives.
+- `bundled-proxy.min.cjs`: self-contained runtime used by `codex.mcp.json`, `.mcp.json`, `claude.mcp.json`, and `mcp.json`. This is packaged because local AI clients do not install `mcp-remote` npm dependencies inside plugin archives.
 
 Patch rationale:
 
