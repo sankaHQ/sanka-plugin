@@ -13,8 +13,12 @@ It attaches Sanka's hosted MCP server (`https://mcp.sanka.com/mcp`) and ships th
 ## Layout
 
 - `skills/` — per-tool skill definitions (one directory per Sanka capability).
-- `plugins/sanka/` — the packaged Claude plugin (marketplace layout).
-- `.mcp.json` / `mcp.json` / `codex.mcp.json` — MCP server attachment manifests per client.
+- `plugins/sanka/` — the packaged Codex plugin, synced from the root by `scripts/sync-codex-package.mjs`.
+  Claude Code installs the repository root (`.claude-plugin/`).
+- MCP server attachment manifests per client: `.mcp.json` / `codex.mcp.json` (Codex),
+  `claude.mcp.json` (Claude Code; paths anchored at `${CLAUDE_PLUGIN_ROOT}` because Claude Code
+  starts plugin MCP servers in the session's working directory), `mcp.json` (Cursor and other
+  local clients), `mcp.remote.json` (remote-only clients).
 - `guardrails/`, `i18n/`, `vendor/`, `assets/` — supporting material.
 - `scripts/` — sync tooling: `sync-codex-package.mjs`, `sync-codex-skill-metadata.mjs`,
   `refresh-codex-plugin.sh`, `rebuild-codex-mcp-remote-vendor.sh`.

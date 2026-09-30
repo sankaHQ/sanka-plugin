@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "sanka": {
+      "command": "node",
+      "args": [
+        "${CLAUDE_PLUGIN_ROOT}/vendor/mcp-remote/sanka-proxy-launcher.cjs",
+        "https://mcp.sanka.com/mcp",
+        "--header",
+        "X-Mcp-Reconnect-Server-Name: sanka"
+      ],
+      "note": "Hosted Sanka MCP server via the packaged local proxy. Claude Code starts plugin MCP servers in the session's working directory and ignores cwd, so the launcher path is anchored at the plugin root. The proxy keeps tools attached during Sanka sign-in and lets expense attachment tools read exact user-provided local receipt paths before forwarding original bytes to hosted Sanka MCP."
+    }
+  }
+}

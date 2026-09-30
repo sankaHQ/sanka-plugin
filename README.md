@@ -25,7 +25,7 @@ Start with the Sanka chip or a plain $sanka:... mention
 Start with /sanka:sanka for natural-language routing, or a specific /sanka:... skill
 ```
 
-Enable auto-update from `/plugin` if you want Claude Code to pull future updates from GitHub.
+Enable auto-update from `/plugin` if you want Claude Code to pull future updates from GitHub. To update by hand, run `claude plugin marketplace update sanka` and `claude plugin update sanka@sanka`, then start a new Claude Code session.
 
 ### Cursor And Other Local MCP Clients
 
@@ -80,7 +80,7 @@ After refresh, reload or reinstall Sanka in Codex and start a fresh thread from 
 
 ## Packaging
 
-Codex loads this repository through `.agents/plugins/marketplace.json`, which points at `plugins/sanka` so the plugin source path is a real subdirectory. Claude Code continues to use the root `.claude-plugin` files with `source: "./"`.
+Codex loads this repository through `.agents/plugins/marketplace.json`, which points at `plugins/sanka` so the plugin source path is a real subdirectory. Claude Code continues to use the root `.claude-plugin` files with `source: "./"` and reads `claude.mcp.json`. Claude Code starts plugin MCP servers in the session's working directory and ignores `cwd`, so that manifest reaches the proxy launcher through `${CLAUDE_PLUGIN_ROOT}`. `mcp.json` stays repository-relative for Cursor and other local MCP clients.
 
 When changing root Codex files such as `.codex-plugin/`, `skills/`, `assets/`, `.mcp.json`, or `codex.mcp.json`, run:
 
