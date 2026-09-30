@@ -25,7 +25,7 @@ Sanka chipまたは$sanka:... mentionから開始する
 /sanka:sankaで自然文routerを使う、または具体的な/sanka:... skillから開始する
 ```
 
-Claude CodeでGitHubからfuture updateをpullしたい場合は、`/plugin` からauto-updateを有効化してください。
+Claude CodeでGitHubからfuture updateをpullしたい場合は、`/plugin` からauto-updateを有効化してください。手動で更新する場合は、`claude plugin marketplace update sanka` と `claude plugin update sanka@sanka` を実行してから、新しいClaude Codeセッションを開始してください。
 
 ### Cursor とその他のlocal MCP client
 

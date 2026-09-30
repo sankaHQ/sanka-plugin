@@ -56,6 +56,23 @@ function assertDirectClientMcpManifest(relativePath) {
   assert.equal(args[1], "https://mcp.sanka.com/mcp", `${relativePath} must pass the hosted Sanka MCP URL after the launcher`);
 }
 
+// Claude Code starts plugin stdio servers in the session's working directory and ignores `cwd`, so a
+// ./vendor/... launcher resolves against the user's project and fails with MODULE_NOT_FOUND.
+function assertClaudePluginLaunchesFromPluginRoot(pluginManifestPath) {
+  const pluginRoot = "${CLAUDE_PLUGIN_ROOT}/";
+  const mcpManifestPath = readJSON(pluginManifestPath).mcpServers;
+  assertLocalMcpManifest(mcpManifestPath);
+  const server = readJSON(mcpManifestPath).mcpServers[expectedServerName];
+  const [launcher, hostedUrl] = server.args ?? [];
+  assert.equal(server.command, "node", `${mcpManifestPath} must launch through node for Windows`);
+  assert.equal(server.cwd, undefined, `${mcpManifestPath} must not rely on cwd, which Claude Code ignores`);
+  assert.ok(
+    launcher?.startsWith(pluginRoot) && fs.existsSync(path.join(repoRoot, launcher.slice(pluginRoot.length))),
+    `${mcpManifestPath} must start the shipped proxy launcher from \${CLAUDE_PLUGIN_ROOT}`,
+  );
+  assert.equal(hostedUrl, "https://mcp.sanka.com/mcp", `${mcpManifestPath} must pass the hosted Sanka MCP URL after the launcher`);
+}
+
 function assertPluginManifest(relativePath) {
   const manifest = readJSON(relativePath);
   assert.equal(manifest.mcpServers, "./.mcp.json", `${relativePath} must load the shared .mcp.json manifest`);
@@ -93,7 +110,7 @@ function resolvePluginSourcePath(source) {
 function hostedMcpUrlsForPluginSource(relativeSourcePath) {
   const sourceRoot = path.resolve(repoRoot, relativeSourcePath);
   const urls = new Set();
-  for (const manifestName of [".mcp.json", "codex.mcp.json", "mcp.json", "mcp.remote.json"]) {
+  for (const manifestName of [".mcp.json", "claude.mcp.json", "codex.mcp.json", "mcp.json", "mcp.remote.json"]) {
     const manifestPath = path.join(sourceRoot, manifestName);
     if (!fs.existsSync(manifestPath)) {
       continue;
@@ -190,7 +207,7 @@ assertCodexMarketplaceManifest(".agents/plugins/marketplace.json");
 assertSingleHostedPluginCatalog(".agents/plugins/marketplace.json");
 assertSingleHostedPluginCatalog(".claude-plugin/marketplace.json");
 assertSinglePackagedPluginDirectory();
-assertDirectClientPluginManifest(".claude-plugin/plugin.json");
+assertClaudePluginLaunchesFromPluginRoot(".claude-plugin/plugin.json");
 assertDirectClientPluginManifest(".plugin/plugin.json");
 
 for (const manifestPath of [".mcp.json", "codex.mcp.json", "plugins/sanka/.mcp.json", "plugins/sanka/codex.mcp.json"]) {
