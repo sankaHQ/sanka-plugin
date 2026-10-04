@@ -24,3 +24,18 @@ Order search is added through `search_flow_orders` when advertised. It matches
 customer names, order notes and line-item text, with 20 results per page. The user
 selects an order before preview and confirmation. This package does not supply
 the sidebar icon; the hosted `open_flow_workspace` tool owns that metadata.
+
+Full-workspace access is a separate server-gated capability. When advertised,
+`open_flow_workspace` accepts an optional `page` inside the connected workspace.
+The user reconnects with explicit full-workspace consent and selects Open
+workspace to use the maintained Flow UI. Existing invoice-only grants are not
+upgraded. The app-only `start_flow_workspace_session` tool performs the browser
+handoff; models must not call it or handle its ticket.
+
+The full view retains Sanka record permissions, confirmations and business
+approvals. Page context is only navigation context, not proof of record contents
+or a successful write. Read the saved record through an advertised tool before
+making such claims. Conversation writes retain the existing tool approval rules.
+Account/billing, security, provider setup and other product control planes open
+in Sanka. Feature flags, browser acceptance, and plugin review remain deployment
+prerequisites; syncing this package does not enable them.
