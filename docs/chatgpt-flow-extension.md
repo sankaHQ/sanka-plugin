@@ -1,6 +1,6 @@
 # Sanka Flow extension packaging
 
-The unreleased Flow panel supports order review, confirmed invoice draft creation,
+The private Flow pilot supports order review, confirmed invoice draft creation,
 submission recovery and saved-invoice readback. It is exposed only when the MCP
 server enables it and the host supports the app entrypoint.
 
@@ -18,4 +18,9 @@ stay in Sanka. A workspace mismatch requires refresh and a new review.
 
 Native OAuth and the panel are off by default. Their implementation and deployment
 runbooks live in the API/MCP repos. Live ChatGPT/account acceptance remains a
-release prerequisite. The local package does not change the host's OAuth setup.
+prerequisite for wider distribution. The local package does not change the host's OAuth setup.
+
+Order search is added through `search_flow_orders` when advertised. It matches
+customer names, order notes and line-item text, with 20 results per page. The user
+selects an order before preview and confirmation. This package does not supply
+the sidebar icon; the hosted `open_flow_workspace` tool owns that metadata.
