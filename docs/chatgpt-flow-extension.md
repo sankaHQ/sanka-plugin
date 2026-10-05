@@ -27,8 +27,10 @@ the sidebar icon; the hosted `open_flow_workspace` tool owns that metadata.
 
 Full-workspace access is a separate server-gated capability. When advertised,
 `open_flow_workspace` accepts an optional `page` inside the connected workspace.
-The user reconnects with explicit full-workspace consent and selects Open
-workspace to use the maintained Flow UI. Existing invoice-only grants are not
+The installed Sanka `/mcp` entry offers Enable full workspace for explicit consent
+to the same account and workspace. After consent, select Refresh and Open workspace
+to use the maintained Flow sidebar, dashboard and object tables. The native
+`/chatgpt` pilot retains its reconnect consent flow. Existing invoice-only grants are not
 upgraded. The app-only `start_flow_workspace_session` tool performs the browser
 handoff; models must not call it or handle its ticket.
 
