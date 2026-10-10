@@ -1,0 +1,15 @@
+interface:
+  display_name: "Get Presentation"
+  short_description: "Read a presentation and its current revision."
+  default_prompt: "Use $sanka:get-presentation to read a presentation and its current revision."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "sanka"
+      description: "Hosted Sanka MCP server for live Sanka workflows"
+      transport: "streamable_http"
+      url: "https://mcp.sanka.com/mcp"
+
+policy:
+  allow_implicit_invocation: false

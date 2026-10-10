@@ -1,0 +1,15 @@
+interface:
+  display_name: "Start Presentation Image Upload"
+  short_description: "Start a staged image upload for a presentation."
+  default_prompt: "Use $sanka:start-presentation-image-upload to start a staged image upload for a presentation."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "sanka"
+      description: "Hosted Sanka MCP server for live Sanka workflows"
+      transport: "streamable_http"
+      url: "https://mcp.sanka.com/mcp"
+
+policy:
+  allow_implicit_invocation: false

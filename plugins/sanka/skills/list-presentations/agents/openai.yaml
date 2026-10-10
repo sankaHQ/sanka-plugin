@@ -1,0 +1,15 @@
+interface:
+  display_name: "List Presentations"
+  short_description: "Find presentations in Sanka Flow Docs or a migration program."
+  default_prompt: "Use $sanka:list-presentations to find presentations in Sanka Flow Docs or a migration program."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "sanka"
+      description: "Hosted Sanka MCP server for live Sanka workflows"
+      transport: "streamable_http"
+      url: "https://mcp.sanka.com/mcp"
+
+policy:
+  allow_implicit_invocation: false

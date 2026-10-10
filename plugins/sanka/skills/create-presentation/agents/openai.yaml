@@ -1,0 +1,15 @@
+interface:
+  display_name: "Create Presentation"
+  short_description: "Create a Sanka Doc presentation from slides, Markdown or an existing Doc."
+  default_prompt: "Use $sanka:create-presentation to create a Sanka Doc presentation from slides, Markdown or an existing Doc."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "sanka"
+      description: "Hosted Sanka MCP server for live Sanka workflows"
+      transport: "streamable_http"
+      url: "https://mcp.sanka.com/mcp"
+
+policy:
+  allow_implicit_invocation: false

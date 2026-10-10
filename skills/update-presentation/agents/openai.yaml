@@ -1,0 +1,15 @@
+interface:
+  display_name: "Update Presentation"
+  short_description: "Edit selected slides or replace an authorized presentation."
+  default_prompt: "Use $sanka:update-presentation to edit selected slides or replace an authorized presentation."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "sanka"
+      description: "Hosted Sanka MCP server for live Sanka workflows"
+      transport: "streamable_http"
+      url: "https://mcp.sanka.com/mcp"
+
+policy:
+  allow_implicit_invocation: false

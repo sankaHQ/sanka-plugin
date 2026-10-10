@@ -1,0 +1,15 @@
+interface:
+  display_name: "Get Presentation Catalog"
+  short_description: "Read available presentation blocks, themes, layouts and limits."
+  default_prompt: "Use $sanka:get-presentation-catalog to read available presentation blocks, themes, layouts and limits."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "sanka"
+      description: "Hosted Sanka MCP server for live Sanka workflows"
+      transport: "streamable_http"
+      url: "https://mcp.sanka.com/mcp"
+
+policy:
+  allow_implicit_invocation: false
