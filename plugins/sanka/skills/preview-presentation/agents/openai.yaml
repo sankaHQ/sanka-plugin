@@ -1,0 +1,15 @@
+interface:
+  display_name: "Preview Presentation"
+  short_description: "Preview rendered slides and inspect layout warnings."
+  default_prompt: "Use $sanka:preview-presentation to preview rendered slides and inspect layout warnings."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "sanka"
+      description: "Hosted Sanka MCP server for live Sanka workflows"
+      transport: "streamable_http"
+      url: "https://mcp.sanka.com/mcp"
+
+policy:
+  allow_implicit_invocation: false

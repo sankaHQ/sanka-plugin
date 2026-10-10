@@ -88,6 +88,7 @@ function buildOpenAiYaml(skillName, title, description) {
 }
 
 function operationForSkill(skillDirName) {
+  if (/^(start|append|finish)-presentation-image-upload/.test(skillDirName) || skillDirName === 'presentations') return 'write';
   if (skillDirName === 'deal-to-estimate') {
     return 'write';
   }
@@ -99,6 +100,7 @@ function operationForSkill(skillDirName) {
 }
 
 function scopeKeyForSkill(skillDirName) {
+  if (skillDirName.includes('presentation')) return 'documents';
   if (skillDirName === 'connect') {
     return undefined;
   }

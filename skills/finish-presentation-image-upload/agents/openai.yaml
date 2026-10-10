@@ -1,0 +1,15 @@
+interface:
+  display_name: "Finish Presentation Image Upload"
+  short_description: "Attach a staged image to a presentation."
+  default_prompt: "Use $sanka:finish-presentation-image-upload to attach a staged image to a presentation."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "sanka"
+      description: "Hosted Sanka MCP server for live Sanka workflows"
+      transport: "streamable_http"
+      url: "https://mcp.sanka.com/mcp"
+
+policy:
+  allow_implicit_invocation: false

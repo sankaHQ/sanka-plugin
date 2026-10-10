@@ -1,0 +1,15 @@
+interface:
+  display_name: "Export Presentation"
+  short_description: "Export a presentation to PowerPoint, PDF or Google Slides."
+  default_prompt: "Use $sanka:export-presentation to export a presentation to PowerPoint, PDF or Google Slides."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "sanka"
+      description: "Hosted Sanka MCP server for live Sanka workflows"
+      transport: "streamable_http"
+      url: "https://mcp.sanka.com/mcp"
+
+policy:
+  allow_implicit_invocation: false

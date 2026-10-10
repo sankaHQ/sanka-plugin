@@ -1,0 +1,15 @@
+interface:
+  display_name: "Append Presentation Image Upload Chunk"
+  short_description: "Append image bytes to a staged presentation upload."
+  default_prompt: "Use $sanka:append-presentation-image-upload-chunk to append image bytes to a staged presentation upload."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "sanka"
+      description: "Hosted Sanka MCP server for live Sanka workflows"
+      transport: "streamable_http"
+      url: "https://mcp.sanka.com/mcp"
+
+policy:
+  allow_implicit_invocation: false
