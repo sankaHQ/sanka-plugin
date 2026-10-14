@@ -1,0 +1,15 @@
+interface:
+  display_name: "Export Sanka Diagram Image"
+  short_description: "Render a saved Sanka diagram as a PNG image."
+  default_prompt: "Use $sanka:export-ferry-diagram-image to render a saved Sanka diagram as a PNG image."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "sanka"
+      description: "Hosted Sanka MCP server for live Sanka workflows"
+      transport: "streamable_http"
+      url: "https://mcp.sanka.com/mcp"
+
+policy:
+  allow_implicit_invocation: false

@@ -10,7 +10,7 @@ Use the attached Sanka MCP tools. For the complete authoring workflow, see [Pres
 
 Workflow:
 
-1. Call `current_workspace` and pass its internal ID as `expected_workspace_id`. Use one source: slides, Markdown or a source Doc. Call `create_presentation`, then `preview_presentation` and fix overflow before presenting the result.
+1. Call `current_workspace` and pass its internal ID as `expected_workspace_id`. Use one source: slides, Markdown or a source Doc. Show a saved Sanka diagram with a `sankaDiagram` block (its `diagramId` from `list_ferry_diagrams`) so the slide follows later diagram edits. Call `create_presentation`, then `preview_presentation` and fix overflow before presenting the result.
 2. If the direct tool call returns `Auth required`, `missing_scope`, or `insufficient_scope`, call `auth_status` exactly once with `{ required_scopes: ["documents:write"] }`. Include `required_user_facing_reply` verbatim when present; otherwise show `connect_url` verbatim. If neither is present, report that Connect Sanka could not be started and stop without attempting client-native OAuth. After the user connects, retry the same Sanka request.
 3. Report the result and relevant links from the tool response.
 
