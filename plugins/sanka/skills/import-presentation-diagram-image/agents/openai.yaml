@@ -1,0 +1,15 @@
+interface:
+  display_name: "Import Presentation Diagram Image"
+  short_description: "Store a saved Sanka diagram's current image in a presentation."
+  default_prompt: "Use $sanka:import-presentation-diagram-image to store a saved Sanka diagram's current image in a presentation."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "sanka"
+      description: "Hosted Sanka MCP server for live Sanka workflows"
+      transport: "streamable_http"
+      url: "https://mcp.sanka.com/mcp"
+
+policy:
+  allow_implicit_invocation: false

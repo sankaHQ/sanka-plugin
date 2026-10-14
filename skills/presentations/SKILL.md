@@ -12,13 +12,14 @@ Workflow:
 
 1. Call `get_presentation_catalog` once per session. For writes, call `current_workspace` and carry its internal ID as `expected_workspace_id`; include `program_id` for migration program Docs and omit it for Sanka Flow Docs.
 2. Outline first: one message per slide with a title stating the point. Aim for at most six bullets of 80 characters each (40 for Japanese). Preserve supplied facts, names and figures exactly. Write Japanese explanations in natural ですます.
-3. Choose blocks by content shape, with one accent emphasis per slide. Images need descriptive alt text and asset IDs returned by the presentation upload or import tools.
+3. Choose blocks by content shape, with one accent emphasis per slide. Images need descriptive alt text and asset IDs returned by the presentation upload or import tools. Show a saved Sanka diagram with a `sankaDiagram` block (its `diagramId` from `list_ferry_diagrams`, plus alt text): it always shows the diagram's latest revision, so later fixes go to the diagram itself.
 4. Call `create_presentation`, then `preview_presentation` in batches of six. Fix every `SLIDE_OVERFLOW` by shortening, splitting or changing layout. Preview changed slides again.
 5. Before editing, call `get_presentation` and use its revision. Prefer targeted ops. On a 409 conflict, read again and reapply only the intended change. Preserve other people’s slides unless deletion was requested.
 6. When an export is requested, call `export_presentation`, poll `get_presentation_export` until terminal, then give the presentation’s `app_url` and the Google Slides or file download link. Use a fresh idempotency key per new export, retaining it only for a retry of the same operation.
 
 Guardrails:
 - Do not invent missing figures or silently switch workspace or program.
+- Do not paste an exported diagram PNG where a `sankaDiagram` block fits; a copied image keeps the revision it was drawn from. Use `import_presentation_diagram_image` only when a fixed copy is wanted.
 - Do not claim an export succeeded while it is queued or running, or a file is attached before saving or attaching its bytes.
 - Google Slides export requires the workspace pilot and the requesting user’s personal Google Drive connection. Use the returned account-settings link for connection problems. Never use another user’s grant. Every new export creates a separate editable file; later edits in Google Slides do not sync back.
 - Use `download_presentation_export` only when PowerPoint or PDF bytes are needed. It returns a session-bound URL or chunk token; complete that transfer before reporting a download.

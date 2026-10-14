@@ -88,6 +88,7 @@ function buildOpenAiYaml(skillName, title, description) {
 }
 
 function operationForSkill(skillDirName) {
+  if (skillDirName === 'export-ferry-diagram-image') return 'read';
   if (/^(start|append|finish)-presentation-image-upload/.test(skillDirName) || skillDirName === 'presentations') return 'write';
   if (skillDirName === 'deal-to-estimate') {
     return 'write';
@@ -101,6 +102,7 @@ function operationForSkill(skillDirName) {
 
 function scopeKeyForSkill(skillDirName) {
   if (skillDirName.includes('presentation')) return 'documents';
+  if (skillDirName.includes('ferry-diagram')) return 'ferry_diagrams';
   if (skillDirName === 'connect') {
     return undefined;
   }
