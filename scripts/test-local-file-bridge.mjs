@@ -100,6 +100,119 @@ try {
     /hidden files or directories/
   );
 
+  // No denied model-supplied path may reach the filesystem, through any tool.
+  const originalRoots = process.env.SANKA_LOCAL_FILE_UPLOAD_DIRS;
+  process.env.SANKA_LOCAL_FILE_UPLOAD_DIRS = tempDir;
+  const realpath = fs.realpathSync.native;
+  const statSync = fs.statSync;
+  const lstatSync = fs.lstatSync;
+  const readFileSync = fs.readFileSync;
+  const fileOperations = [];
+  fs.realpathSync.native = (target, ...rest) => {
+    fileOperations.push(["realpath", target]);
+    return realpath(target, ...rest);
+  };
+  fs.lstatSync = (target, ...rest) => {
+    fileOperations.push(["lstat", target]);
+    return lstatSync(target, ...rest);
+  };
+  fs.statSync = (target, ...rest) => {
+    fileOperations.push(["stat", target]);
+    return statSync(target, ...rest);
+  };
+  fs.readFileSync = (target, ...rest) => {
+    fileOperations.push(["read", target]);
+    return readFileSync(target, ...rest);
+  };
+  try {
+    const deniedPaths = [
+      String.raw`\\attacker.example\share\receipt.pdf`,
+      "//attacker.example/share/receipt.pdf",
+      String.raw`\\?\UNC\attacker.example\share\receipt.pdf`,
+      String.raw`\\.\pipe\receipt.pdf`,
+      path.resolve(tempDir, "..", "outside-receipt.pdf"),
+      unsupportedPath,
+      hiddenPath
+    ];
+    for (const name of [
+      "upload_expense_attachment", "start_expense_attachment_upload",
+      "append_expense_attachment_upload_chunk"
+    ]) {
+      for (const deniedPath of deniedPaths) {
+        fileOperations.length = 0;
+        assert.throws(() => prepareLocalFileUploadToolCall({
+          method: "tools/call", params: {
+            name, arguments: { local_file_path: deniedPath, offset: 0 }
+          }
+        }));
+        assert.equal(fileOperations.some(([, target]) =>
+          target === deniedPath || target === path.resolve(deniedPath)), false,
+          `${name} accessed denied path ${deniedPath}`);
+      }
+    }
+
+    // Approved roots may themselves be symlinks (e.g. /tmp on macOS).
+    const aliasRoot = path.join(tempDir, "approved-alias");
+    fs.symlinkSync(tempDir, aliasRoot, "dir");
+    process.env.SANKA_LOCAL_FILE_UPLOAD_DIRS = aliasRoot;
+    for (const localPath of [path.join(aliasRoot, "receipt.pdf"), realpath(filePath)]) {
+      const result = prepareLocalFileUploadToolCall({
+        method: "tools/call", params: {
+          name: "upload_expense_attachment", arguments: { local_file_path: localPath }
+        }
+      });
+      assert.equal(result.params.arguments.content_base64, expectedBase64);
+    }
+
+    process.env.SANKA_LOCAL_FILE_UPLOAD_DIRS = path.relative(process.cwd(), tempDir);
+    assert.equal(prepareLocalFileUploadToolCall({
+      method: "tools/call", params: {
+        name: "upload_expense_attachment", arguments: { local_file_path: filePath }
+      }
+    }).params.arguments.content_base64, expectedBase64);
+
+    // Canonical containment is checked before stat/read, not after metadata leaks.
+    process.env.SANKA_LOCAL_FILE_UPLOAD_DIRS = tempDir;
+    const outsideDir = fs.mkdtempSync(path.join(os.tmpdir(), "sanka-plugin-outside-"));
+    try {
+      const outsideFile = path.join(outsideDir, "receipt.pdf");
+      fs.writeFileSync(outsideFile, bytes);
+      const link = path.join(tempDir, "escape.pdf");
+      fs.symlinkSync(outsideFile, link);
+      fileOperations.length = 0;
+      assert.throws(() => prepareLocalFileUploadToolCall({
+        method: "tools/call", params: {
+          name: "upload_expense_attachment", arguments: { local_file_path: link }
+        }
+      }), /symlinks inside an allowed upload directory/);
+      assert.equal(fileOperations.some(([operation, target]) =>
+        target === realpath(outsideFile)), false);
+      const directoryLink = path.join(tempDir, "escape-directory");
+      fs.symlinkSync(outsideDir, directoryLink, "dir");
+      const networkLink = path.join(tempDir, "network.pdf");
+      fs.symlinkSync("//attacker.example/share/receipt.pdf", networkLink);
+      for (const localPath of [path.join(directoryLink, "receipt.pdf"), networkLink]) {
+        fileOperations.length = 0;
+        assert.throws(() => prepareLocalFileUploadToolCall({
+          method: "tools/call", params: {
+            name: "start_expense_attachment_upload", arguments: { local_file_path: localPath }
+          }
+        }), /symlinks inside an allowed upload directory/);
+        assert.equal(fileOperations.some(([operation, target]) =>
+          operation === "realpath" && target !== tempDir), false);
+      }
+    } finally {
+      fs.rmSync(outsideDir, { recursive: true, force: true });
+    }
+  } finally {
+    fs.realpathSync.native = realpath;
+    fs.statSync = statSync;
+    fs.lstatSync = lstatSync;
+    fs.readFileSync = readFileSync;
+    if (originalRoots === undefined) delete process.env.SANKA_LOCAL_FILE_UPLOAD_DIRS;
+    else process.env.SANKA_LOCAL_FILE_UPLOAD_DIRS = originalRoots;
+  }
+
   const alreadyEncoded = prepareLocalFileUploadToolCall({
     jsonrpc: "2.0",
     id: 4,
