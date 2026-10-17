@@ -187,6 +187,10 @@ function readLocalFileForUpload(localFilePath, maxBytes) {
 
 function normalizeLocalFilePath(localFilePath) {
   const filePath = localFilePath.trim();
+  // Reject network and device paths before normalization can hide their prefix.
+  if (/^[\\/]{2}/.test(filePath)) {
+    throw new LocalFileUploadError(`${LOCAL_FILE_PATH_FIELD} must be a local filesystem path.`);
+  }
   if (!path.isAbsolute(filePath)) {
     throw new LocalFileUploadError(`${LOCAL_FILE_PATH_FIELD} must be an absolute path.`);
   }
@@ -194,15 +198,24 @@ function normalizeLocalFilePath(localFilePath) {
 }
 
 function statLocalUploadFile(filePath, maxBytes) {
-  let stat;
+  const roots = allowedLocalUploadRoots();
+  // This check must precede every filesystem operation on the supplied path.
+  assertAllowedLocalUploadPath(filePath, roots.flatMap((root) => [root.path, root.realPath]));
+  // Only the approved root may be a symlink. Inspect each child without
+  // following it, so a junction/alias cannot contact a network target first.
+  const localPath = localPathWithoutChildSymlinks(filePath, roots);
   let realPath;
   try {
-    realPath = fs.realpathSync.native(filePath);
+    realPath = fs.realpathSync.native(localPath);
+  } catch {
+    throw new LocalFileUploadError("Cannot read local attachment file.");
+  }
+  assertAllowedLocalUploadPath(realPath, roots.map((root) => root.realPath));
+  let stat;
+  try {
     stat = fs.statSync(realPath);
-  } catch (error) {
-    throw new LocalFileUploadError(
-      `Cannot read local attachment file: ${error instanceof Error ? error.message : String(error)}`
-    );
+  } catch {
+    throw new LocalFileUploadError("Cannot read local attachment file.");
   }
 
   if (!stat.isFile()) {
@@ -216,11 +229,33 @@ function statLocalUploadFile(filePath, maxBytes) {
       `Local attachment file is ${stat.size} bytes, which exceeds the ${maxBytes} byte local upload limit.`
     );
   }
-  assertAllowedLocalUploadPath(realPath);
   return {
     path: realPath,
     size: stat.size
   };
+}
+
+function localPathWithoutChildSymlinks(filePath, roots) {
+  const root = roots
+    .flatMap((entry) => [entry, { path: entry.realPath, realPath: entry.realPath }])
+    .filter((entry) => pathIsInsideRoot(filePath, entry.path))
+    .sort((left, right) => right.path.length - left.path.length)[0];
+  let localPath = root.realPath;
+  for (const segment of path.relative(root.path, filePath).split(path.sep).filter(Boolean)) {
+    localPath = path.join(localPath, segment);
+    let stat;
+    try {
+      stat = fs.lstatSync(localPath);
+    } catch {
+      throw new LocalFileUploadError("Cannot read local attachment file.");
+    }
+    if (stat.isSymbolicLink()) {
+      throw new LocalFileUploadError(
+        `${LOCAL_FILE_PATH_FIELD} must not traverse symlinks inside an allowed upload directory.`
+      );
+    }
+  }
+  return localPath;
 }
 
 function assertLocalFileToolArguments(args) {
@@ -280,7 +315,7 @@ function base64LengthForByteLength(byteLength) {
   return Math.ceil(byteLength / 3) * 4;
 }
 
-function assertAllowedLocalUploadPath(filePath) {
+function assertAllowedLocalUploadPath(filePath, roots) {
   const ext = path.extname(filePath).toLowerCase();
   if (!MIME_BY_EXTENSION.has(ext)) {
     throw new LocalFileUploadError(
@@ -292,7 +327,6 @@ function assertAllowedLocalUploadPath(filePath) {
     throw new LocalFileUploadError(`${LOCAL_FILE_PATH_FIELD} must not include hidden files or directories.`);
   }
 
-  const roots = allowedLocalUploadRoots();
   if (!roots.some((root) => pathIsInsideRoot(filePath, root))) {
     throw new LocalFileUploadError(
       `${LOCAL_FILE_PATH_FIELD} must be inside an allowed upload directory. Set ${LOCAL_UPLOAD_ROOTS_ENV} to a ${path.delimiter}-separated allowlist when needed.`
@@ -309,7 +343,9 @@ function allowedLocalUploadRoots() {
   return roots
     .map((root) => {
       try {
-        return fs.realpathSync.native(path.resolve(root));
+        const rootPath = normalizeLocalFilePath(path.isAbsolute(root) ? root : path.resolve(root));
+        const realPath = normalizeLocalFilePath(fs.realpathSync.native(rootPath));
+        return { path: rootPath, realPath };
       } catch {
         return null;
       }

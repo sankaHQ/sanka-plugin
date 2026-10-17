@@ -16,3 +16,10 @@ Patch rationale:
 - Hosted Sanka MCP cannot read a user's local receipt PDF path directly. Local Sanka Plugin clients expose `local_file_path` on expense attachment upload tools, reads that exact file in the local proxy, and forwards the original bytes as normal hosted MCP upload arguments.
 
 Do not hand-edit the vendored chunk file or bundled artifacts. If upstream changes are needed, refresh from the tagged `mcp-remote` release, re-apply the `proxy.mjs` patch intentionally, then rebuild `bundled-proxy.cjs` and `bundled-proxy.min.cjs`.
+
+Local attachment uploads accept regular files inside the configured upload roots
+(or the default Desktop, Documents, Downloads, Pictures, and temporary directories).
+UNC/device paths are rejected before filesystem access. An approved root may be a
+symlink, but files and directories below it must not be symlinks or junctions; copy
+linked receipts into an approved directory before uploading. Paths must use the
+configured root spelling or its canonical spelling.
