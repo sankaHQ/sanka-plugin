@@ -41,6 +41,7 @@ Intent routes:
 - Deals, HubSpot deal URLs, Salesforce Opportunity quote readiness, estimates, quotes, approvals, order handoffs, fulfillment handoffs, workflow runs: `resolve_record`, `preview_workflow`, `start_workflow`, `get_workflow_run`
 - HubSpot revenue summaries, unbilled revenue, approval waits, unpaid invoices, blocked revenue: `preview_workflow` with `workflow_type: "revenue_control_summary"` only
 - Sales incentives, sales commissions, draft commission reports, unpaid commission exceptions, low-margin commission exceptions, refund/credit commission exceptions: `preview_workflow` with `workflow_type: "sales_incentive_commission"` only
+- IT onboarding and offboarding, user provisioning, and Google Workspace or Microsoft 365 accounts, groups and licenses: call `get_capability_guidance`, then save a Sanka workflow with `create_workflow` or `update_workflow` and `provider: "sanka"`. The steps `create-directory-account`, `suspend-directory-account`, `update-directory-groups` and `update-directory-licenses` keep their settings in `input_data.identity_directory`. Put an approval step before them. Runs start from the employee's record in Sanka; `run_workflow` cannot pass an employee.
 - CRM records: companies, contacts, deals, tickets, tasks, properties, pipelines
 - Sales and billing records: estimates, invoices, bills, orders, slips, payments, purchase orders, subscriptions, disbursements
 - Expenses: expenses and expense attachments
@@ -92,6 +93,7 @@ Guardrails:
 - Commission reports must preserve included/excluded/flagged status and reasons for every returned deal. Surface unpaid, refunded/credited, low-margin, disputed, incomplete, unmapped, missing owner, missing amount, missing currency, and missing compensation-rule exceptions instead of hiding them.
 - If multiple currencies are returned in a commission report, report totals per currency unless the tool explicitly says FX conversion was applied.
 - Suggested next actions from commission reports are recommendations only. Do not perform them unless the user explicitly asks for a separate supported workflow.
+- Directory account steps change real people's access. Set `confirmed: true` on a suspend, `remove_all` or license-removal step only after the user explicitly confirms that exact change, never by default. The steps need a user-provisioning connection, a workspace admin and a workspace in the pilot; saving a workflow does not check these. Deleting accounts is not offered. Do not invent provider-specific tools such as `create_google_workspace_user` or `suspend_microsoft_365_user`.
 - Do not sync all Sanka invoices to freee by default. `all_eligible_unsynced` requires explicit user confirmation and `confirm_all`.
 - Existing freee mappings are duplicate warnings. Re-sync or multiple freee drafts require explicit user intent and `allow_resync` or `allow_multiple_freee_drafts`.
 - freee arguments must go through backend-validated `freee_args`; do not send arbitrary freee payloads.
