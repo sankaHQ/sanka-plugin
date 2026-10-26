@@ -30,8 +30,12 @@ It attaches Sanka's hosted MCP server (`https://mcp.sanka.com/mcp`) and ships th
   new capability is the workspace `convert-api-mcp` skill (`../.codex/skills/convert-api-mcp/`).
 - When MCP tools change in `../sanka-mcp`, regenerate/sync the matching skill metadata
   here (use the `scripts/` sync tooling rather than hand-editing duplicated metadata).
-- Build/notarize/publish of the desktop plugin release is driven by the workspace
-  `sanka-plugin-build` skill (`../.codex/skills/sanka-plugin-build/`).
+- Package root changes with `node scripts/sync-codex-package.mjs`, then verify
+  with `node scripts/sync-codex-package.mjs --check` and
+  `node scripts/test-codex-mcp-manifests.mjs` (see `README.md`). Claude Code uses
+  the root marketplace; Codex uses `plugins/sanka/`. The old notarized desktop ZIP
+  release workflow is retired; do not restore it. Publishing requires explicit
+  user authorization and follows the workspace PR flow.
 
 ## Gotchas
 
