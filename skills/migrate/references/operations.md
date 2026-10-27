@@ -79,11 +79,21 @@ need their own reviewed provisioning. Inspect `applicationRuntimeSampling`; pack
 alone does not prove the application runs. Reconcile unknown outcomes before ordinary resume.
 
 Online Archive is separate from Outlook's ordinary Archive folder. Graph does not copy In-Place
-Archives. This migration requires the source mailbox to remain active with its data intact;
-native cross-tenant mailbox moves do not satisfy that requirement. Report Online Archive as
-unsupported until a source-preserving copy provider is qualified. Do not move, delete or cut over
-the source mailbox. Standalone Python or TypeScript SDK regeneration is outside this migration
-product workflow.
+Archives through the normal mail API. A separate Exchange Graph beta route is available only for
+local qualification when `MIGRATION_ARCHIVE_PREVIEW_ENABLED=true`; it is disabled by default and
+blocked outside local development/test runtimes. Select `mailbox_scope: online_archive` on a
+`mailboxes` resource and acknowledge `online_archive_graph_beta_preview` plus the original meeting
+addresses/links limitation. Primary and archive scopes can be reviewed separately for the same user.
+Both Online Archives must already exist and the destination archive must be empty. No archive is
+enabled automatically and no fallback to the primary mailbox is allowed. Exported opaque items are
+imported in create mode into the destination archive. Auxiliary archive redirects are bounded and
+must retain the tenant, operation and folder/item identity. A lost import response requires explicit
+reconciliation; ordinary resume must not create another copy. Verification rechecks the source
+account, primary/archive identities, folder tree and item versions as well as destination receipts.
+The source mailbox must stay active with its data intact. Do not move, delete or cut over the source
+mailbox, or disable its account. Hidden/recoverable content and real Microsoft tenant acceptance
+remain outside the verified local profile. Standalone Python or TypeScript SDK regeneration is
+outside this migration product workflow.
 
 If native review reports `preparation_failed`, inspect inventory, correct and save the review
 with its current binding hash/revision, then explicitly prepare again. Do not poll forever or
