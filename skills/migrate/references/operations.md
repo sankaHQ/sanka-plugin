@@ -79,9 +79,11 @@ need their own reviewed provisioning. Inspect `applicationRuntimeSampling`; pack
 alone does not prove the application runs. Reconcile unknown outcomes before ordinary resume.
 
 Online Archive is separate from Outlook's ordinary Archive folder. Graph does not copy In-Place
-Archives. Native cross-tenant mailbox moves can include archives but require explicit source and
-cutover decisions; never silently replace a source-preserving copy with a move. Standalone Python
-or TypeScript SDK regeneration is outside this migration product workflow.
+Archives. This migration requires the source mailbox to remain active with its data intact;
+native cross-tenant mailbox moves do not satisfy that requirement. Report Online Archive as
+unsupported until a source-preserving copy provider is qualified. Do not move, delete or cut over
+the source mailbox. Standalone Python or TypeScript SDK regeneration is outside this migration
+product workflow.
 
 If native review reports `preparation_failed`, inspect inventory, correct and save the review
 with its current binding hash/revision, then explicitly prepare again. Do not poll forever or
