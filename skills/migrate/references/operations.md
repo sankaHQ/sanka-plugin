@@ -54,3 +54,37 @@ These tools connect to the same Sanka engine from Codex and Claude. Local HTTP f
 orchestration and recovery behavior; acceptance by two disposable Microsoft tenants must be
 established separately before any production migration. Never substitute direct Graph/PowerShell
 scripts for an unavailable Sanka tool.
+
+### Extended Microsoft content
+
+For a meeting conversation, Microsoft cannot import historical content into a native meeting
+chat. Only after the user chooses that outcome, set the chat resource's
+`meeting_chat_mode: group_copy` and acknowledge `meeting_chat_becomes_group_copy` in the native
+review. The target is a new group labelled `Meeting archive: …`; its receipt retains the original
+meeting-chat ID. Review participants and history visibility. Do not describe the result as a
+recreated meeting or claim recordings/invitations have been rehosted.
+
+For modern SharePoint Site Pages, explicitly set `include_site_pages: true`, map the preprovisioned
+empty Site Pages library, and retain the native history/permission preparation path. Unknown
+asset references, classic serialized web parts and mismatched target schema remain blockers;
+never silently use current-page-only creation when historical versions were requested.
+
+Use `get_migration_native_applications` with a source catalog site from this run's SharePoint
+snapshot. Select SPFx `applications` using the returned app/product IDs, expected version and
+package ETag, source catalog site/scope, package filename and operator evidence. Acknowledge `sharepoint_application_code_execution`.
+The destination site collection app catalog must already exist. The native engine uploads without
+overwrite, deploys within that site, installs and reads back the package/version. It does not
+grant API permissions or deploy tenant-wide extensions. External app services and vendor licenses
+need their own reviewed provisioning. Inspect `applicationRuntimeSampling`; package installation
+alone does not prove the application runs. Reconcile unknown outcomes before ordinary resume.
+
+Online Archive is separate from Outlook's ordinary Archive folder. Graph does not copy In-Place
+Archives. This migration requires the source mailbox to remain active with its data intact;
+native cross-tenant mailbox moves do not satisfy that requirement. Report Online Archive as
+unsupported until a source-preserving copy provider is qualified. Do not move, delete or cut over
+the source mailbox. Standalone Python or TypeScript SDK regeneration is outside this migration
+product workflow.
+
+If native review reports `preparation_failed`, inspect inventory, correct and save the review
+with its current binding hash/revision, then explicitly prepare again. Do not poll forever or
+replace a source-preserving archive copy with a mailbox move.
