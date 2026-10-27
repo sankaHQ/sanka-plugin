@@ -30,3 +30,4 @@ Guardrails:
 - Keep every migration read/write bound to the same pinned workspace; never rely on mutable current-workspace state.
 - Do not use local files, terminal commands or a database as a fallback for live migration state.
 - Preserve required transfer safety evidence even when it increases response size.
+For real Microsoft 365 tenant transfers, follow the native review and preparation sequence in [operation details](references/operations.md#microsoft-365-to-microsoft-365).
