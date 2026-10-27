@@ -66,7 +66,7 @@ recreated meeting or claim recordings/invitations have been rehosted.
 
 For modern SharePoint Site Pages, explicitly set `include_site_pages: true`, map the preprovisioned
 empty Site Pages library, and retain the native history/permission preparation path. Unknown
-asset references, classic serialized web parts and mismatched target schema remain blockers;
+asset references and mismatched target schema remain blockers; classic parts require the bounded explicit profile below;
 never silently use current-page-only creation when historical versions were requested.
 
 Use `get_migration_native_applications` with a source catalog site from this run's SharePoint
@@ -91,8 +91,24 @@ must retain the tenant, operation and folder/item identity. A lost import respon
 reconciliation; ordinary resume must not create another copy. Verification rechecks the source
 account, primary/archive identities, folder tree and item versions as well as destination receipts.
 The source mailbox must stay active with its data intact. Do not move, delete or cut over the source
-mailbox, or disable its account. Hidden/recoverable content and real Microsoft tenant acceptance
-remain outside the verified local profile. Standalone Python or TypeScript SDK regeneration is
+mailbox, or disable its account. For ordinary hidden archive folders, explicitly set
+`include_hidden_archive_folders: true` and acknowledge `hidden_archive_content`. Root and child
+listings include hidden folders; capture and fresh verification preserve visibility and hierarchy.
+Missing visibility metadata blocks preparation. **Original Recoverable Items state is not supported:**
+`RECOVERABLE_STATE_UNQUALIFIED` stops exposed recoverable folders before transfer. Never replace
+Deletions/Purges/Versions/DiscoveryHolds with an ordinary hidden folder, or claim an item copy
+preserves native hold/purge behavior. Full recoverable coverage and real Microsoft tenant
+acceptance remain unqualified.
+
+For shared static classic Content Editor web parts, explicitly set `include_classic_webparts: true`
+and acknowledge `classic_webpart_native_passthrough`; Site Pages also require `include_site_pages`.
+The engine carries unchanged Microsoft AMR serialization into current and historical manifest
+nodes and compares shared SOAP properties at the destination. A changed/dropped part invalidates
+verification. Never disable NoScript to force a result. Personalized/custom parts, tenant-dependent
+references, non-static HTML or changed historical serialized properties remain blocked with
+`CLASSIC_SERIALIZER_REQUIRED`. Those need a qualified Windows worker and SPMT's Microsoft web-part
+serializer DLL, which are currently unavailable. Local opaque fixtures prove passthrough and drift
+handling; they do not qualify Microsoft acceptance or historical rendering. Standalone Python or TypeScript SDK regeneration is
 outside this migration product workflow.
 
 If native review reports `preparation_failed`, inspect inventory, correct and save the review
