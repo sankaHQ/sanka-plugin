@@ -10,3 +10,47 @@
 - Where available, `repair_migration` retries failed records/relationships under the unchanged reviewed plan, with explicit destination-write and cost authorization (currently 300 credits on completed repair). `review_migration` requests a signed evidence review (currently 250 credits) after separate cost authorization. Both require a stable supported idempotency key. `get_migration_review` and `get_migration_attestation_key` read existing evidence/key without starting paid work. A service attestation is not independent human approval; receiving its payload/key does not itself verify its signature.
 - After apply, queued or applying means pending. Poll status, use the supported verification tools, and report verification outcome separately from transport success. Failed, skipped and `not_run` checks have not passed. Use ingestion source/batch tools only for their reviewed update-only configuration and payload; activation/staging is not completed transfer evidence.
 - Code migration tools register genuine client-produced scan/plan/apply/verification artifacts for DRF-to-FastAPI migrations. They do not run customer code, rewrite repositories, run tests or deploy. Never manufacture evidence or infer permission to run local code from artifact-registration authorization. These endpoints have no idempotency contract.
+
+## Microsoft 365 to Microsoft 365
+
+Use the native public lifecycle for real tenants; preserve the signed demo path for demo accounts.
+All calls keep the same internal workspace UUID, migration ID and source/destination System IDs.
+Configure real Microsoft Systems with tenant GUIDs and application credentials through the supported
+System setup. Full OneDrive/SharePoint history and permissions require certificate authentication,
+preprovisioned empty destination libraries, compatible schema/version retention, and reviewed
+identity correspondence. Do not put private keys or passwords in a prompt.
+
+1. Discover and scan explicit `workplace_groups`, `workplace_mailboxes`, `workplace_calendars`,
+   `workplace_contacts`, `workplace_onedrive`, `workplace_sharepoint`, `workplace_teams` and
+   `workplace_chats` scopes using the ordinary migration Scan tools.
+2. Read `get_migration_native_review`. Use its actual source/destination identity UUIDs and
+   resource candidates. Save one-to-one user correspondence and selected resource targets with
+   `save_migration_native_review`, the current binding hash/revision, source-freeze acknowledgement,
+   full version/permission preservation and explicit limitation/exclusion reasons. Do not infer a
+   correspondence from matching display names.
+3. With authorization to read source content, call `prepare_migration_native_content` using the
+   returned review hash/revision and a stable idempotency key. Poll native review until prepared.
+   Preparation stages source content privately and may run Microsoft metadata-export jobs. It does
+   not import destination documents or messages. Review any fidelity blocker; do not silently
+   exclude unsupported content or replace a rejected hash.
+4. Save exact unfiltered Name/Owner routes for every prepared workload. Validate the mapping and
+   inspect the canonical plan, including its native preparation receipt. Use the ordinary confirmed
+   apply tool only within the user's destination-write authorization. Source data is retained.
+5. Poll persisted state. Verify after transfer and inspect native reconciliation separately from
+   counters. Opaque Exchange import receipts, item class and destination change keys do not prove
+   semantic equality of every field. Original organizers/meeting links are retained; this does not
+   rehost meetings or recreate original sharing URLs.
+6. If an operation is `issuing` or `uncertain`, pause and drain its original executor. Inspect the
+   provider outcome before `recover_migration_native_operation`, supplying the exact operation
+   revision, known destination receipt and evidence. Recovery reads back the candidate and never
+   repeats create/import. An opaque mailbox item without an acknowledged correspondence receipt
+   cannot be adopted solely because its ID/class exists. Do not use generic repair or a new
+   idempotency key to repeat an uncertain provider create. `action=resume_staging` omits the
+   destination ID and is allowed only when a SharePoint checkpoint proves submission was never
+   dispatched. After recovery, inspect the current canonical plan and resume with its reviewed hash;
+   successful provider writes remain protected by the native journal.
+
+These tools connect to the same Sanka engine from Codex and Claude. Local HTTP fixtures prove
+orchestration and recovery behavior; acceptance by two disposable Microsoft tenants must be
+established separately before any production migration. Never substitute direct Graph/PowerShell
+scripts for an unavailable Sanka tool.
