@@ -1,5 +1,5 @@
 ---
-description: Create ticket in live Sanka. Use when the user explicitly invokes /sanka:create-ticket.
+description: Create a customer support ticket in live Sanka Flow. Use when the user explicitly invokes /sanka:create-ticket.
 disable-model-invocation: true
 argument-hint: "[details to create the record]"
 ---
@@ -26,3 +26,4 @@ Guardrails:
 - Do not use local repo files, terminal commands, Django shell, Postgres, or any repo-local fallback for live Sanka data.
 - Do not call `search_docs` or `execute` when `create_ticket` covers the request.
 - Do not invent required business values that the user did not provide or clearly imply.
+- An employee's IT request is not a Flow ticket: use `desk_create_ticket` where Sanka Desk is enabled.

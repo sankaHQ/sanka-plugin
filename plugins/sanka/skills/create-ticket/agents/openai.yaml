@@ -1,7 +1,7 @@
 interface:
   display_name: "Create Ticket"
-  short_description: "Create ticket in live Sanka."
-  default_prompt: "Use $sanka:create-ticket to create ticket in live Sanka."
+  short_description: "Create a customer support ticket in live Sanka Flow."
+  default_prompt: "Use $sanka:create-ticket to create a customer support ticket in live Sanka Flow."
 
 dependencies:
   tools:
