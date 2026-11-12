@@ -72,10 +72,10 @@ Guardrails:
 - Call the named Sanka MCP tool directly instead of probing attachment state through discovery tools.
 - Do not report a plugin attachment failure unless a direct call to the named Sanka MCP tool returns a tool-not-found or unavailable error from the client.
 - Do not answer "Sanka cannot do this" only because older workflow tools such as `preview_workflow` or `start_workflow` do not cover a provider-native automation request. Use `get_capability_guidance` first; if the guidance tool is missing, show the refresh prompt.
-- If the direct tool call returns `Auth required`, call `auth_status` exactly once to surface Connect Sanka metadata.
-- If `auth_status` returns `required_user_facing_reply`, include it verbatim; otherwise repeat `connect_url` verbatim.
-- Do not fabricate a connect, OAuth, or login URL. Only repeat the Connect Sanka URL returned by `auth_status`.
-- Do not start or recommend client-native OAuth. Hosted Sanka MCP authentication uses only the Connect Sanka session exchange.
+- If the direct tool call returns `Auth required`, call `auth_status` exactly once and follow its `reconnect_instructions`.
+- If `auth_status` reports that Sanka is not connected, tell the user to reconnect Sanka in their AI client and follow its `reconnect_instructions`.
+- Do not fabricate a connect, OAuth, or login URL.
+- Sanka uses standard MCP OAuth: the AI client signs the user in on Sanka's own page. Never ask the user to paste a token, password or URL.
 - Use this router as the Sanka entrypoint; do not force the user to choose a narrower Sanka skill when the intent is clear.
 - Do not use HubSpot MCP tools for Sanka business actions. HubSpot may be a source record, but Sanka owns estimates, approvals, invoices, workflow runs, audit trails, and record writes.
 - Do not use Salesforce MCP tools for Sanka quote-readiness actions. Salesforce may be a source record, but Sanka owns readiness checks, approval rules, source references, and permission handling.
