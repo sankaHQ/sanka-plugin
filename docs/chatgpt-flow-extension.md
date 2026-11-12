@@ -4,7 +4,7 @@ The private Flow pilot supports order review, confirmed invoice draft creation,
 submission recovery and saved-invoice readback. It is exposed only when the MCP
 server enables it and the host supports the app entrypoint.
 
-This package remains a thin local-client integration. Existing proxy/Connect Sanka
+This package remains a thin local-client integration. Existing proxy
 manifests remain on `/mcp`. Updating this package does not register, enable or
 publish the separate native `/chatgpt` connector or Sign in with ChatGPT.
 

@@ -247,7 +247,7 @@ for (const root of ["skills", "plugins/sanka/skills"]) {
       assert.equal(
         contents.includes(unsupportedNativeOauthInstruction),
         false,
-        `${relativePath} must route authentication through Connect Sanka instead of ${unsupportedNativeOauthInstruction}`,
+        `${relativePath} must leave Sanka sign-in to the client's standard MCP OAuth instead of ${unsupportedNativeOauthInstruction}`,
       );
     }
   }

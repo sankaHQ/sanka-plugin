@@ -11,7 +11,7 @@ Workflow:
 
 1. Require the target record identifier and the changes to apply. If either is missing, ask a concise follow-up.
 2. Call `update_property` directly.
-3. If the direct tool call returns `Auth required`, `missing_scope`, or `insufficient_scope`, call `auth_status` exactly once with `required_scopes` derived from `object_name` and the property operation. Normalize object names such as `purchase-orders -> purchase_orders`, `inventory-transactions -> inventory_transactions`, and `cases -> cases`, then use the matching `:read` or `:write` scope. Include `required_user_facing_reply` verbatim when present; otherwise show `connect_url` verbatim. If neither is present, report that Connect Sanka could not be started and stop without attempting client-native OAuth. After the user connects, retry the same Sanka request.
+3. If the direct tool call returns `Auth required`, `missing_scope`, or `insufficient_scope`, call `auth_status` exactly once with `required_scopes` derived from `object_name` and the property operation. Normalize object names such as `purchase-orders -> purchase_orders`, `inventory-transactions -> inventory_transactions`, and `cases -> cases`, then use the matching `:read` or `:write` scope. Tell the user to reconnect Sanka in their AI client (standard OAuth sign-in on Sanka), following its `reconnect_instructions`. After the user reconnects, retry the same Sanka request.
 4. Summarize the updated property and the changed fields clearly.
 
 Guardrails:
@@ -19,10 +19,10 @@ Guardrails:
 - Do not call `list_mcp_resources`, `list_mcp_resource_templates`, or `tool_search` as a preflight for this command.
 - Call the named Sanka MCP tool directly instead of probing attachment state through discovery tools.
 - Do not report a plugin attachment failure unless a direct call to the named Sanka MCP tool returns a tool-not-found or unavailable error from the client.
-- If the direct tool call returns `Auth required`, `missing_scope`, or `insufficient_scope`, call `auth_status` exactly once with `required_scopes` derived from `object_name` and the property operation so Connect Sanka requests the correct object-specific scope.
-- If `auth_status` returns `required_user_facing_reply`, include it verbatim; otherwise repeat `connect_url` verbatim.
-- Do not fabricate a connect, OAuth, or login URL. Only repeat the Connect Sanka URL returned by `auth_status`.
-- Do not start or recommend client-native OAuth. Hosted Sanka MCP authentication uses only the Connect Sanka session exchange.
+- If the direct tool call returns `Auth required`, `missing_scope`, or `insufficient_scope`, call `auth_status` exactly once with `required_scopes` derived from `object_name` and the property operation so the reply names the object-specific scope.
+- If `auth_status` reports that Sanka is not connected, tell the user to reconnect Sanka in their AI client and follow its `reconnect_instructions`.
+- Do not fabricate a connect, OAuth, or login URL.
+- Sanka uses standard MCP OAuth: the AI client signs the user in on Sanka's own page. Never ask the user to paste a token, password or URL.
 - Do not use local repo files, terminal commands, Django shell, Postgres, or any repo-local fallback for live Sanka data.
 - Do not call `search_docs` or `execute` when `update_property` covers the request.
 - Do not guess target ids or mutate records when the requested change is ambiguous.

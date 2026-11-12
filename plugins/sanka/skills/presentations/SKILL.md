@@ -26,11 +26,11 @@ Guardrails:
 - Google Slides export requires the workspace pilot and the requesting user’s personal Google Drive connection. Use the returned account-settings link for connection problems. Never use another user’s grant. Every new export creates a separate editable file; later edits in Google Slides do not sync back.
 - Use `download_presentation_export` only when PowerPoint or PDF bytes are needed. It returns a session-bound URL or chunk token; complete that transfer before reporting a download.
 - Exporting does not authorize changing sharing permissions or sending the deck to anyone.
-- If the direct tool call returns `Auth required`, `missing_scope`, or `insufficient_scope`, call `auth_status` exactly once with `{ required_scopes: ["documents:write"] }` to surface Connect Sanka metadata.
+- If the direct tool call returns `Auth required`, `missing_scope`, or `insufficient_scope`, call `auth_status` exactly once with `{ required_scopes: ["documents:write"] }` and follow its `reconnect_instructions`.
 - Do not call `list_mcp_resources`, `list_mcp_resource_templates`, or `tool_search` as a preflight for this command.
 - Call the named Sanka MCP tool directly instead of probing attachment state through discovery tools.
 - Do not report a plugin attachment failure unless a direct call to the named Sanka MCP tool returns a tool-not-found or unavailable error from the client.
-- If `auth_status` returns `required_user_facing_reply`, include it verbatim; otherwise repeat `connect_url` verbatim.
-- Do not fabricate a connect, OAuth, or login URL. Only repeat the Connect Sanka URL returned by `auth_status`.
-- Do not start or recommend client-native OAuth. Hosted Sanka MCP authentication uses only the Connect Sanka session exchange.
+- If `auth_status` reports that Sanka is not connected, tell the user to reconnect Sanka in their AI client and follow its `reconnect_instructions`.
+- Do not fabricate a connect, OAuth, or login URL.
+- Sanka uses standard MCP OAuth: the AI client signs the user in on Sanka's own page. Never ask the user to paste a token, password or URL.
 - Do not use local repo files, shell or database access as a fallback for live Sanka data.

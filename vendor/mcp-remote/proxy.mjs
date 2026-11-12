@@ -2,11 +2,10 @@
 // Vendored from mcp-remote@0.1.38 and patched for local Sanka plugin clients.
 //
 // Why this exists:
-// Local plugin clients must keep the hosted Sanka tool list attached before a
-// user signs in, and Sanka's expense upload flow needs to read exact local file
-// paths from the user's machine. Authentication should be initiated only when
-// the hosted MCP returns an explicit Sanka connect URL, not by preemptively
-// starting mcp-remote's native localhost OAuth coordinator during proxy boot.
+// Sanka's expense upload flow needs to read exact local file paths from the
+// user's machine, which the hosted MCP server cannot. Sign-in is mcp-remote's
+// native MCP OAuth: on the server's 401 it registers the "Sanka Plugin" client,
+// opens Sanka's consent page and keeps the tokens on disk.
 
 import {
   JSONRPCMessageSchema,
@@ -15,20 +14,16 @@ import {
   discoverOAuthServerInfo,
   log,
   parseCommandLineArgs,
-  setupSignalHandlers
+  setupSignalHandlers,
+  NodeOAuthClientProvider,
+  createLazyAuthCoordinator
 } from "./chunk-65X3S4HB.js";
 import {
   LocalFileUploadError,
   augmentToolsListForLocalFileUploads,
   prepareLocalFileUploadToolCall
 } from "./sanka-local-file-bridge.mjs";
-import { suppressNativeOAuthChallenge } from "./sanka-local-auth-bridge.mjs";
-import {
-  applyPersistedMcpSessionHeader,
-  clearPersistedMcpSessionId,
-  removeMcpSessionHeader,
-  persistAndApplyMcpSessionHeader
-} from "./sanka-local-session-store.mjs";
+import { EventEmitter } from "node:events";
 import process2 from "node:process";
 
 const REMOTE_INITIALIZE_PROTOCOL_VERSION = "2024-11-05";
@@ -130,13 +125,7 @@ class StdioServerTransport {
   }
 }
 
-function sankaMcpProxy({
-  transportToClient,
-  transportToServer,
-  ignoredTools = [],
-  onServerSessionId,
-  onStaleServerSession
-}) {
+function sankaMcpProxy({ transportToClient, transportToServer, ignoredTools = [] }) {
   let transportToClientClosed = false;
   let transportToServerClosed = false;
   const pendingRequests = new Map();
@@ -203,22 +192,7 @@ function sankaMcpProxy({
           });
         }
 
-        try {
-          await transportToServer.send(message);
-        } catch (error) {
-          if (isStaleMcpSessionError(error) && onStaleServerSession) {
-            onStaleServerSession(error);
-            await sendJsonRpcError(
-              transportToClient,
-              message.id,
-              -32603,
-              "Stored Sanka MCP session expired and was cleared. Retry the Sanka tool call to start a fresh session."
-            );
-            return;
-          }
-          throw error;
-        }
-        onServerSessionId?.(transportToServer.sessionId);
+        await transportToServer.send(message);
       })
       .catch(onServerError);
   };
@@ -256,7 +230,6 @@ function sankaMcpProxy({
             }
           }
         }
-        message = suppressNativeOAuthChallenge(message);
 
         log("[Remote→Local]", message.method || message.id);
         debugLog("Remote → Local message", {
@@ -314,18 +287,6 @@ async function sendJsonRpcError(transport, id, code, message) {
   });
 }
 
-function isStaleMcpSessionError(error) {
-  const code = Number(error?.code ?? error?.status ?? error?.statusCode ?? 0);
-  const message = String(error?.message ?? error ?? "").toLowerCase();
-  if (message.includes("mcp-session-id")) {
-    return true;
-  }
-  if (message.includes("session") && /(invalid|unknown|expired|not found|missing)/.test(message)) {
-    return true;
-  }
-  return code === 400 || code === 404;
-}
-
 function patternToRegex(pattern) {
   const parts = pattern.split("*");
   const escapedParts = parts.map((part) => part.replace(/\W/g, "\\$&"));
@@ -359,14 +320,11 @@ async function runProxy(
   authTimeoutMs,
   serverUrlHash
 ) {
-  const remoteHeaders = { ...(headers ?? {}) };
-  const restoredSessionId = applyPersistedMcpSessionHeader(serverUrl, remoteHeaders);
-  if (restoredSessionId) {
-    debugLog("Restored persisted Sanka MCP session id for local proxy");
-  }
+  const events = new EventEmitter();
+  const authCoordinator = createLazyAuthCoordinator(serverUrlHash, callbackPort, events, authTimeoutMs);
 
   log("Discovering OAuth server configuration...");
-  const discoveryResult = await discoverOAuthServerInfo(serverUrl, remoteHeaders);
+  const discoveryResult = await discoverOAuthServerInfo(serverUrl, headers);
   if (discoveryResult.protectedResourceMetadata) {
     log(`Discovered authorization server: ${discoveryResult.authorizationServerUrl}`);
     if (discoveryResult.protectedResourceMetadata.scopes_supported) {
@@ -378,65 +336,51 @@ async function runProxy(
     debugLog("No Protected Resource Metadata found, using server URL as authorization server");
   }
 
-  const authProvider = null;
+  // The name Sanka's consent page shows the user for this client.
+  const authProvider = new NodeOAuthClientProvider({
+    serverUrl: discoveryResult.authorizationServerUrl,
+    callbackPort,
+    host,
+    clientName: "Sanka Plugin",
+    staticOAuthClientMetadata,
+    staticOAuthClientInfo,
+    authorizeResource,
+    serverUrlHash,
+    authorizationServerMetadata: discoveryResult.authorizationServerMetadata,
+    protectedResourceMetadata: discoveryResult.protectedResourceMetadata,
+    wwwAuthenticateScope: discoveryResult.wwwAuthenticateScope
+  });
 
   const localTransport = new StdioServerTransport();
+  let server = null;
 
   const authInitializer = async () => {
-    throw new Error(
-      "Sanka Plugin disables mcp-remote native OAuth. Use the hosted Sanka MCP connect_url returned by Sanka tools."
-    );
-  };
-
-  const clearRestoredSession = (error) => {
-    clearPersistedMcpSessionId(serverUrl);
-    removeMcpSessionHeader(remoteHeaders);
-    log("Stored Sanka MCP session id was rejected; cleared it and will use a fresh session.");
-    debugLog("Cleared stale persisted Sanka MCP session id", {
-      errorMessage: error instanceof Error ? error.message : String(error)
-    });
-  };
-
-  const connectRemoteTransport = async () => {
-    try {
-      return await connectToRemoteServer(
-        null,
-        serverUrl,
-        authProvider,
-        remoteHeaders,
-        authInitializer,
-        transportStrategy
-      );
-    } catch (error) {
-      if (!restoredSessionId || !isStaleMcpSessionError(error)) {
-        throw error;
-      }
-      clearRestoredSession(error);
-      return await connectToRemoteServer(
-        null,
-        serverUrl,
-        authProvider,
-        remoteHeaders,
-        authInitializer,
-        transportStrategy
-      );
+    const authState = await authCoordinator.initializeAuth();
+    server = authState.server;
+    if (authState.skipBrowserAuth) {
+      log("Authentication was completed by another instance - will use tokens from disk");
+      await new Promise((resolve) => setTimeout(resolve, 1e3));
     }
+    return {
+      waitForAuthCode: authState.waitForAuthCode,
+      skipBrowserAuth: authState.skipBrowserAuth
+    };
   };
 
   try {
-    debugLog("Native mcp-remote OAuth is disabled for the Sanka local proxy");
-    const remoteTransport = await connectRemoteTransport();
+    const remoteTransport = await connectToRemoteServer(
+      null,
+      serverUrl,
+      authProvider,
+      headers,
+      authInitializer,
+      transportStrategy
+    );
 
     sankaMcpProxy({
       transportToClient: localTransport,
       transportToServer: remoteTransport,
-      ignoredTools,
-      onStaleServerSession: clearRestoredSession,
-      onServerSessionId: (sessionId) => {
-        if (persistAndApplyMcpSessionHeader(serverUrl, remoteHeaders, sessionId)) {
-          debugLog("Persisted Sanka MCP session id for local proxy reuse");
-        }
-      }
+      ignoredTools
     });
 
     await localTransport.start();
@@ -447,6 +391,9 @@ async function runProxy(
     const cleanup = async () => {
       await remoteTransport.close();
       await localTransport.close();
+      if (server) {
+        server.close();
+      }
     };
 
     setupSignalHandlers(cleanup);
