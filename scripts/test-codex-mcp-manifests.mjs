@@ -40,6 +40,12 @@ function assertCodexMcpManifest(relativePath) {
     false,
     `${relativePath} must not pass cwd-relative vendor paths as node arguments`,
   );
+  // The proxy answers initialize and tools/list only after the first browser sign-in, and Codex
+  // applies startup_timeout_sec to both (default 30 s), so a shorter limit fails the first connect.
+  assert.ok(
+    server.startup_timeout_sec >= 180,
+    `${relativePath} must give Codex at least 180 seconds of startup_timeout_sec for the first Sanka sign-in`,
+  );
 }
 
 function assertDirectClientMcpManifest(relativePath) {

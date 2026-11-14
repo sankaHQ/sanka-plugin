@@ -8,7 +8,8 @@
         "--header",
         "X-Mcp-Reconnect-Server-Name: sanka"
       ],
-      "note": "Hosted Sanka MCP server via the packaged local proxy. On first use it signs in with standard MCP OAuth (it opens Sanka's consent page and keeps the tokens on this machine) and lets expense attachment tools read exact user-provided local receipt paths before forwarding original bytes to hosted Sanka MCP."
+      "startup_timeout_sec": 300,
+      "note": "Hosted Sanka MCP server via the packaged local proxy. On first use it signs in with standard MCP OAuth (it opens Sanka's consent page and keeps the tokens on this machine) and lets expense attachment tools read exact user-provided local receipt paths before forwarding original bytes to hosted Sanka MCP. The proxy answers Codex only after that sign-in, so startup_timeout_sec gives the user five minutes to finish it instead of Codex's 30-second default."
     }
   }
 }
