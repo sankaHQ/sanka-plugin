@@ -50,7 +50,8 @@ Intent routes:
 - WatchTower waste review: renewals, vendor price creep, duplicate vendors, spend summary: `list_watchtower_findings`, `update_watchtower_finding`, `create_buy_request_from_finding`, `get_watchtower_summary`
 - Private inbox: private messages, message threads, replies, archive, sync
 - Calendar: availability and attendance create, reschedule, cancel, bootstrap
-- Data movement and integrations: imports, exports, integration channels, integration sync, demo workspace generation
+- Data movement and integrations: imports, exports, integration channels, integration sync
+- Demo workspaces for Sanka members: a new Free workspace with a case's fictional data for a Sanka Desk, Sanka Flow or Sanka Monitor demo: `generate_demo_workspace`
 
 Refresh prompt:
 
