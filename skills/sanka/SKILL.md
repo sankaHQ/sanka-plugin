@@ -51,7 +51,7 @@ Intent routes:
 - Private inbox: private messages, message threads, replies, archive, sync
 - Calendar: availability and attendance create, reschedule, cancel, bootstrap
 - Data movement and integrations: imports, exports, integration channels, integration sync
-- Demo workspaces for Sanka members: a new Free workspace with a case's fictional data for a Sanka Desk, Sanka Flow or Sanka Monitor demo: `generate_demo_workspace`
+- Demo workspaces for Sanka members: a new Free workspace with a case's fictional data for a Sanka Desk, Sanka Flow, Sanka Monitor or Sanka Migrate demo, with named Sanka colleagues as admins: `generate_demo_workspace`
 
 Refresh prompt:
 
