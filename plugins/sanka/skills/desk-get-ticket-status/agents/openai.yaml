@@ -1,0 +1,15 @@
+interface:
+  display_name: "Desk Get Ticket Status"
+  short_description: "Read the status of one of the user's own Sanka Desk IT requests, including its approval page while it waits for approval."
+  default_prompt: "Use $sanka:desk-get-ticket-status to read the status of one of the user's own Sanka Desk IT requests, including its approval page while it waits for approval."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "sanka"
+      description: "Hosted Sanka MCP server for live Sanka workflows"
+      transport: "streamable_http"
+      url: "https://mcp.sanka.com/mcp"
+
+policy:
+  allow_implicit_invocation: false

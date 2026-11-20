@@ -1,0 +1,15 @@
+interface:
+  display_name: "Desk List My Tickets"
+  short_description: "List the user's own IT requests with Sanka Desk, the company's IT service desk."
+  default_prompt: "Use $sanka:desk-list-my-tickets to list the user's own IT requests with Sanka Desk, the company's IT service desk."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "sanka"
+      description: "Hosted Sanka MCP server for live Sanka workflows"
+      transport: "streamable_http"
+      url: "https://mcp.sanka.com/mcp"
+
+policy:
+  allow_implicit_invocation: false

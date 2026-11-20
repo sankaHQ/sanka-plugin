@@ -26,4 +26,4 @@ Guardrails:
 - Do not use local repo files, terminal commands, Django shell, Postgres, or any repo-local fallback for live Sanka data.
 - Do not call `search_docs` or `execute` when `create_ticket` covers the request.
 - Do not invent required business values that the user did not provide or clearly imply.
-- An employee's IT request is not a Flow ticket: use `desk_create_ticket` where Sanka Desk is enabled.
+- An employee's IT request is not a Flow ticket: use `desk_create_ticket`, or a Desk Action through the `desk-actions` skill, where Sanka Desk is enabled.

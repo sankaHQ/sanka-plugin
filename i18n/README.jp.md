@@ -49,6 +49,7 @@ $sanka:deal-to-estimate https://app.hubspot.com/contacts/.../record/0-3/... 見�
 $sanka:deal-to-estimate https://app.hubspot.com/contacts/.../record/0-3/... Sankaに同期済みなら見積を作成して。
 $sanka:list-deals 最近の取引を見せて。
 $sanka:create-expense この領収書から経費を作成して。
+$sanka:desk-actions mai@example.com のHubSpotアカウントを作成して。先にpreviewを見せて。
 $sanka:refresh
 ```
 

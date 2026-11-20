@@ -1,0 +1,15 @@
+interface:
+  display_name: "Desk Preview Action"
+  short_description: "Preview a Sanka Desk Action with its inputs, with nothing filed, and ask the user whether to create the ticket."
+  default_prompt: "Use $sanka:desk-preview-action to preview a Sanka Desk Action with its inputs, with nothing filed, and ask the user whether to create the ticket."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "sanka"
+      description: "Hosted Sanka MCP server for live Sanka workflows"
+      transport: "streamable_http"
+      url: "https://mcp.sanka.com/mcp"
+
+policy:
+  allow_implicit_invocation: false
