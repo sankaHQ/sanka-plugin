@@ -1,0 +1,15 @@
+interface:
+  display_name: "Desk Actions"
+  short_description: "Ask Sanka Desk, the company's IT service desk, for an IT change such as a HubSpot, Salesforce, Google Workspace, Microsoft 365, Okta, Slack or Sanka Flow account, access or license, previewed and confirmed before anything is filed."
+  default_prompt: "Use $sanka:desk-actions to ask Sanka Desk, the company's IT service desk, for an IT change such as a HubSpot, Salesforce, Google Workspace, Microsoft 365, Okta, Slack or Sanka Flow account, access or license, previewed and confirmed before anything is filed."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "sanka"
+      description: "Hosted Sanka MCP server for live Sanka workflows"
+      transport: "streamable_http"
+      url: "https://mcp.sanka.com/mcp"
+
+policy:
+  allow_implicit_invocation: false

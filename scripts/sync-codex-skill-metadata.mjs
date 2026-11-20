@@ -190,7 +190,26 @@ function scopeKeyForSkill(skillDirName) {
   return undefined;
 }
 
+// Sanka Desk tools use the MCP resources `desk_tickets` (requests) and `desk_actions` (Actions and
+// approvals), not the Flow `tickets` resource. The hosted MCP requires `<resource>:<read|write>`
+// when it delegates that scope to `mcp:access`, and `mcp:access` itself otherwise.
+const DESK_ACTION_SKILLS = new Set(['desk-list-actions', 'desk-preview-action', 'desk-run-action', 'desk-list-my-approvals']);
+const DESK_WRITE_SKILLS = new Set(['desk-create-ticket', 'desk-run-action']);
+const DESK_DELEGATED_SCOPES = new Set(['desk_actions:read', 'desk_actions:write']);
+
+function deskRequiredScopes(skillDirName) {
+  if (skillDirName === 'desk-actions') {
+    return { mode: 'static', values: ['desk_actions:read', 'desk_actions:write'] };
+  }
+  const resource = DESK_ACTION_SKILLS.has(skillDirName) ? 'desk_actions' : 'desk_tickets';
+  const scope = `${resource}:${DESK_WRITE_SKILLS.has(skillDirName) ? 'write' : 'read'}`;
+  return { mode: 'static', values: [DESK_DELEGATED_SCOPES.has(scope) ? scope : 'mcp:access'] };
+}
+
 function requiredScopesForSkill(skillDirName) {
+  if (skillDirName.startsWith('desk-')) {
+    return deskRequiredScopes(skillDirName);
+  }
   if (skillDirName === 'deal-to-estimate') {
     return {
       mode: 'static',

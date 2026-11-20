@@ -1,0 +1,15 @@
+interface:
+  display_name: "Desk List Actions"
+  short_description: "List the Sanka Desk Actions the user can ask for in this workspace and what each integration's rule lets them do."
+  default_prompt: "Use $sanka:desk-list-actions to list the Sanka Desk Actions the user can ask for in this workspace and what each integration's rule lets them do."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "sanka"
+      description: "Hosted Sanka MCP server for live Sanka workflows"
+      transport: "streamable_http"
+      url: "https://mcp.sanka.com/mcp"
+
+policy:
+  allow_implicit_invocation: false

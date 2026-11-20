@@ -1,0 +1,15 @@
+interface:
+  display_name: "Desk List My Approvals"
+  short_description: "List the Sanka Desk approvals waiting for the user's decision, with each approval page."
+  default_prompt: "Use $sanka:desk-list-my-approvals to list the Sanka Desk approvals waiting for the user's decision, with each approval page."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "sanka"
+      description: "Hosted Sanka MCP server for live Sanka workflows"
+      transport: "streamable_http"
+      url: "https://mcp.sanka.com/mcp"
+
+policy:
+  allow_implicit_invocation: false
