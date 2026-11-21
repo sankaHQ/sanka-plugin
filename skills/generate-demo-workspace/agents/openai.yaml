@@ -1,7 +1,7 @@
 interface:
   display_name: "Generate Demo Workspace"
-  short_description: "Build a new Free demo workspace for a Sanka Desk, Sanka Flow or Sanka Monitor demo."
-  default_prompt: "Use $sanka:generate-demo-workspace to build a new Free demo workspace for a Sanka Desk, Sanka Flow or Sanka Monitor demo."
+  short_description: "Build a new Free demo workspace for a Sanka Desk, Sanka Flow, Sanka Monitor or Sanka Migrate demo."
+  default_prompt: "Use $sanka:generate-demo-workspace to build a new Free demo workspace for a Sanka Desk, Sanka Flow, Sanka Monitor or Sanka Migrate demo."
 
 dependencies:
   tools:
