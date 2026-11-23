@@ -1,7 +1,7 @@
 interface:
   display_name: "Sanka"
-  short_description: "Route natural-language Sanka requests to the right live Sanka workflow, record, inbox, billing, expense, procurement, waste-finding, IT request, Desk Action, refresh, or connect action."
-  default_prompt: "Use $sanka:sanka to route natural-language Sanka requests to the right live Sanka workflow, record, inbox, billing, expense, procurement, waste-finding, IT request, Desk Action, refresh, or connect action."
+  short_description: "Route natural-language Sanka requests to the right live Sanka workflow, record, inbox, billing, expense, procurement, waste-finding, IT request, Desk Action, own CRM, calendar or mail question, refresh, or connect action."
+  default_prompt: "Use $sanka:sanka to route natural-language Sanka requests to the right live Sanka workflow, record, inbox, billing, expense, procurement, waste-finding, IT request, Desk Action, own CRM, calendar or mail question, refresh, or connect action."
 
 dependencies:
   tools:

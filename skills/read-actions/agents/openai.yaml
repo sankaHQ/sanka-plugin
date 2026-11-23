@@ -1,0 +1,15 @@
+interface:
+  display_name: "Read Actions"
+  short_description: "Answer a question from the user's own HubSpot, Salesforce, Google Calendar or Gmail with Sanka read Actions, read live as their own login, with the price told first and the method given with every number."
+  default_prompt: "Use $sanka:read-actions to answer a question from the user's own HubSpot, Salesforce, Google Calendar or Gmail with Sanka read Actions, read live as their own login, with the price told first and the method given with every number."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "sanka"
+      description: "Hosted Sanka MCP server for live Sanka workflows"
+      transport: "streamable_http"
+      url: "https://mcp.sanka.com/mcp"
+
+policy:
+  allow_implicit_invocation: false

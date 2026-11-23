@@ -206,9 +206,21 @@ function deskRequiredScopes(skillDirName) {
   return { mode: 'static', values: [DESK_DELEGATED_SCOPES.has(scope) ? scope : 'mcp:access'] };
 }
 
+// Read Actions use the MCP resource `read_actions`: listing Actions and reading a run are reads, and
+// a run is a write because it spends Sanka Credits.
+const READ_ACTION_SCOPES = {
+  'read-actions': ['read_actions:read', 'read_actions:write'],
+  'list-read-actions': ['read_actions:read'],
+  'run-read-action': ['read_actions:write'],
+  'get-read-action-run': ['read_actions:read'],
+};
+
 function requiredScopesForSkill(skillDirName) {
   if (skillDirName.startsWith('desk-')) {
     return deskRequiredScopes(skillDirName);
+  }
+  if (READ_ACTION_SCOPES[skillDirName]) {
+    return { mode: 'static', values: READ_ACTION_SCOPES[skillDirName] };
   }
   if (skillDirName === 'deal-to-estimate') {
     return {

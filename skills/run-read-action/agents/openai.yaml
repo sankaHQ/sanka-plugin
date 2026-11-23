@@ -1,0 +1,15 @@
+interface:
+  display_name: "Run Read Action"
+  short_description: "Run a Sanka read Action on the user's own HubSpot, Salesforce, Google Calendar or Gmail, as their own login, and give the result with its method. Each completed run costs the Action's Sanka Credits."
+  default_prompt: "Use $sanka:run-read-action to run a Sanka read Action on the user's own HubSpot, Salesforce, Google Calendar or Gmail, as their own login, and give the result with its method. Each completed run costs the Action's Sanka Credits."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "sanka"
+      description: "Hosted Sanka MCP server for live Sanka workflows"
+      transport: "streamable_http"
+      url: "https://mcp.sanka.com/mcp"
+
+policy:
+  allow_implicit_invocation: false

@@ -50,6 +50,7 @@ $sanka:deal-to-estimate https://app.hubspot.com/contacts/.../record/0-3/... Crea
 $sanka:list-deals Show recent deals.
 $sanka:create-expense Create an expense from this receipt.
 $sanka:desk-actions Set up a HubSpot account for mai@example.com. Show me the preview first.
+$sanka:read-actions How much open pipeline do I have in HubSpot by stage?
 $sanka:refresh
 ```
 

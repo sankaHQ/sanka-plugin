@@ -1,0 +1,15 @@
+interface:
+  display_name: "List Read Actions"
+  short_description: "List the Sanka read Actions the user can run on their own HubSpot, Salesforce, Google Calendar and Gmail, with each one's price in Sanka Credits, inputs and whether their own login is connected."
+  default_prompt: "Use $sanka:list-read-actions to list the Sanka read Actions the user can run on their own HubSpot, Salesforce, Google Calendar and Gmail, with each one's price in Sanka Credits, inputs and whether their own login is connected."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "sanka"
+      description: "Hosted Sanka MCP server for live Sanka workflows"
+      transport: "streamable_http"
+      url: "https://mcp.sanka.com/mcp"
+
+policy:
+  allow_implicit_invocation: false
