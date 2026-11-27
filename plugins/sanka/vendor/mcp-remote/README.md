@@ -2,7 +2,8 @@ Vendored from `mcp-remote@0.1.38`.
 
 Files:
 
-- `chunk-65X3S4HB.js`: copied from upstream package without local edits
+- `chunk-65X3S4HB.js`: copied from upstream by the rebuild script, then patched for Sanka
+- `scripts/mcp-remote-oauth-refresh-lock.patch`: serializes OAuth token refresh across processes sharing the same cache, reuses a token another process refreshed, and saves tokens atomically.
 - `sanka-local-file-bridge.mjs`: Sanka-specific local-client bridge for exact user-provided local expense attachment paths
 - `proxy.mjs`: based on upstream `dist/proxy.js`, patched to apply the local expense attachment bridge and to keep the client's MCP protocol version on `initialize`. Sign-in is upstream `mcp-remote` native MCP OAuth (client name "Sanka Plugin").
 - `bundled-proxy.mjs` / `bundled-proxy.cjs`: self-contained unminified rebuild artifacts kept in the source repo and omitted from the packaged plugin copy.
@@ -13,7 +14,9 @@ Patch rationale:
 - Hosted Sanka MCP is a standard MCP OAuth protected resource. On its 401 the proxy uses `mcp-remote`'s native OAuth: it registers a public client, opens Sanka's consent page, receives the code on a localhost callback and stores the tokens under `~/.mcp-auth` (or `MCP_REMOTE_CONFIG_DIR`).
 - Hosted Sanka MCP cannot read a user's local receipt PDF path directly. Local Sanka Plugin clients expose `local_file_path` on expense attachment upload tools, reads that exact file in the local proxy, and forwards the original bytes as normal hosted MCP upload arguments.
 
-Do not hand-edit the vendored chunk file or bundled artifacts. If upstream changes are needed, refresh from the tagged `mcp-remote` release, re-apply the `proxy.mjs` patch intentionally, then rebuild `bundled-proxy.cjs` and `bundled-proxy.min.cjs`.
+Do not hand-edit the vendored chunk file or bundled artifacts. If upstream changes are needed, refresh from the tagged `mcp-remote` release, review the local patches, then run `scripts/rebuild-codex-mcp-remote-vendor.sh`.
+
+Run `node scripts/test-oauth-refresh-concurrency.mjs` from the repository root to verify concurrent refresh with a local OAuth fixture. Set `SANKA_TEST_CODEX` to a Codex CLI executable to run the scenario through two app-server processes.
 
 Local attachment uploads accept regular files inside the configured upload roots
 (or the default Desktop, Documents, Downloads, Pictures, and temporary directories).
