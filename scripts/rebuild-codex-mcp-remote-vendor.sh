@@ -14,7 +14,9 @@ echo "Rebuilding vendored Codex mcp-remote bundle from mcp-remote@$VERSION"
 
 cd "$TMP_DIR"
 npm init -y >/dev/null 2>&1
-npm install "mcp-remote@$VERSION" esbuild >/dev/null 2>&1
+# Keep the existing Express diagnostics dependency when rebuilding.
+npm pkg set overrides.object-inspect=1.13.4
+npm install "mcp-remote@$VERSION" esbuild proper-lockfile@4.1.2 >/dev/null 2>&1
 
 cp "$TMP_DIR/node_modules/mcp-remote/dist/chunk-65X3S4HB.js" "$VENDOR_DIR/chunk-65X3S4HB.js"
 
@@ -49,6 +51,8 @@ if old not in source:
     raise SystemExit("Expected auth coordination SIGINT block not found in vendored chunk")
 path.write_text(source.replace(old, new, 1), encoding="utf-8")
 PY
+
+patch --batch --forward "$VENDOR_DIR/chunk-65X3S4HB.js" < "$ROOT_DIR/scripts/mcp-remote-oauth-refresh-lock.patch"
 
 mkdir -p "$TMP_DIR/src"
 cp "$VENDOR_DIR/proxy.mjs" "$TMP_DIR/src/proxy.mjs"

@@ -1,0 +1,86 @@
+--- chunk-65X3S4HB.js
++++ chunk-65X3S4HB.js
+@@ -18532,6 +18532,23 @@
+   }
+ }
+ async function auth(provider, options) {
++  if (provider.withTokenLock) {
++    return provider.withTokenLock(async () => {
++      if (options.rejectedAuthorization !== void 0) {
++        const latest = await provider.tokens();
++        const grantedScopes = (latest?.scope ?? "").split(/\s+/);
++        if (latest?.access_token &&
++          `Bearer ${latest.access_token}` !== options.rejectedAuthorization &&
++          (!options.scope || options.scope.split(/\s+/).every((scope) => grantedScopes.includes(scope)))) {
++          return "AUTHORIZED";
++        }
++      }
++      return authWithCredentialRecovery(provider, options);
++    });
++  }
++  return authWithCredentialRecovery(provider, options);
++}
++async function authWithCredentialRecovery(provider, options) {
+   try {
+     return await authInternal(provider, options);
+   } catch (error2) {
+@@ -19547,6 +19564,7 @@
+             serverUrl: this._url,
+             resourceMetadataUrl: this._resourceMetadataUrl,
+             scope: this._scope,
++            rejectedAuthorization: headers.get("authorization"),
+             fetchFn: this._fetchWithInit
+           });
+           if (result !== "AUTHORIZED") {
+@@ -19860,6 +19878,7 @@
+             serverUrl: this._url,
+             resourceMetadataUrl: this._resourceMetadataUrl,
+             scope: this._scope,
++            rejectedAuthorization: headers.get("authorization"),
+             fetchFn: this._fetchWithInit
+           });
+           if (result !== "AUTHORIZED") {
+@@ -20932,6 +20951,7 @@
+ import open from "open";
+ import { sanitizeUrl } from "strict-url-sanitise";
+ import { randomUUID } from "node:crypto";
++import oauthTokenLock from "proper-lockfile";
+ var NodeOAuthClientProvider = class {
+   /**
+    * Creates a new NodeOAuthClientProvider
+@@ -21074,6 +21094,19 @@
+     this._clientInfo = clientInformation;
+     await writeJsonFile(this.serverUrlHash, "client_info.json", clientInformation);
+   }
++  async withTokenLock(operation) {
++    await ensureConfigDir();
++    // Refresh tokens rotate server-side. Hold the lock until the replacement is on disk.
++    const release = await oauthTokenLock.lock(getConfigFilePath(this.serverUrlHash, "tokens.json"), {
++      realpath: false,
++      retries: { retries: 40, minTimeout: 100, maxTimeout: 1e3 }
++    });
++    try {
++      return await operation();
++    } finally {
++      await release();
++    }
++  }
+   /**
+    * Gets the OAuth tokens if they exist
+    * @returns The OAuth tokens or undefined
+@@ -21123,7 +21156,14 @@
+       expiresIn: `${timeLeft} seconds`,
+       expiresInValue: tokens.expires_in
+     });
+-    await writeJsonFile(this.serverUrlHash, "tokens.json", tokens);
++    const tokenPath = getConfigFilePath(this.serverUrlHash, "tokens.json");
++    const tempPath = `${tokenPath}.${randomUUID()}.tmp`;
++    try {
++      await fs.writeFile(tempPath, JSON.stringify(tokens, null, 2), { encoding: "utf-8", mode: 384, flag: "wx" });
++      await fs.rename(tempPath, tokenPath);
++    } finally {
++      await fs.rm(tempPath, { force: true });
++    }
+   }
+   /**
+    * Redirects the user to the authorization URL
